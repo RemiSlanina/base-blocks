@@ -1,0 +1,291 @@
+:root {
+  /* Light theme (default) */
+  --text-primary: #212529;
+  --text-secondary: #6c757d;
+  --bg-primary: #ffffff;
+  --bg-secondary: #f8f9fa;
+  --accent: #4a0e94; 
+  /* #3B3B88  #4a0e94*/
+  --accent-2: #0d6efd;
+  
+
+  /* BLOCK COLORS */
+  /* PRIMARY */
+  --box-dark-primary: #0B0227; 
+  --box-mid-dark-primary: #160840; 
+  --box-medium-primary: #81779E; 
+  --box-light-primary: #C1BAD5; 
+  --box-spare-primary: #3E2F6B; 
+  
+  /* SECONDARY */
+  --box-dark-secondary: #393000; 
+  --box-mid-dark-secondary: #5D4D02; 
+  --box-medium-secondary: #E6DCA6; 
+  --box-light-secondary: #FFF9DA; 
+  --box-spare-secondary: #9C8C39; 
+
+  /* TERTIARY (Teal) */
+  --box-dark-tertiary: #022727;
+  --box-mid-dark-tertiary: #084040;
+  --box-medium-tertiary: #2F6B6B;
+  --box-light-tertiary: #BAD5D5;
+
+  /* QUATERNARY (Rust) */
+  --box-dark-quaternary: #270B02;
+  --box-mid-dark-quaternary: #401608;
+  --box-medium-quaternary: #6B3E2F;
+  --box-light-quaternary: #D5C1BA;
+
+  /* QUINARY (Sage) */
+  --box-dark-quinary: #0B2702;
+  --box-mid-dark-quinary: #164008;
+  --box-medium-quinary: #3E6B2F;
+  --box-light-quinary: #BAD5BA;
+
+  /* SENARY (Burgundy) */
+  --box-dark-senary: #27020B;
+  --box-mid-dark-senary: #400816;
+  --box-medium-senary: #6B2F3E;
+  --box-light-senary: #D5BAD5;
+
+  --box-dark-disabled: #545454;
+  --box-light-disabled:#a0a0a0; 
+
+
+  /* GOLDEN RATIO VALUES */
+  --golden-ratio: 1.618;
+  --golden-minor: 0.618; /* 1 / golden-ratio */
+  --golden-major: 2.618; /* golden-ratio squared */
+
+  /* Derived values */
+  --aspect-ratio: calc(var(--golden-ratio) * 3 / 2);
+  --golden-minor-rem: calc(var(--golden-minor) * 1rem);
+  --golden-ration-boxes: calc(var(--golden-ratio) * 100px);
+
+  /* Spacing & fonts */
+  --font-main: 'Libre Franklin', sans-serif;
+  --font-heading: 'Petit Formal Script', cursive;
+  --spacing-unit: 1rem;
+  --max-width: 6rem; /* for buttons */
+}
+
+
+
+/* Dark theme via @media */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+  --text-primary: #f8f9fa;
+  --text-secondary: #adb5bd;
+  --bg-primary: #212529;
+  --bg-secondary: #343a40;
+  --accent: #b288e6;
+  }
+}
+
+[data-theme="dark"] {
+  /* Dark theme overrides */
+  --text-primary: #f8f9fa;
+  --text-secondary: #adb5bd;
+  --bg-primary: #212529;
+  --bg-secondary: #343a40;
+  --accent: #b288e6;
+}
+
+[data-theme="light"] {
+  /* Light theme overrides */
+  --text-primary: #212529;
+  --text-secondary: #6c757d;
+  --bg-primary: #ffffff;
+  --bg-secondary: #f8f9fa;
+  --accent: #4a0e94;
+}
+
+/* *********************************************** */
+
+/* ****************** BODY: ****************** */
+
+body {
+  display: grid; 
+  justify-content: center;
+  font-family: var(--font-main); 
+  background-color: var(--bg-primary); 
+  color: var(--text-primary);
+}
+.main {
+  max-width: 90dvw;
+  min-width: 20dvw;
+/*   background-color: red;
+ */}
+
+button {
+  background: var(--bg-secondary);
+  padding: var(--spacing-unit);
+  color: var(--accent);
+  aspect-ratio: var(--aspect-ratio);
+  border-radius: var(--golden-minor-rem); 
+  border: 1.4px solid var(--text-secondary); 
+}
+
+#theme-toggle {
+  position: absolute; 
+  top: var(--golden-minor-rem); 
+  right: var(--golden-minor-rem); 
+  font-size: calc(var(--golden-minor) * 1rem);
+  padding: calc(var(--golden-minor) * 1rem);
+}
+
+h1{
+  font-size: 4.236rem;
+  margin-top: var(--golden-minor-rem);
+  text-align: center; 
+}
+
+h2 {
+  font-size: 1.618rem; 
+}
+/* ****************** GRID: ****************** */
+.grid-container {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr); 
+  gap: 5px; 
+/*   grid-template-columns: 1fr calc(var(--golden-ratio) * 1fr);
+  grid-template-rows: auto auto auto;
+  justify-content: center; */
+  place-content: center;
+}
+
+/* ****************** BLOCKS: ****************** */
+
+.block {
+  text-align: center;
+  place-content: center;
+  aspect-ratio: 3/3;
+  min-width: 10svw;
+  max-width: var(--golden-ration-boxes);
+  background-color: var(--accent-2);
+/*   border: 1px solid white; */
+  color: var(--box-dark-primary); 
+  background-color: var(--box-light-primary);
+  border: 3px solid var(--box-dark-primary); 
+}
+.block:hover{
+  background-color: var(--box-medium-primary);
+  border: 3px solid var(--box-mid-dark-primary); 
+}
+/* ****************** COLORED BASES: ****************** */
+/* *************** BASE 1: *************** */
+.base1 {
+  background-color: var(--box-light-primary);
+  border: 3px solid var(--box-dark-primary); 
+} .base1:hover{
+  background-color: var(--box-medium-primary);
+  border: 3px solid var(--box-mid-dark-primary); 
+}
+/* *************** BASE 2: *************** */
+.base2 {
+  background-color: var(--box-light-secondary);
+  border: 3px solid var(--box-dark-secondary); 
+} .base2:hover{
+  background-color: var(--box-medium-secondary);
+  border: 3px solid var(--box-mid-dark-secondary); 
+}
+/* *************** BASE 3: *************** */
+.base3 {
+  background-color: var(--box-light-tertiary);
+  border: 3px solid var(--box-dark-primary); 
+} .base3:hover{
+  background-color: var(--box-medium-tertiary);
+  border: 3px solid var(--box-mid-dark-tertiary); 
+}
+/* *************** BASE 4: *************** */
+.base4 {
+  background-color: var(--box-light-quaternary);
+  border: 3px solid var(--box-dark-quaternary); 
+} .base4:hover{
+  background-color: var(--box-medium-quaternary);
+  border: 3px solid var(--box-mid-dark-quaternary); 
+}
+/* *************** BASE 5: *************** */
+.base5 {
+  background-color: var(--box-light-quinary);
+  border: 3px solid var(--box-dark-quinary); 
+} .base5:hover{
+  background-color: var(--box-medium-quinary);
+  border: 3px solid var(--box-mid-dark-quinary); 
+}
+/* *************** BASE 6: *************** */
+.base6 {
+  background-color: var(--box-light-senary);
+  border: 3px solid var(--box-dark-senary); 
+} .base6:hover{
+  background-color: var(--box-medium-senary);
+  border: 3px solid var(--box-mid-dark-senary); 
+}
+
+/* *************** DISABLE & SELECT *************** */
+
+.disabled{
+  background-color: var(--box-dark-disabled);
+  color: var(--box-light-disabled);
+  pointer-events: none;
+  opacity: 0.5;
+} 
+.disabled:hover{
+  background-color: var(--box-dark-disabled);
+  color: var(--box-light-disabled);
+}
+.selected{
+  transform: scale(114%); 
+}
+.deselected{
+  transform: scale(100%); 
+}
+/* ****************** fontface ****************** */
+
+/* TODO: Convert Libre Franklin to WOFF2 when time. */
+/* Libre Franklin - Regular (variable) */
+@font-face {
+  font-family: 'Libre Franklin';
+  src: url('./fonts/LibreFranklin-VariableFont_wght.ttf') format('truetype');
+  font-weight: 100 900; /* Supports all weights from 100 to 900 */
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Libre Franklin - Italic (variable) */
+@font-face {
+  font-family: 'Libre Franklin';
+  src: url('./fonts/LibreFranklin-Italic-VariableFont_wght.ttf') format('truetype');
+  font-weight: 100 900; /* Supports all weights from 100 to 900 */
+  font-style: italic;
+  font-display: swap;
+}
+
+/* ****************** @media ****************** */
+
+/* wrap boxes with display flex for smaller screens */
+@media (max-width: 600px) { 
+  .grid-container {
+    /* 
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+     */
+    display: flex;
+    flex-wrap: wrap; 
+    gap: 3px; /* adjust gap  */
+    justify-content: center;
+  }
+  .block {
+    min-width: 20svw; /* adjust box size */
+  }
+}
+
+/* adjust gap and box size  */
+@media (max-width: 600px) {
+  .grid-container {
+    gap: 3px;  
+  }
+  .block {
+    min-width: 20svw; 
+  }
+}
