@@ -154,9 +154,6 @@ h2 {
   justify-content: center;
   grid-template-columns: repeat(4, 1fr);
   gap: 5px;
-  /*   grid-template-columns: 1fr calc(var(--golden-ratio) * 1fr);
-  grid-template-rows: auto auto auto;
-  justify-content: center; */
   place-content: center;
   margin: 0 auto;
 }
@@ -316,10 +313,6 @@ h2 {
 /* wrap boxes with display flex for smaller screens */
 @media (max-width: 600px) {
   .grid-container {
-    /* 
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-     */
     display: flex;
     flex-wrap: wrap;
     gap: 3px; /* adjust gap  */

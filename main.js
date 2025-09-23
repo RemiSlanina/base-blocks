@@ -111,14 +111,6 @@ class BaseBlock {
     this.face = (this.face + 1) % this.systems.length;
     // Add the new class
     this.element.classList.add(this.baseClasses[this.face]);
-
-    /*  if (!firstBlock) {
-      firstBlock = this;
-    } else if (!firstBlock === this) {
-      secondBlock = this;
-      lockBoard = true;
-      checkForMatch();
-    } */
   }
   select = () => {
     console.trace();
@@ -191,30 +183,6 @@ class BaseBlock {
 // ************************ ENGINE ************************
 
 // ************************ Testing ************************
-/* 
-for (let i = 1; i <= 16; i++) {
-  // random ID
-  //let randomId = Math.floor(Math.random() * 900) + 100;
-  //TO DO : ADD SYSTEMID
-  let blockOne = new BaseBlock(Math.floor(Math.random() * 900) + 100, i, bases);
-  console.log(blockOne);
-  let blockTwo = new BaseBlock(Math.floor(Math.random() * 900) + 100, i, bases);
-  console.log(blockTwo);
-  let block = document.createElement("div");
-  block.classList.add("block");
-  grid.appendChild(block);
-  blocks.push(block);
-}
-
-const systems = [binary, decimal, hex, octal];
-let block = new BaseBlock(Math.floor(Math.random() * 900) + 100, 10, systems);
-console.log(block.currentDisplay); // "1010(2)"
-block.flip();
-console.log(block.currentDisplay); // "10(10)"
-block.flip();
-console.log(block.currentDisplay); // "a(16)" 
-
- */
 
 // Common Number Systems (for first version):
 const bin = new SystemId(1, 'BIN', '(2)', 2);
@@ -246,53 +214,12 @@ for (
   }
 }
 
-/* console.log(binary.toDisplay(10)); // "1010(2)"
-console.log(decimal.toDisplay(10)); // "10(10)"
-console.log(hex.toDisplay(10)); // "a(16)"
-console.log(octal.toDisplay(10)); // "12(8)" */
-
-// oooold code:
-
-/* 
-// An array of SystemId instances
-const systems = [bin, dec, hex, oct];
-// Each Base gets the systems-array as an argument
-// Each array item represents a face of the block = a base
-for (let i = 1; i <= 16; i++) {
-  // Create two blocks for each number
-  for (let j = 0; j < 2; j++) {
-    let block = new BaseBlock(
-      Math.floor(Math.random() * 900) + 100,
-      i,
-      systems,
-      Math.floor(Math.random() * 4) // random starting face
-    );
-    blocks.push(block);
-  }
-}
- */
-
 // Shuffle the blocks for the game
 // -0.5 to +0.5 -> negative switch element
 blocks.sort(() => Math.random() - 0.5);
 
 blocks.forEach((block) => {
   block.element.textContent = block.getCurrentDisplay();
-  /* 
-  // ****************** LEFT CLICK: ****************** 
-  block.element.addEventListener("contextmenu", (e) => {
-    e.preventDefault();
-    block.flip();
-    block.element.textContent = block.getCurrentDisplay();
-  });
-  // ****************** RIGHT CLICK: ****************** 
-  block.element.addEventListener("click", () => {
-    block.select();
-  });
- */
-  //block.element.addEventListener("click", block.select.bind(block));
-
-  //block.element.addEventListener("click", block.select);
 
   grid.appendChild(block.element);
 });
