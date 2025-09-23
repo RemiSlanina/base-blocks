@@ -13,7 +13,7 @@
   8x8
   8x10
 */
-const grid = document.querySelector(".grid-container");
+const grid = document.querySelector('.grid-container');
 const blocks = [];
 const selectedSystems = [];
 let lockBoard = false;
@@ -35,7 +35,7 @@ function checkForMatch() {
     secondBlock.disable();
     //lockBoard = false; in resetBoard (below)
     score++;
-    document.querySelector(".score").textContent = score;
+    document.querySelector('.score').textContent = score;
     console.log("It's a match!");
   } else {
     firstBlock.deselect();
@@ -86,18 +86,18 @@ class BaseBlock {
     this.face = face; // index of the current system => systemId
     this.matched = matched;
     /* for CSS manipulation:  */
-    this.baseClasses = ["base1", "base2", "base3", "base4", "base5", "base6"];
-    this.element = document.createElement("div");
-    this.element.classList.add("block", this.baseClasses[this.face]);
+    this.baseClasses = ['base1', 'base2', 'base3', 'base4', 'base5', 'base6'];
+    this.element = document.createElement('div');
+    this.element.classList.add('block', this.baseClasses[this.face]);
     this.isFirst = false;
     this.isSecond = false;
 
     /* ****************** RIGHT CLICK: ****************** */
     this.selectBound = this.select.bind(this);
-    this.element.addEventListener("click", this.selectBound);
+    this.element.addEventListener('click', this.selectBound);
 
     /* ****************** LEFT CLICK: ****************** */
-    this.element.addEventListener("contextmenu", (e) => {
+    this.element.addEventListener('contextmenu', (e) => {
       e.preventDefault();
       this.flip();
       this.element.textContent = this.getCurrentDisplay();
@@ -124,8 +124,8 @@ class BaseBlock {
   }
   select = () => {
     console.trace();
-    if (this.element.classList.contains("disabled")) {
-      console.log("Block is disabled, cannot select");
+    if (this.element.classList.contains('disabled')) {
+      console.log('Block is disabled, cannot select');
       return;
     }
     if (this === firstBlock) {
@@ -141,8 +141,8 @@ class BaseBlock {
       secondBlock = this;
       this.isSecond = true;
     }
-    this.element.classList.remove("deselected");
-    this.element.classList.add("selected");
+    this.element.classList.remove('deselected');
+    this.element.classList.add('selected');
     console.log(`selected ${this.getCurrentDisplay()}`);
 
     // at the end!!
@@ -158,20 +158,20 @@ class BaseBlock {
       secondBlock = null;
       this.isSecond = false;
     } else return;
-    this.element.classList.remove("selected");
-    this.element.classList.add("deselected");
+    this.element.classList.remove('selected');
+    this.element.classList.add('deselected');
     console.log(`deselected ${this.getCurrentDisplay()}`);
   }
   disableBypassed() {
     /* this.element.classList.remove("selected");
     this.element.classList.add("deselected"); */
     //this.deselect();
-    this.element.removeEventListener("click", this.selectBound);
+    this.element.removeEventListener('click', this.selectBound);
     this.deselect();
-    this.element.classList.add("disabled");
+    this.element.classList.add('disabled');
     console.log(`disabled ${this.getCurrentDisplay()}`);
-    console.log("After disable:", this.element.classList);
-    if (this.element.classList.contains("disabled")) {
+    console.log('After disable:', this.element.classList);
+    if (this.element.classList.contains('disabled')) {
       console.log(
         `${this.getCurrentDisplay()} is disabled after calling disable()`
       );
@@ -185,7 +185,7 @@ class BaseBlock {
     const newElement = this.element.cloneNode(true);
     this.element.parentNode.replaceChild(newElement, this.element);
     this.element = newElement;
-    this.element.classList.add("disabled");
+    this.element.classList.add('disabled');
     this.deselect();
   }
 }
@@ -219,10 +219,10 @@ console.log(block.currentDisplay); // "a(16)"
  */
 
 // Common Number Systems (for first version):
-const bin = new SystemId(1, "BIN", "(2)", 2);
-const dec = new SystemId(2, "DEC", "(10)", 10);
-const hex = new SystemId(3, "HEX", "(16)", 16);
-const oct = new SystemId(4, "OCT", "(8)", 8);
+const bin = new SystemId(1, 'BIN', '(2)', 2);
+const dec = new SystemId(2, 'DEC', '(10)', 10);
+const hex = new SystemId(3, 'HEX', '(16)', 16);
+const oct = new SystemId(4, 'OCT', '(8)', 8);
 
 // update the systems ( = bases ) the user selected:
 // const selectedSystems = ["bin", "oct", "dec", "hex"];
@@ -307,25 +307,46 @@ blocks.forEach((block) => {
 // load saved theme if there is any
 // or fall back to system preference (dark or light)
 //const savedTheme = localStorage.getItem("theme");
-if (localStorage.getItem("theme")) {
-  document.documentElement("data-theme", localStorage.getItem("theme"));
+if (localStorage.getItem('theme')) {
+  document.documentElement('data-theme', localStorage.getItem('theme'));
 }
 
 // for accessibility :
 // let the user toggle the theme manually
 // toggle theme and save preference
-document.getElementById("theme-toggle").addEventListener("click", () => {
+document.getElementById('theme-toggle').addEventListener('click', () => {
   /* e.preventDefault(); */
   //document.documentElement.classList.toggle("dark");
   document.documentElement.setAttribute(
-    "data-theme",
-    document.documentElement.getAttribute("data-theme") === "dark"
-      ? "light"
-      : "dark"
+    'data-theme',
+    document.documentElement.getAttribute('data-theme') === 'dark'
+      ? 'light'
+      : 'dark'
   );
-  document.documentElement.setAttribute("data-theme", newTheme);
-  localStorage.setItem("theme", newTheme);
+  document.documentElement.setAttribute('data-theme', newTheme);
+  localStorage.setItem('theme', newTheme);
 });
 /* 
 const currentTheme = document.documentElement.getAttribute("data-theme");
 console.log(currentTheme); // "dark" or null (if not set) */
+
+// ************************ ACCORDION ************************
+
+const accordions = document.getElementsByClassName('accordion');
+//console.log(accordions);
+
+for (let i = 0; i < accordions.length; i++) {
+  accordions[i].addEventListener('click', (e) => {
+    // button: stay active
+    e.target.classList.toggle('active');
+    // toggle accordion panels
+
+    //let panel = this.nextElementSibling;
+    let panel = e.target.nextElementSibling;
+    if (panel.style.display === 'block') {
+      panel.style.display = 'none';
+    } else {
+      panel.style.display = 'block';
+    }
+  });
+}

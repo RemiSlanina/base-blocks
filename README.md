@@ -37,7 +37,22 @@ A memory-style game where players match numbers across different number systems.
 
 ## License
 
-MIT.
+MIT for the code:
+
+- The **code** in this repository is licensed under the [MIT License](./LICENSE).
+- The **artwork, images, and design assets** are © Remi Slanina.
+
+You may:
+
+- ✅ Use or adapt the **code** freely (MIT).
+- ✅ Use the **artwork** for personal or educational purposes, with **credit**.
+- ❌ Not use the artwork or images for **commercial purposes** without explicit permission.
+
+This means:
+
+- **Developers** → free to use the code in your own projects.
+- **Artists/educators** → free to show or remix the visuals if you credit me.
+- **Companies** → please contact me before using any artwork commercially.
 
 ---
 
