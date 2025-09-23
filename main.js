@@ -30,24 +30,22 @@ function setSelectedBlocks(num) {
 }
 
 function checkForMatch() {
-  if (firstBlock.number === secondBlock.number) {
-    firstBlock.disable();
-    secondBlock.disable();
-    //lockBoard = false; in resetBoard (below)
-    score++;
-    document.querySelector('.score').textContent = score;
-    console.log("It's a match!");
-  } else {
-    firstBlock.deselect();
-    secondBlock.deselect();
-  }
-
-  //console.log(firstBlock.getCurrentDisplay());
-  //console.log(secondBlock.isSecond);
-  resetBoard();
-  //console.log(firstBlock.getCurrentDisplay());
-  //console.log(secondBlock.getCurrentDisplay());
-  // If I stop the code here, the blocks behave as they should
+  setTimeout(() => {
+    console.log('check hello');
+    if (firstBlock.number === secondBlock.number) {
+      //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+      firstBlock.disable();
+      secondBlock.disable();
+      //lockBoard = false; in resetBoard (below)
+      score++;
+      document.querySelector('.score').textContent = score;
+      console.log("It's a match!");
+    } else {
+      firstBlock.deselect();
+      secondBlock.deselect();
+    }
+    resetBoard();
+  }, 300);
 }
 
 function resetBoard() {
