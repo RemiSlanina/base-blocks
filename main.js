@@ -226,34 +226,25 @@ blocks.forEach((block) => {
 
 // ************************ Dark Mode ************************
 
-//const html = document.documentElement;
-//const toggle = document.getElementById("theme-toggle");
+// ************************ Dark Mode ************************
 
-// load saved theme if there is any
-// or fall back to system preference (dark or light)
-//const savedTheme = localStorage.getItem("theme");
-if (localStorage.getItem('theme')) {
-  document.documentElement('data-theme', localStorage.getItem('theme'));
+// Load saved theme if there is any
+const savedTheme = localStorage.getItem('theme');
+if (savedTheme) {
+  document.documentElement.setAttribute('data-theme', savedTheme);
 }
 
-// for accessibility :
-// let the user toggle the theme manually
-// toggle theme and save preference
+// Toggle theme and save preference
 document.getElementById('theme-toggle').addEventListener('click', () => {
-  /* e.preventDefault(); */
-  //document.documentElement.classList.toggle("dark");
-  document.documentElement.setAttribute(
-    'data-theme',
-    document.documentElement.getAttribute('data-theme') === 'dark'
-      ? 'light'
-      : 'dark'
-  );
+  const currentTheme = document.documentElement.getAttribute('data-theme');
+  const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+
   document.documentElement.setAttribute('data-theme', newTheme);
   localStorage.setItem('theme', newTheme);
 });
-/* 
-const currentTheme = document.documentElement.getAttribute("data-theme");
-console.log(currentTheme); // "dark" or null (if not set) */
+
+const currentTheme = document.documentElement.getAttribute('data-theme');
+console.log(currentTheme); // "dark", "light", or null
 
 // ************************ ACCORDION ************************
 

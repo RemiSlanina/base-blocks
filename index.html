@@ -12,6 +12,17 @@
 
     <h1>Base Blocks</h1>
 
+    <!-- TO-DO: 
+    ADD Dosis (font)
+    ADD interactive demo 
+    A tiny interactive demo in the accordion 
+    (e.g., click +1 in binary, watch it go 1, 10, 11, 100…). 
+    ADD white to the visuals 
+    ADD Timer Button + logic 
+    ADD Tooltipps 
+    ADD a Demo for the game (How to play)
+    -->
+
     <section class="main">
       <div class="grid-container">
         <!--     <div class="block"></div>
@@ -20,18 +31,22 @@
       <div class="block"></div>
       <div class="block"></div> -->
       </div>
-      <p>Score: <span class="score"></span></p>
-      <div class="actions">
-        <button onclick="restart()">Restart</button>
-        <br />
+      <div class="display">
+        <p>Score: <span class="score">0</span></p>
+        <div class="actions">
+          <button onclick="restart()">Restart</button>
+          <br />
+        </div>
       </div>
+
       <div>
         <p class="manual-text">
           Memory like concept - match across bases 💙 <br />
-          Find two matching values accross different number systems.
+          Find two matching values across different number systems.
         </p>
         <p><span class="thank-you-message"></span></p>
-
+      </div>
+      <div class="accordion-container">
         <button class="accordion">I guess this is math?</button>
         <div class="panel">
           <p>
@@ -40,7 +55,7 @@
           </p>
           <p>
             Flip the cubes when you are lost, and watch out for (10) -> this
-            tell you it's a the base you are used to (the decimal system).
+            tells you it's a the base you are used to (the decimal system).
           </p>
         </div>
 

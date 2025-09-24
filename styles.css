@@ -8,6 +8,7 @@
   --accent-reverse: #d3cce7;
   /* #3B3B88  #4a0e94*/
   --accent-2: #0d6efd;
+  --text-box: #343a40;
 
   /* BLOCK COLORS */
   /* PRIMARY */
@@ -116,6 +117,17 @@ body {
   max-width: var(--max-width-screen);
   min-width: 20dvw;
 }
+.display {
+  display: flex;
+  gap: 4rem;
+  place-content: center;
+  padding: 0.8rem;
+  text-align: center;
+}
+.manual-text {
+  display: flex;
+  place-content: center;
+}
 
 button {
   background: var(--bg-secondary);
@@ -128,8 +140,8 @@ button {
 
 #theme-toggle {
   position: absolute;
-  top: var(--golden-minor-rem);
-  right: var(--golden-minor-rem);
+  top: 1rem;
+  right: 1rem;
   font-size: calc(var(--golden-minor) * 1rem);
   padding: calc(var(--golden-minor) * 1rem);
 }
@@ -168,7 +180,8 @@ h2 {
   max-width: var(--golden-ration-boxes);
   background-color: var(--accent-2);
   /*   border: 1px solid white; */
-  color: var(--box-dark-primary);
+  /* color: var(--box-dark-primary); */
+  color: var(--text-box);
   font-size: 1.382rem;
   font-weight: 800;
   background-color: var(--box-light-primary);
@@ -241,6 +254,7 @@ h2 {
   color: var(--box-light-disabled);
   pointer-events: none;
   opacity: 0.5;
+  z-index: 1;
 }
 .disabled:hover {
   background-color: var(--box-dark-disabled);
@@ -248,14 +262,21 @@ h2 {
 }
 .selected {
   transform: scale(114%);
-  transition: transform 0.1s ease;
+  transition: transform 0.2s ease;
+  z-index: 10;
 }
 .deselected {
   transform: scale(100%);
-  transition: transform 0.1s ease;
+  transition: transform 0.2s ease;
+  z-index: 2;
 }
 
 /* ****************** ACCORDION: ****************** */
+
+/* .accordion-container {
+  background-color: purple;
+  border: 4px solid lime;
+} */
 
 .accordion {
   cursor: pointer;
@@ -280,14 +301,17 @@ h2 {
   overflow: hidden; 
   transition: max-height 0.2s ease-out;  */
 }
+/* ****************** IMG FIX ****************** */
+img {
+  opacity: 0.6;
+}
 /* ****************** fontface ****************** */
 
-/* TODO: Convert Libre Franklin to WOFF2 when time. */
 /* Libre Franklin - Regular (variable) */
 @font-face {
   font-family: 'Libre Franklin';
   src: url('./fonts/LibreFranklin-VariableFont_wght.ttf') format('truetype');
-  font-weight: 100 900; /* Supports all weights from 100 to 900 */
+  font-weight: 100 900;
   font-style: normal;
   font-display: swap;
 }
@@ -297,8 +321,17 @@ h2 {
   font-family: 'Libre Franklin';
   src: url('./fonts/LibreFranklin-Italic-VariableFont_wght.ttf')
     format('truetype');
-  font-weight: 100 900; /* Supports all weights from 100 to 900 */
+  font-weight: 100 900;
   font-style: italic;
+  font-display: swap;
+}
+
+/* Dosis - Regular (variable) */
+@font-face {
+  font-family: 'Dosis';
+  src: url('./fonts/Dosis-VariableFont_wght.ttf') format('truetype');
+  font-weight: 200 800;
+  font-style: normal;
   font-display: swap;
 }
 
