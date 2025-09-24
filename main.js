@@ -84,8 +84,8 @@ class BaseBlock {
     this.face = face; // index of the current system => systemId
     this.matched = matched;
     /* for CSS manipulation:  */
-    this.baseClasses = ['base1', 'base2', 'base3', 'base4', 'base5', 'base6'];
-    this.element = document.createElement('div');
+    this.baseClasses = ['base1', 'base2', 'base3', 'base4', 'base5', 'base6']; // contain color schemes for bin, dec...
+    this.element = document.createElement('div'); // create the parent div for the block
     this.element.classList.add('block', this.baseClasses[this.face]);
     this.isFirst = false;
     this.isSecond = false;
