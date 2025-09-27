@@ -11,7 +11,7 @@
 
   /* BLOCKS */
   --text-box: #343a40;
-  --block-size: 64px;
+  --block-size: 160px;
 
   /* BLOCK COLORS */
   /* PRIMARY */
@@ -109,10 +109,11 @@
 
 /* ****************** BODY: ****************** */
 
+/* 
 * {
   border: 1px solid blue;
 }
-
+ */
 body {
   display: grid;
   justify-content: center;
@@ -165,13 +166,22 @@ h2 {
 /* ****************** GRID: ****************** */
 .grid-container {
   display: grid;
+
+  /* display: flex;
+  flex-basis: var(--block-size);
+  flex-wrap: wrap; */
   width: fit-content;
   max-width: var(
     --max-width-screen,
     90vw
   ); /* fall back to 90vw if the variable with 90dvw fails */
   justify-content: center;
-  grid-template-columns: repeat(4, 1fr);
+  /* grid-template-columns: repeat(4, 1fr); */
+  /* grid-template-columns: repeat(auto-fit, minmax(80px, 1fr)); */
+  /*   grid-template-columns: repeat(auto-fit, minmax(var(--block-size), 1fr));
+ */
+  /* grid-template-columns: repeat(6, 1fr); */
+  grid-template-columns: repeat(auto-fill, var(--block-size));
   gap: 5px;
   place-content: center;
   margin: 0 auto;
@@ -184,28 +194,32 @@ h2 {
   text-align: center;
   place-content: center;
   /* 
+  width: 10vw;
   aspect-ratio: 3/3;
+ */
+  /* 
   min-width: 10svw;
-  max-width: var(--golden-ration-boxes);
-   */
-  background-color: var(--accent-2);
-  /*   border: 1px solid white; */
+  max-width: var(--golden-ration-boxes); */
+
+  /*   background-color: var(--accent-2);
+ */ /*   border: 1px solid white; */
   /* color: var(--box-dark-primary); */
   color: var(--text-box);
   font-size: 1.382rem;
   font-weight: 800;
-  background-color: var(--box-light-primary);
-  border: 3px solid var(--box-dark-primary);
+  /* background-color: var(--box-light-primary); */
+  /*   border: 3px solid var(--box-dark-primary);
+ */
   position: relative;
   width: var(--block-size);
   height: var(--block-size);
   transform-style: preserve-3d;
   transition: transform 0.2s ease;
 }
-.block:hover {
+/* .block:hover {
   background-color: var(--box-medium-primary);
   border: 3px solid var(--box-mid-dark-primary);
-}
+} */
 
 .face {
   position: absolute;
@@ -215,9 +229,8 @@ h2 {
   justify-content: center;
   backface-visibility: hidden;
   /* for testing purposes */
-
-  background: rgba(100, 150, 250, 0.9);
-  border: 2px solid #fff;
+  /* background: rgba(100, 150, 250, 0.9); */
+  /* border: 2px solid #fff; */
 }
 
 .face-0 {
@@ -234,56 +247,56 @@ h2 {
 }
 /* ****************** COLORED BASES: ****************** */
 /* *************** BASE 1: *************** */
-.face.base-color-1 {
+.base-color-1 {
   background-color: var(--box-light-primary);
   border: 3px solid var(--box-dark-primary);
 }
-.face.base-color-1:hover {
+.base-color-1:hover {
   background-color: var(--box-medium-primary);
   border: 3px solid var(--box-mid-dark-primary);
 }
 /* *************** BASE 2: *************** */
-.face.base-color-2 {
+.base-color-2 {
   background-color: var(--box-light-secondary);
   border: 3px solid var(--box-dark-secondary);
 }
-.face.base-color-2:hover {
+.base-color-2:hover {
   background-color: var(--box-medium-secondary);
   border: 3px solid var(--box-mid-dark-secondary);
 }
 /* *************** BASE 3: *************** */
-.face.base-color-3 {
+.base-color-3 {
   background-color: var(--box-light-tertiary);
   border: 3px solid var(--box-dark-primary);
 }
-.face.base-color-3:hover {
+.base-color-3:hover {
   background-color: var(--box-medium-tertiary);
   border: 3px solid var(--box-mid-dark-tertiary);
 }
 /* *************** BASE 4: *************** */
-.face.base-color-4 {
+.base-color-4 {
   background-color: var(--box-light-quaternary);
   border: 3px solid var(--box-dark-quaternary);
 }
-.face.base-color-4:hover {
+.base-color-4:hover {
   background-color: var(--box-medium-quaternary);
   border: 3px solid var(--box-mid-dark-quaternary);
 }
 /* *************** BASE 5: *************** */
-.face.base-color-5 {
+.base-color-5 {
   background-color: var(--box-light-quinary);
   border: 3px solid var(--box-dark-quinary);
 }
-.face.base-color-5:hover {
+.base-color-5:hover {
   background-color: var(--box-medium-quinary);
   border: 3px solid var(--box-mid-dark-quinary);
 }
 /* *************** BASE 6: *************** */
-.face.base-color-6 {
+.base-color-6 {
   background-color: var(--box-light-senary);
   border: 3px solid var(--box-dark-senary);
 }
-.face.base-color-6:hover {
+.base-color-6:hover {
   background-color: var(--box-medium-senary);
   border: 3px solid var(--box-mid-dark-senary);
 }
@@ -376,29 +389,36 @@ img {
   font-display: swap;
 }
 
+/* debug first */
 /* ****************** @media ****************** */
-
+/* 
 @media (max-width: 960px) {
-  .block {
-    min-width: 15svw;
+  :root {
+    --block-size: 100px;
   }
-}
 
+}
+ */
 /* wrap boxes with display flex for smaller screens */
+/* 
 @media (max-width: 600px) {
   .grid-container {
     display: flex;
     flex-wrap: wrap;
-    gap: 3px; /* adjust gap  */
+    gap: 3px; 
     justify-content: center;
   }
   .block {
-    min-width: 20svw; /* adjust box size */
+    min-width: 20svw; 
   }
 }
-
+ */
 /* adjust gap and box size  */
+/* 
 @media (max-width: 600px) {
+  :root {
+    --block-size: 80px;
+  }
   .grid-container {
     gap: 3px;
   }
@@ -406,3 +426,4 @@ img {
     min-width: 20svw;
   }
 }
+ */

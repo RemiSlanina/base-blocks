@@ -6,6 +6,8 @@ numbers across bases by clicking on them.
 // ************************ VARS ************************
 //const bases = ["bin", "oct", "dec", "hex"];
 
+/* const { act } = require('react');
+ */
 /* 
   ALLOWED SET SIZES for match 2: 
   2x2
@@ -23,7 +25,7 @@ let lockBoard = false;
 let score = 0;
 let time = 0;
 let startingRange = 1;
-let setSize = 16; // number of blocks, must be even
+let setSize = 24; // number of blocks, must be even
 let numberOfMatches = 2;
 let firstBlock, secondBlock;
 
@@ -51,11 +53,7 @@ function checkForMatch() {
 }
 
 function resetBoard() {
-  //console.log(firstBlock.isSecond);
-  //console.log(secondBlock.isSecond);
-  //firstBlock.isFirst = false;
   firstBlock = null;
-  //secondBlock.isFirst = false;
   secondBlock = null;
   lockBoard = false;
 }
@@ -66,12 +64,6 @@ function resetBoard() {
 
 /* manages a base that can be reused by different numbers throughout the puzzle */
 class SystemId {
-  /* Constructor Parameters: 
-    id : random id, unrelated to system, f.e. 1 for binary, 2 for hex, ...,
-    label : a short expressive label like "BIN" or "DEC" (or "")
-    badge : the suffix for the number, like (2) or (10)...,
-    base = 0 : the CURRENT base 
-     */
   constructor(id, base, badge, label) {
     this.id = id; // e.g., 1 for binary, 2 for decimal, etc.
     this.label = label; // e.g., "BIN", "DEC"
@@ -98,20 +90,20 @@ class BaseBlock {
     id :  integer value representing an ID,
     number : integer value representing the number of the cube,
     systems : systems = an Array [] of SystemIds  ,
-    face = 0 : the index of the current face  ,
-    matched = false : has this cube been matched  */
+    activeFaceIndex = 0 : the index of the current face  ,
+    matched = false : has this cube been matched  
+  */
   constructor(
     id,
     number,
     systems /* systems = SystemId [] */,
-    face = 0 /* current face */,
+    activeFaceIndex = 0 /* current face */,
     matched = false
   ) {
     this.id = id;
-    this.number = number; // the actual value (e.g., 10)
-    this.systems = systems; // assume 4 systems for now (front/right/back/left)
-    // index of the current system => systemId
-    this.face = face; // 0..3 (front=0, right=1, back=2, left=3)
+    this.number = number;
+    this.systems = systems;
+    this.activeFaceIndex = activeFaceIndex; // 0..3 (front=0, right=1, back=2, left=3)
     this.isFirst = false;
     this.isSecond = false;
     this.matched = matched;
@@ -125,13 +117,12 @@ class BaseBlock {
       'base-color-4',
       'base-color-5',
       'base-color-6',
-    ]; // contain color schemes for bin, dec...
+    ];
     this.element = document.createElement('div'); // the cube
-    //this.element.classList.add('block', this.baseColorClasses[this.face]);
+    this.element.classList.add('block');
 
-    // the faces in CSS (4 for now)
     this.faces = [];
-    const faceCount = Math.min(systems.length, 4); // 4 or more / 4-6(?) faces
+    const faceCount = Math.min(systems.length, 4);
     for (let i = 0; i < faceCount; i++) {
       const faceElement = document.createElement('div');
       faceElement.classList.add('face', `face-${i}`, this.baseColorClasses[i]);
@@ -148,9 +139,9 @@ class BaseBlock {
     /* ****************** RIGHT CLICK: ****************** */
     // right click = flip cube
     this.element.addEventListener('contextmenu', (e) => {
+      console.log('context-menu click');
       e.preventDefault();
       this.flip();
-      //this.element.textContent = this.getCurrentDisplay();
     });
 
     // initial rotation
@@ -159,36 +150,32 @@ class BaseBlock {
 
   /* ****************** BB METHODS: ****************** */
 
-  // get the Display for ANY face of the cube
+  // get the Display for ANY face
   getDisplayFor(i) {
     return this.systems[i].toDisplay(this.number);
   }
 
-  // get the display for the CURRENTLY SHOWN face of the cube
+  // get the display for the CURRENTLY SHOWN face
   getCurrentDisplay() {
-    return this.getDisplayFor(this.face);
-    //older code:
-    //return this.systems[this.face].toDisplay(this.number);
+    return this.getDisplayFor(this.activeFaceIndex);
   }
+
   flip() {
-    /*   // Remove the old class
-    this.element.classList.remove(this.baseColorClasses[this.face]);
-    // Update the face index (cycle back to 0 if at the end)
-    this.face = (this.face + 1) % this.systems.length;
-    // Add the new class
-    this.element.classList.add(this.baseColorClasses[this.face]); */
-
-    this.face = (this.face + 1) % this.systems.length;
+    console.log(
+      `right cl + ${this.activeFaceIndex} + ${
+        this.systems[this.activeFaceIndex].label
+      }`
+    );
+    this.activeFaceIndex = (this.activeFaceIndex + 1) % this.systems.length;
+    this.updateRotation();
+    console.log(this.faces[this.activeFaceIndex]);
   }
 
-  // Rotate the cube container
-  // -90° steps
   updateRotation() {
-    const deg = -90 * this.face;
+    const deg = -90 * this.activeFaceIndex;
     this.element.style.transform = `rotateY(${deg}deg)`;
   }
 
-  // called if number or systems change
   rerender() {
     this.faces.forEach((f, i) => {
       f.textContent = this.getDisplayFor(i);
@@ -218,11 +205,11 @@ class BaseBlock {
     this.element.classList.add('selected');
     console.log(`selected ${this.getCurrentDisplay()}`);
 
-    // at the end!!
     if (secondBlock) {
       checkForMatch();
     }
   };
+
   deselect() {
     if (this.isFirst) {
       firstBlock = null;
@@ -235,26 +222,15 @@ class BaseBlock {
     this.element.classList.add('deselected');
     console.log(`deselected ${this.getCurrentDisplay()}`);
   }
+
   disableBypassed() {
-    /* this.element.classList.remove("selected");
-    this.element.classList.add("deselected"); */
-    //this.deselect();
     this.element.removeEventListener('click', this.selectBound);
     this.deselect();
     this.element.classList.add('disabled');
     console.log(`disabled ${this.getCurrentDisplay()}`);
-    console.log('After disable:', this.element.classList);
-    if (this.element.classList.contains('disabled')) {
-      console.log(
-        `${this.getCurrentDisplay()} is disabled after calling disable()`
-      );
-      return;
-    }
   }
 
-  // FOR TROUBLESHOOTING:
   disable() {
-    // Clone the element to remove all listeners (nuclear option)
     const newElement = this.element.cloneNode(true);
     this.element.parentNode.replaceChild(newElement, this.element);
     this.element = newElement;
@@ -266,20 +242,15 @@ class BaseBlock {
 // ************************ ENGINE ************************
 
 // create 4 systems and push them to selectedSystems []
-
 // Common Number Systems (for first version):
+
 const bin = new SystemId(1, 2, '(2)', 'BIN');
 const dec = new SystemId(2, 10, '(10)', 'DEC');
 const hex = new SystemId(3, 16, '(16)', 'HEX');
 const oct = new SystemId(4, 8, '(8)', 'OCT');
-// update the systems ( = bases ) the user selected:
-// const selectedSystems = ["bin", "oct", "dec", "hex"];
-selectedSystems.push(bin);
-selectedSystems.push(dec);
-selectedSystems.push(hex);
-selectedSystems.push(oct);
 
-// lets say the user selects 4 bases: bin, oct, dec, hex
+selectedSystems.push(bin, dec, hex, oct);
+
 for (
   let i = startingRange;
   i < setSize / numberOfMatches + startingRange;
@@ -301,7 +272,7 @@ for (
 blocks.sort(() => Math.random() - 0.5);
 
 blocks.forEach((block) => {
-  block.element.textContent = block.getCurrentDisplay();
+  //block.element.textContent = block.getCurrentDisplay();
   grid.appendChild(block.element);
 });
 
