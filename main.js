@@ -131,6 +131,20 @@ class BaseBlock {
       this.faces.push(faceElement);
     }
 
+    // pretty tops and bottoms
+    const faceElementTop = document.createElement('div');
+    faceElementTop.classList.add('face', 'face-top', 'base-top-bottom-color-1');
+    this.element.appendChild(faceElementTop);
+    //this.faces.push(faceElementTop); // should I really push them?
+    const faceElementBottom = document.createElement('div');
+    faceElementBottom.classList.add(
+      'face',
+      'face-bottom',
+      'base-top-bottom-color-1'
+    );
+    this.element.appendChild(faceElementBottom);
+    //this.faces.push(faceElementBottom); // should I really push them?
+
     /* ****************** LEFT CLICK: ****************** */
     // left click = select
     this.selectBound = this.select.bind(this);
