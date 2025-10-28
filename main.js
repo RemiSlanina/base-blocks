@@ -24,7 +24,7 @@ const selectedSystems = [];
 let lockBoard = false;
 let score = 0;
 let time = 0;
-let startingRange = 1;
+let startingRange = 10;
 let setSize = 24; // number of blocks, must be even
 let numberOfMatches = 2;
 let firstBlock, secondBlock;
