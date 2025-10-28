@@ -1,27 +1,18 @@
-//import { nanoid } from "nanoid"; // generate IDs
 
+/* The main functionality for base-blocks, a memory like game 
+   for matching across bases 
+   written in pure vanilla js 
+   */
 // ************************ VARS ************************
-//const bases = ["bin", "oct", "dec", "hex"];
 
-/* 
-  ALLOWED SET SIZES for match 2: 
-  2x2
-  4x4
-  4x5
-  4x6
-  6x6
-  8x8
-  8x10
-*/
-
-// ****************************** Vars ******************************
 const grid = document.querySelector('.grid-container'); 
 const selectedSystems = []; 
 let trackFlips = true; 
-let flipCount = 0;
+let flipCountGlobal = 0;
 const restartButton = document.getElementById('restart-button');
 let lockBoard = false;
 let score = 0;
+let matchesFound = 0;
 let time = 0;
 const blocks = [];
 let startingRange = 10;
@@ -64,6 +55,7 @@ class BaseBlock {
     this.systems = systems; // array of SystemId objects
     this.face = face; // index of the current system => systemId
     this.matched = matched;
+    this.flipCount = 0;
     /* for CSS manipulation:  */
     this.baseClasses = ['base1', 'base2', 'base3', 'base4', 'base5', 'base6'];
     this.element = document.createElement('div');
@@ -91,19 +83,26 @@ class BaseBlock {
     return this.systems[this.face].toDisplay(this.number);
   }
   flip() {
+    this.flipCount++;
+    flipCountGlobal++;
     // Remove the old class
     this.element.classList.remove(this.baseClasses[this.face]);
     // Update the face index (cycle back to 0 if at the end)
     this.face = (this.face + 1) % this.systems.length;
     // Add the new class
     this.element.classList.add(this.baseClasses[this.face]);
-    // you pay for flipping with socre penalty: 
-    //score--; // Penalty for flipping
-    // In BaseBlock.flip():
+    // you pay for flipping with score penalty:
+
     if (trackFlips) {
       score = Math.max(0, score - 1); // Penalty for flipping
     }
     document.querySelector('.score').textContent = score;
+    if (this.flipCount > 5) {
+      console.log(`Block ID ${this.id} has been flipped ${this.flipCount} times.`);
+      console.log(`Global flip count is ${flipCountGlobal}.`);  
+      console.log('Consider strategizing your flips to minimize penalties.');
+      console.log('Need help? Nudge Remi to add tips! Thanks :)'); 
+    }
   }
   select = () => {
     //console.trace();
@@ -126,7 +125,6 @@ class BaseBlock {
     }
     this.element.classList.remove('deselected');
     this.element.classList.add('selected');
-    //.log(`selected ${this.getCurrentDisplay()}`);
 
     // at the end!!
     if (secondBlock) {
@@ -143,27 +141,18 @@ class BaseBlock {
     } else return;
     this.element.classList.remove('selected');
     this.element.classList.add('deselected');
-    //.log(`deselected ${this.getCurrentDisplay()}`);
   }
   disableBypassed() {
-    /* this.element.classList.remove("selected");
-    this.element.classList.add("deselected"); */
-    //this.deselect();
+
     this.element.removeEventListener('click', this.selectBound);
     this.deselect();
     this.element.classList.add('disabled');
-    //console.log(`disabled ${this.getCurrentDisplay()}`);
-    //console.log('After disable:', this.element.classList);
     if (this.element.classList.contains('disabled')) {
-      //console.log(
-      //  `${this.getCurrentDisplay()} is disabled after calling disable()`
-      //);
       return;
     }
   }
   // FOR TROUBLESHOOTING:
   disable() {
-    // Clone the element to remove all listeners (nuclear option)
     const newElement = this.element.cloneNode(true);
     this.element.parentNode.replaceChild(newElement, this.element);
     this.element = newElement;
@@ -200,18 +189,12 @@ for (let j = 0; j < this.matches; j++) {
     //.log(`debuggger value: ${debucgger} for number: ${i} match: ${j}`);
     debucgger++;
   }
-      // const number = this.startRange + i;
-     // const systems = this.createNumberSystems(number);
-     // const block = new BaseBlock(i, number, systems);
-      //this.blocks.push(block);
-      //this.block.generateInterface();
     }
 
       this.shuffleBlocks();
 
     // generate blocks interface
       this.blocks.forEach((block) => {  
-        //.log(block);
         block.generateInterface();
       });
   }
@@ -237,8 +220,41 @@ for (let j = 0; j < this.matches; j++) {
 
 // ************************ ENGINE ************************ 
 
+function checkWin() {
+  // TO-DO: implement win check
+  console.log('Checking for win condition...');
+  if (matchesFound === setSize / numberOfMatches) {
+    // check if all blocks got the same base facing up?? 
+    // then someone probably cheated :) 
+
+    // implement cheat detection here later
+
+    const unmatchedBlocks = blocks.filter(block => !block.matched); 
+    const firstBase = unmatchedBlocks[0]?.face; 
+    const allSameBase = unmatchedBlocks.every(block => block.face === firstBase);
+
+    if (allSameBase) {
+      console.log('All blocks are facing the same base! Possible cheating detected. Or player confused? Implement better instructions?');
+      confetti({ particleCount: 100, spread: 50, colors: ['#363636ff', '#888888ff', '#c5c5c5ff'] }); // Shame confetti
+      alert('Nice, but all unmatched blocks are facing the same base. Try matching different bases!');
+      return;
+    }
+
+    console.log('You win!');
+    // Trigger confetti animation
+    confetti({
+      particleCount: 200,
+      spread: 70,
+      origin: { y: 0.6 }
+    });
+    // more celebration or win message here
+    //const thankYouMessage = document.querySelector('.thank-you-message');
+    //thankYouMessage.textContent = '🎉 Congratulations! You matched all blocks! 🎉';
+  }
+  }
+
 function restart() {
-  // TO-DO: implement restart
+  // restart the game
   console.log('Restarting the game...');
   // Clear existing blocks from the grid
   grid.innerHTML = '';
@@ -254,13 +270,14 @@ function checkForMatch() {
   setTimeout(() => {
     console.log('check hello');
     if (firstBlock.number === secondBlock.number) {
-      //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
       firstBlock.disable();
       secondBlock.disable();
       //lockBoard = false; in resetBoard (below)
       score += numberOfMatches * 20; // Reward for a match
+      matchesFound++;
       document.querySelector('.score').textContent = score;
       console.log("It's a match!");
+      checkWin();
     } else {
       firstBlock.deselect();
       secondBlock.deselect();
@@ -270,11 +287,7 @@ function checkForMatch() {
 }
 
 function resetBoard() {
-  //console.log(firstBlock.isSecond);
-  //console.log(secondBlock.isSecond);
-  //firstBlock.isFirst = false;
   firstBlock = null;
-  //secondBlock.isFirst = false;
   secondBlock = null;
   lockBoard = false;
 }
@@ -295,41 +308,6 @@ selectedSystems.push(hex);
 selectedSystems.push(oct);
 
 const blockSet = new BlockSet(setSize, numberOfMatches, startingRange, selectedSystems); 
-
-
-/* 
-// lets say the user selects 4 bases: bin, oct, dec, hex
-for (
-  let i = startingRange;
-  i < setSize / numberOfMatches + startingRange;
-  i++
-) {
-  for (let j = 0; j < numberOfMatches; j++) {
-    let block = new BaseBlock(
-      Math.floor(Math.random() * 900) + 100,
-      i,
-      selectedSystems,
-      Math.floor(Math.random() * selectedSystems.length)
-    );
-    blocks.push(block);
-  }
-}
-
-// Shuffle the blocks for the game
-// -0.5 to +0.5 -> negative switch element
-blocks.sort(() => Math.random() - 0.5);
-
-blocks.forEach((block) => {
-  //block.element.textContent = block.getCurrentDisplay();
-  //grid.appendChild(block.element);
-  block.generateInterface();
-});
-
- */ 
-
-//const blockSet = new BlockSet(setSize, numberOfMatches, startingRange, selectedSystems); 
-// blockSet.createBlocks(); 
-
 // ************************ Dark Mode ************************
 
 // ************************ Dark Mode ************************
