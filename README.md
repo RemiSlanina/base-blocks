@@ -4,7 +4,7 @@ A memory-style game where players match numbers across different number systems.
 
 > WIP (WORK IN PROGRESS)
 
-![Screenshot 1](assets/screenshots/Screenshot-1-WIP.png)
+[![Screenshot 1](assets/screenshots/Screenshot-1-WIP.png)](https://base-blocks.vercel.app/)
 
 ## Features
 
@@ -20,6 +20,14 @@ A memory-style game where players match numbers across different number systems.
 4. Match all blocks to win!
 
 ## Setup
+
+1. Visit 
+    ```
+   https://base-blocks.vercel.app/
+    ```
+2. Play. 
+
+or: 
 
 1. Clone this repo:
    ```bash
@@ -56,4 +64,4 @@ This means:
 
 ---
 
-Thank you for visiting.
+Thank you for visiting. Have fun playing :) 
