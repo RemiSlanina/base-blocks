@@ -39,18 +39,23 @@
     </section>
 
     <aside>
+      <p>Game Controls not currently working</p>
+      <p>Reminder: Please add functionality for game controls</p>
       <form action="game-controls">
         <fieldset>
           <legend>Game Controls</legend>
 
           <!-- choose starting number -->
-          <label for="starting-range">Starting:</label>
+
+          <label for="starting-range"
+            >Starting: <span id="starting-range-output"></span
+          ></label>
           <input
             type="range"
             id="starting-range"
             name="starting-range"
             min="1"
-            max="1000"
+            max="100"
             value="8"
             class="slider"
           />

@@ -12,6 +12,8 @@ const restartButton = document.getElementById('restart-button');
 const startGameButton = document.getElementById('start-game-button');
 let startingRange =
   document.getElementById('starting-range').valueAsNumber || 10;
+let startingRangeOutput = document.getElementById('starting-range-output');
+startingRangeOutput.textContent = startingRange;
 let numberOfBases = document.getElementById('bases-count').valueAsNumber || 2;
 let lockBoard = false;
 let score = 0;
@@ -23,22 +25,15 @@ let setSize = 16; // number of blocks, must be even
 let numberOfMatches =
   document.getElementById('matches-count').valueAsNumber || 2;
 let firstBlock, secondBlock;
+const slider = document.getElementById('starting-range');
+// Update the current slider value (each time you drag the slider)
+slider.oninput = function () {
+  startingRangeOutput.textContent = this.value;
+};
+// Set initial output
 
 restartButton.addEventListener('click', restart);
 startGameButton.addEventListener('click', startGame);
-
-function startGame() {
-  // get user settings
-  startingRange = document.getElementById('starting-range').valueAsNumber || 10;
-  numberOfBases = document.getElementById('bases-count').valueAsNumber || 2;
-  numberOfMatches = document.getElementById('matches-count').valueAsNumber || 2;
-
-  console.log(
-    `Starting game with range: ${startingRange}, bases: ${numberOfBases}, matches: ${numberOfMatches}`
-  );
-  // restart the game with new settings
-  restart();
-}
 
 // ****************************** Helper Functions ******************************
 
@@ -239,6 +234,20 @@ class BlockSet {
 }
 
 // ************************ ENGINE ************************
+
+/* startGame with user settings */
+function startGame() {
+  // get user settings
+  startingRange = document.getElementById('starting-range').valueAsNumber || 10;
+  numberOfBases = document.getElementById('bases-count').valueAsNumber || 2;
+  numberOfMatches = document.getElementById('matches-count').valueAsNumber || 2;
+
+  console.log(
+    `Starting game with range: ${startingRange}, bases: ${numberOfBases}, matches: ${numberOfMatches}`
+  );
+  // restart the game with new settings
+  restart();
+}
 
 function checkWin() {
   // TO-DO: implement win check

@@ -381,6 +381,7 @@ img {
   }
   .block {
     min-width: 20svw; /* adjust box size */
+    font-size: 1rem;
   }
 }
 
