@@ -1,34 +1,51 @@
-
 /* The main functionality for base-blocks, a memory like game 
    for matching across bases 
    written in pure vanilla js 
    */
 // ************************ VARS ************************
 
-const grid = document.querySelector('.grid-container'); 
-const selectedSystems = []; 
-let trackFlips = true; 
+const grid = document.querySelector('.grid-container');
+const selectedSystems = [];
+let trackFlips = true;
 let flipCountGlobal = 0;
 const restartButton = document.getElementById('restart-button');
+const startGameButton = document.getElementById('start-game-button');
+let startingRange =
+  document.getElementById('starting-range').valueAsNumber || 10;
+let numberOfBases = document.getElementById('bases-count').valueAsNumber || 2;
 let lockBoard = false;
 let score = 0;
 let matchesFound = 0;
 let time = 0;
 const blocks = [];
-let startingRange = 10;
+//let startingRange = 10;
 let setSize = 16; // number of blocks, must be even
-let numberOfMatches = 2;
-let firstBlock, secondBlock; 
-
+let numberOfMatches =
+  document.getElementById('matches-count').valueAsNumber || 2;
+let firstBlock, secondBlock;
 
 restartButton.addEventListener('click', restart);
+startGameButton.addEventListener('click', startGame);
+
+function startGame() {
+  // get user settings
+  startingRange = document.getElementById('starting-range').valueAsNumber || 10;
+  numberOfBases = document.getElementById('bases-count').valueAsNumber || 2;
+  numberOfMatches = document.getElementById('matches-count').valueAsNumber || 2;
+
+  console.log(
+    `Starting game with range: ${startingRange}, bases: ${numberOfBases}, matches: ${numberOfMatches}`
+  );
+  // restart the game with new settings
+  restart();
+}
+
 // ****************************** Helper Functions ******************************
 
 // TO-DOs
 function setSelectedBlocks(num) {
-  // TO-DO: variable blocks instead of firstBlock, secondBlock 
-} 
-
+  // TO-DO: variable blocks instead of firstBlock, secondBlock
+}
 
 // ****************************** Classes ******************************
 
@@ -74,10 +91,10 @@ class BaseBlock {
       this.element.textContent = this.getCurrentDisplay();
     });
   }
-  generateInterface(){
-  this.element.textContent = this.getCurrentDisplay();
-  grid.appendChild(this.element);
-  this.element.title = "Right-click to flip the block";
+  generateInterface() {
+    this.element.textContent = this.getCurrentDisplay();
+    grid.appendChild(this.element);
+    this.element.title = 'Right-click to flip the block';
   }
   getCurrentDisplay() {
     return this.systems[this.face].toDisplay(this.number);
@@ -98,10 +115,12 @@ class BaseBlock {
     }
     document.querySelector('.score').textContent = score;
     if (this.flipCount > 5) {
-      console.log(`Block ID ${this.id} has been flipped ${this.flipCount} times.`);
-      console.log(`Global flip count is ${flipCountGlobal}.`);  
+      console.log(
+        `Block ID ${this.id} has been flipped ${this.flipCount} times.`
+      );
+      console.log(`Global flip count is ${flipCountGlobal}.`);
       console.log('Consider strategizing your flips to minimize penalties.');
-      console.log('Need help? Nudge Remi to add tips! Thanks :)'); 
+      console.log('Need help? Nudge Remi to add tips! Thanks :)');
     }
   }
   select = () => {
@@ -143,7 +162,6 @@ class BaseBlock {
     this.element.classList.add('deselected');
   }
   disableBypassed() {
-
     this.element.removeEventListener('click', this.selectBound);
     this.deselect();
     this.element.classList.add('disabled');
@@ -161,42 +179,45 @@ class BaseBlock {
   }
 }
 
-
-// ****************** BlockSet ****************** 
+// ****************** BlockSet ******************
 class BlockSet {
   constructor(size, matches, startingRange, systemIds) {
     this.size = size || 16; // total number of blocks
     this.matches = matches || 2; // number of matches per group
     this.startingRange = startingRange || 12; // starting range for numbers
     this.blocks = [];
-    this.systemIds = systemIds || this.createDefaultSystems(); 
+    this.systemIds = systemIds || this.createDefaultSystems();
     this.createBlocks();
     this.selectedBlocks = [];
   }
 
   createBlocks() {
-    let debucgger = 0; 
+    let debucgger = 0;
     //create blocks
-    for (let i = this.startingRange;i < (this.size / this.matches) + this.startingRange; i++) {
-for (let j = 0; j < this.matches; j++) {
-    let block = new BaseBlock(
-      Math.floor(Math.random() * 900) + 100,
-      i,
-      selectedSystems,
-      Math.floor(Math.random() * selectedSystems.length)
-    );
-    this.blocks.push(block); 
-    //.log(`debuggger value: ${debucgger} for number: ${i} match: ${j}`);
-    debucgger++;
-  }
+    for (
+      let i = this.startingRange;
+      i < this.size / this.matches + this.startingRange;
+      i++
+    ) {
+      for (let j = 0; j < this.matches; j++) {
+        let block = new BaseBlock(
+          Math.floor(Math.random() * 900) + 100,
+          i,
+          selectedSystems,
+          Math.floor(Math.random() * selectedSystems.length)
+        );
+        this.blocks.push(block);
+        //.log(`debuggger value: ${debucgger} for number: ${i} match: ${j}`);
+        debucgger++;
+      }
     }
 
-      this.shuffleBlocks();
+    this.shuffleBlocks();
 
     // generate blocks interface
-      this.blocks.forEach((block) => {  
-        block.generateInterface();
-      });
+    this.blocks.forEach((block) => {
+      block.generateInterface();
+    });
   }
 
   shuffleBlocks() {
@@ -209,34 +230,43 @@ for (let j = 0; j < this.matches; j++) {
 
   createDefaultSystems(number) {
     return [
-      new SystemId(1, "BIN", "(2)", 2),
-      new SystemId(2, "OCT", "(8)", 8),
-      new SystemId(3, "DEC", "(10)", 10),
-      new SystemId(4, "HEX", "(16)", 16),
+      new SystemId(1, 'BIN', '(2)', 2),
+      new SystemId(2, 'OCT', '(8)', 8),
+      new SystemId(3, 'DEC', '(10)', 10),
+      new SystemId(4, 'HEX', '(16)', 16),
     ];
   }
 }
 
-
-// ************************ ENGINE ************************ 
+// ************************ ENGINE ************************
 
 function checkWin() {
   // TO-DO: implement win check
   console.log('Checking for win condition...');
   if (matchesFound === setSize / numberOfMatches) {
-    // check if all blocks got the same base facing up?? 
-    // then someone probably cheated :) 
+    // check if all blocks got the same base facing up??
+    // then someone probably cheated :)
 
     // implement cheat detection here later
 
-    const unmatchedBlocks = blocks.filter(block => !block.matched); 
-    const firstBase = unmatchedBlocks[0]?.face; 
-    const allSameBase = unmatchedBlocks.every(block => block.face === firstBase);
+    const unmatchedBlocks = blocks.filter((block) => !block.matched);
+    const firstBase = unmatchedBlocks[0]?.face;
+    const allSameBase = unmatchedBlocks.every(
+      (block) => block.face === firstBase
+    );
 
     if (allSameBase) {
-      console.log('All blocks are facing the same base! Possible cheating detected. Or player confused? Implement better instructions?');
-      confetti({ particleCount: 100, spread: 50, colors: ['#363636ff', '#888888ff', '#c5c5c5ff'] }); // Shame confetti
-      alert('Nice, but all unmatched blocks are facing the same base. Try matching different bases!');
+      console.log(
+        'All blocks are facing the same base! Possible cheating detected. Or player confused? Implement better instructions?'
+      );
+      confetti({
+        particleCount: 100,
+        spread: 50,
+        colors: ['#363636ff', '#888888ff', '#c5c5c5ff'],
+      }); // Shame confetti
+      alert(
+        'Nice, but all unmatched blocks are facing the same base. Try matching different bases!'
+      );
       return;
     }
 
@@ -245,13 +275,13 @@ function checkWin() {
     confetti({
       particleCount: 200,
       spread: 70,
-      origin: { y: 0.6 }
+      origin: { y: 0.6 },
     });
     // more celebration or win message here
     //const thankYouMessage = document.querySelector('.thank-you-message');
     //thankYouMessage.textContent = '🎉 Congratulations! You matched all blocks! 🎉';
   }
-  }
+}
 
 function restart() {
   // restart the game
@@ -263,7 +293,12 @@ function restart() {
   time = 0;
   document.querySelector('.score').textContent = score;
   // Create a new BlockSet
-  const blockSet = new BlockSet(setSize, numberOfMatches, startingRange, selectedSystems);
+  const blockSet = new BlockSet(
+    setSize,
+    numberOfMatches,
+    startingRange,
+    selectedSystems
+  );
 }
 
 function checkForMatch() {
@@ -307,7 +342,12 @@ selectedSystems.push(dec);
 selectedSystems.push(hex);
 selectedSystems.push(oct);
 
-const blockSet = new BlockSet(setSize, numberOfMatches, startingRange, selectedSystems); 
+const blockSet = new BlockSet(
+  setSize,
+  numberOfMatches,
+  startingRange,
+  selectedSystems
+);
 // ************************ Dark Mode ************************
 
 // ************************ Dark Mode ************************
