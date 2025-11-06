@@ -9,35 +9,44 @@
  - fix cheating detection
  - ensure win detection works with 4 bases and 4 matches
  - let user chose which bases to play with (not only choosing a number with predefined ones)
- - or at least randomize the bases selected for the number of bases chosen
+ - or at least randomize the bases selected for the number of bases chosen 
+ - let users choose set size (number of blocks) from a given list 
+ - adjust the css to fit variable set sizes (maybe more columns on wider screens)
+ .- implement levels with increasing difficulty (range, bases, matches)
+ - fix mobile layout issues (280 px width for smaller numbers, 440-450 for larger)
 */
 
+//for testing that the file has been edited
+//consoleassert(false, 'Remove this line after reading'); // temporary to mark the file as edited
+
 const grid = document.querySelector('.grid-container');
-const selectedSystems = [];
-let trackFlips = true;
-let flipCountGlobal = 0;
+const selectedSystems = []; // array of SystemId objects selected by the user
+let trackFlips = true; // whether to track flips for score penalty, currently unused
+let flipCountGlobal = 0; // global flip count for all blocks
 const restartButton = document.getElementById('restart-button');
 const startGameButton = document.getElementById('start-game-button');
-let startingRange =
-  document.getElementById('starting-range').valueAsNumber || 10;
-let startingRangeOutput = document.getElementById('starting-range-output');
-startingRangeOutput.textContent = startingRange;
-let numberOfBases = document.getElementById('bases-count').valueAsNumber || 2;
-const slider = document.getElementById('starting-range');
-let lockBoard = false;
-let score = 0;
-let matchesFound = 0;
-let time = 0;
-const blocks = [];
+let lockBoard = false; // to prevent user from clicking when checking for match
+let score = 0; // current score
+let matchesFound = 0; // number of matches found
+let time = 0; // elapsed time, currently unused
+const blocks = []; // array of BaseBlock objects, delete, this has been replaced by blockSet
 //let startingRange = 10;
 let setSize = 16; // number of blocks, must be even
-let numberOfMatches =
-  document.getElementById('matches-count').valueAsNumber || 2;
-let selectedBlocks = [];
-let selectedCount = 0;
+let selectedBlocks = []; // array of BaseBlock objects selected by the user
+let selectedCount = 0; // number of currently selected blocks
 // ATTENTION:
 // selectionLimit = numberOfMatches; // how many blocks can be selected at once
 let firstBlock, secondBlock;
+
+// USER INPUT VARS:
+let startingRange =
+  document.getElementById('starting-range').valueAsNumber || 10; // USER INPUT, the starting point for numbers
+let startingRangeOutput = document.getElementById('starting-range-output');
+startingRangeOutput.textContent = startingRange;
+let numberOfBases = document.getElementById('bases-count').valueAsNumber || 2; // USER INPUT, how many bases to use
+let numberOfMatches =
+  document.getElementById('matches-count').valueAsNumber || 2; // USER INPUT, how many blocks make a match
+const slider = document.getElementById('starting-range');
 
 // Set initial output
 
@@ -62,7 +71,9 @@ function setSelectedBlocks(num) {
 
 // ****************** NumberSystems ******************
 
-class SystemId {
+// Represents a number system (base)
+// exported for testing purposes
+export class SystemId {
   constructor(systemId, label, badge, base) {
     this.systemId = systemId; // e.g., 1 for binary, 2 for decimal, etc.
     this.label = label; // e.g., "BIN", "DEC"
@@ -76,7 +87,9 @@ class SystemId {
 
 // ****************** BaseBlocks ******************
 
-class BaseBlock {
+// Represents a single block in the game
+// exported for testing purposes
+export class BaseBlock {
   constructor(id, number, systems, face = 0, matched = false) {
     this.id = id;
     this.number = number; // the actual value (e.g., 10)
@@ -270,7 +283,10 @@ class BaseBlock {
 }
 
 // ****************** BlockSet ******************
-class BlockSet {
+
+// Represents the entire set of blocks in the game
+// exported for testing purposes
+export class BlockSet {
   constructor(size, matches, startingRange, systemIds) {
     this.size = size || 16; // total number of blocks
     this.matches = matches || 2; // number of matches per group
@@ -330,9 +346,15 @@ class BlockSet {
 
 // ************************ ENGINE ************************
 
-/* startGame with user settings */
-function startGame() {
+// startGame with user settings
+// called when user clicks "Start Game" button
+// expoted for testing purposes
+export function startGame() {
   // get user settings
+  // TO-DO:
+  // let user change setSize
+  // sanitize inputs
+  // write input checks and/or error messages (unlinkly, but numberOfBases = -400 is eeevil)
   startingRange = document.getElementById('starting-range').valueAsNumber || 10;
   numberOfBases = parseInt(document.getElementById('bases-count').value, 10);
   numberOfMatches = parseInt(
@@ -352,8 +374,9 @@ function startGame() {
 // also
 // does not detect win given 4 bases and 4 matches
 // TO-DO: fix cheating detection
+// expoted for testing purposes
 
-function checkWin() {
+export function checkWin() {
   console.log('Checking for win condition...');
 
   if (typeof blockSet === 'undefined') {
@@ -449,7 +472,10 @@ function checkWin() {
   } */
 }
 
-function restart() {
+// restart the game with the old settings
+// expoted for testing purposes
+
+export function restart() {
   // restart the game
   console.log('Restarting the game...');
   // Clear existing blocks from the grid
@@ -496,7 +522,8 @@ function restart() {
 // works mostly, but needs to be tested more
 // once I matched a block with itself (should not be possible)
 // TO-DO: fix that
-function checkForMatch() {
+// expoted for testing purposes
+export function checkForMatch() {
   setTimeout(() => {
     //console.log('checking for match...');
 
@@ -560,13 +587,17 @@ function checkForMatch() {
   }, 300);
 }
 
-function resetBoard() {
+// reset the selection state
+// exported for testing purposes
+export function resetBoard() {
   firstBlock = null;
   secondBlock = null;
   lockBoard = false;
 }
 
-// ************************ Testing ************************
+// ************************ Quick Tests ************************
+
+console.assert(true, 'Testing setup works!'); // node js assert module, perhaps?
 
 // Common Number Systems (for first version):
 const bin = new SystemId(1, 'BIN', '(2)', 2);
@@ -629,3 +660,29 @@ for (let i = 0; i < accordions.length; i++) {
     }
   });
 }
+
+// ************************ Testing ************************
+
+// for testing:
+export const globalVar = {
+  grid,
+  selectedSystems,
+  trackFlips,
+  flipCountGlobal,
+  restartButton,
+  startGameButton,
+  startingRange,
+  startingRangeOutput,
+  numberOfBases,
+  slider,
+  lockBoard,
+  score,
+  matchesFound,
+  time,
+  blocks,
+  setSize,
+  numberOfMatches,
+  selectedBlocks,
+  selectedCount,
+  blockSet,
+};

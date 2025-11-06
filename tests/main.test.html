@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Base Blocks</title>
+    <link rel="stylesheet" type="text/css" href="../styles.css" />
+    <script
+      src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"
+      defer
+    ></script>
+    <script src="../main.js" type="module" defer></script>
+    <script src="./main.test.js" type="module" defer></script>
+  </head>
+  <body>
+    <button id="theme-toggle">Dark Mode</button>
+
+    <h1>Deeeeeesst</h1>
+
+    <!-- TO-DO: 
+        HALF BAKED TEST FILE
+        TO DO LATER 
+    -->
+
+    <section class="main">
+      <div class="grid-container"></div>
+      <div class="display">
+        <p>Score: <span class="score">0</span></p>
+        <div class="actions">
+          <button id="restart-button">Restart</button>
+          <br />
+        </div>
+      </div>
+    </section>
+
+    <aside>
+      <p>Game Controls not currently working</p>
+      <p>Reminder: Please add functionality for game controls</p>
+      <form action="game-controls">
+        <fieldset>
+          <legend>Game Controls</legend>
+
+          <!-- choose starting number -->
+
+          <label for="starting-range"
+            >Starting: <span id="starting-range-output"></span
+          ></label>
+          <input
+            type="range"
+            id="starting-range"
+            name="starting-range"
+            min="1"
+            max="100"
+            value="8"
+            class="slider"
+          />
+          <br />
+
+          <!-- 
+          <label for="grid-size">Grid Size:</label>
+          <select id="grid-size" name="grid-size">
+            <option value="4">4 x 4</option>
+            <option value="5">5 x 5</option>
+            <option value="6">6 x 6</option>
+          </select>
+          <br />
+ -->
+          <!-- how many bases do you want to play with? -->
+          <label for="bases-count">Number of Bases:</label>
+          <select id="bases-count" name="bases-count">
+            <option value="2">2 Bases</option>
+            <!-- 
+            <option value="3">3 Bases</option>
+             -->
+            <option value="4">4 Bases</option>
+          </select>
+          <br />
+
+          <!-- how many matches for a block? -->
+          <label for="matches-count">Number of Matches:</label>
+          <select id="matches-count" name="matches-count">
+            <option value="2">2 Matches</option>
+            <!-- <option value="3">3 Matches</option> -->
+            <option value="4">4 Matches</option>
+          </select>
+
+          <button type="button" id="start-game-button">Start Game</button>
+        </fieldset>
+      </form>
+    </aside>
+
+    <section class="explanation">
+      <div>
+        <p class="manual-text">
+          Memory like concept - match across bases 💙 <br />
+          Find two matching values across different number systems.
+        </p>
+        <p><span class="thank-you-message"></span></p>
+      </div>
+      <!-- Accordion with manuals -->
+      <!-- deleted -->
+    </section>
+  </body>
+</html>
