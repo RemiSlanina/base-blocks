@@ -41,57 +41,59 @@
     <aside>
       <p>Game Controls not currently working</p>
       <p>Reminder: Please add functionality for game controls</p>
-      <form action="game-controls">
-        <fieldset>
-          <legend>Game Controls</legend>
 
-          <!-- choose starting number -->
+      <span class="game-controls">
+        <!-- this is actually a part of the game controls:  -->
+        <!-- which bases does the user select? -->
+        <label for="base-buttons-container">Select bases:</label>
+        <div class="base-buttons-container">
+          <!-- make buttons in js -->
+        </div>
+        <div class="selected-bases"></div>
 
-          <label for="starting-range"
-            >Starting: <span id="starting-range-output"></span
-          ></label>
-          <input
-            type="range"
-            id="starting-range"
-            name="starting-range"
-            min="1"
-            max="100"
-            value="8"
-            class="slider"
-          />
-          <br />
+        <form>
+          <fieldset>
+            <legend>Game Controls</legend>
 
-          <!-- 
-          <label for="grid-size">Grid Size:</label>
-          <select id="grid-size" name="grid-size">
-            <option value="4">4 x 4</option>
-            <option value="5">5 x 5</option>
-            <option value="6">6 x 6</option>
-          </select>
-          <br />
- -->
-          <!-- how many bases do you want to play with? -->
-          <label for="bases-count">Number of Bases:</label>
-          <select id="bases-count" name="bases-count">
-            <option value="2">2 Bases</option>
-            <!-- 
+            <!-- choose starting number -->
+
+            <label for="starting-range"
+              >Starting: <span id="starting-range-output"></span
+            ></label>
+            <input
+              type="range"
+              id="starting-range"
+              name="starting-range"
+              min="1"
+              max="100"
+              value="8"
+              class="slider"
+            />
+            <br />
+
+            <!-- how many bases do you want to play with? -->
+            <label for="bases-count">Number of Bases:</label>
+            <select id="bases-count" name="bases-count">
+              <option value="2">2 Bases</option>
+              <!-- 
             <option value="3">3 Bases</option>
              -->
-            <option value="4">4 Bases</option>
-          </select>
-          <br />
+              <option value="4">4 Bases</option>
+            </select>
+            <br />
 
-          <!-- how many matches for a block? -->
-          <label for="matches-count">Number of Matches:</label>
-          <select id="matches-count" name="matches-count">
-            <option value="2">2 Matches</option>
-            <!-- <option value="3">3 Matches</option> -->
-            <option value="4">4 Matches</option>
-          </select>
+            <!-- how many matches for a block? -->
+            <label for="matches-count">Number of Matches:</label>
+            <select id="matches-count" name="matches-count">
+              <option value="2">2 Matches</option>
+              <!-- <option value="3">3 Matches</option> -->
+              <option value="4">4 Matches</option>
+            </select>
 
-          <button type="button" id="start-game-button">Start Game</button>
-        </fieldset>
-      </form>
+            <button type="button" id="start-game-button">Start Game</button>
+          </fieldset>
+        </form>
+      </span>
     </aside>
 
     <section class="explanation">

@@ -20,7 +20,6 @@
 //consoleassert(false, 'Remove this line after reading'); // temporary to mark the file as edited
 
 const grid = document.querySelector('.grid-container');
-const selectedSystems = []; // array of SystemId objects selected by the user
 let trackFlips = true; // whether to track flips for score penalty, currently unused
 let flipCountGlobal = 0; // global flip count for all blocks
 const restartButton = document.getElementById('restart-button');
@@ -31,12 +30,16 @@ let matchesFound = 0; // number of matches found
 let time = 0; // elapsed time, currently unused
 const blocks = []; // array of BaseBlock objects, delete, this has been replaced by blockSet
 //let startingRange = 10;
+const baseContainer = document.querySelector('base-buttons-container'); // let user select bases
+let selectedSystems = []; // this should become selectedBases (a set instead of an array!!)
+const selectedBases = new Set();
+
 let setSize = 16; // number of blocks, must be even
 let selectedBlocks = []; // array of BaseBlock objects selected by the user
 let selectedCount = 0; // number of currently selected blocks
+//const supportedBases = []; // created after class SystemId
 // ATTENTION:
 // selectionLimit = numberOfMatches; // how many blocks can be selected at once
-let firstBlock, secondBlock;
 
 // USER INPUT VARS:
 let startingRange =
@@ -44,15 +47,16 @@ let startingRange =
 let startingRangeOutput = document.getElementById('starting-range-output');
 startingRangeOutput.textContent = startingRange;
 let numberOfBases = document.getElementById('bases-count').valueAsNumber || 2; // USER INPUT, how many bases to use
+const dropDownNumberOfBases = document.getElementById('bases-count');
 let numberOfMatches =
   document.getElementById('matches-count').valueAsNumber || 2; // USER INPUT, how many blocks make a match
 const slider = document.getElementById('starting-range');
-
-// Set initial output
+// add selected systems to user input vars
 
 // ************************ EVENT LISTENERS ************************
 restartButton.addEventListener('click', restart);
 startGameButton.addEventListener('click', startGame);
+dropDownNumberOfBases.addEventListener('change', updateNumberOfBases);
 
 // ****************************** Helper Functions ******************************
 
@@ -60,6 +64,11 @@ startGameButton.addEventListener('click', startGame);
 slider.oninput = function () {
   startingRangeOutput.textContent = this.value;
 };
+
+function updateNumberOfBases() {
+  numberOfBases = document.getElementById('bases-count').value || 2;
+  console.log(`numberOfBases: ${numberOfBases}`);
+}
 
 // TO-DOs
 function setSelectedBlocks(num) {
@@ -74,15 +83,147 @@ function setSelectedBlocks(num) {
 // Represents a number system (base)
 // exported for testing purposes
 export class SystemId {
-  constructor(systemId, label, badge, base) {
-    this.systemId = systemId; // e.g., 1 for binary, 2 for decimal, etc.
-    this.label = label; // e.g., "BIN", "DEC"
-    this.badge = badge; // e.g., "(2)", "(10)"
-    this.base = base; // the actual base (2, 10, 16, 8)
+  constructor(label, badge, base) {
+    this.label = label; // e.g., "BIN", "DEC", "22", ""
+    this.badge = badge; // e.g., "₂", "₁₆", "" (empty for 10)
+    this.base = base; // the actual base (2, 10, 16, etc.)
   }
   toDisplay(num) {
-    return num.toString(this.base).toUpperCase() + this.badge;
+    const converted = num.toString(this.base).toUpperCase();
+    return this.badge ? converted + this.badge : converted;
   }
+}
+
+// NEED TO CREATE AN ARRAY OF NUMBER SYSTEMS HERE TO USE IN BASEBLOCKS CLASS NEXT
+
+// collection of systemIds used in the game:
+const supportedBases = [
+  new SystemId('BIN', '₂', 2),
+  new SystemId('3', '₃', 3),
+  new SystemId('4', '₄', 4),
+  new SystemId('5', '₅', 5),
+  new SystemId('6', '₆', 6),
+  new SystemId('7', '₇', 7),
+  new SystemId('OCT', '₈', 8),
+  new SystemId('9', '₉', 9),
+  new SystemId('DEC', '', 10),
+  new SystemId('11', '₁₁', 11),
+  new SystemId('12', '₁₂', 12),
+  new SystemId('13', '₁₃', 13),
+  new SystemId('14', '₁₄', 14),
+  new SystemId('15', '₁₅', 15),
+  new SystemId('HEX', '₁₆', 16),
+  new SystemId('17', '₁₇', 17),
+  new SystemId('18', '₁₈', 18),
+  new SystemId('19', '₁₉', 19),
+  new SystemId('20', '₂₀', 20),
+  new SystemId('21', '₂₁', 21),
+  new SystemId('22', '₂₂', 22),
+  new SystemId('23', '₂₃', 23),
+  new SystemId('24', '₂₄', 24),
+  new SystemId('25', '₂₅', 25),
+  new SystemId('26', '₂₆', 26),
+  new SystemId('27', '₂₇', 27),
+  new SystemId('28', '₂₈', 28),
+  new SystemId('29', '₂₉', 29),
+  new SystemId('30', '₃₀', 30),
+];
+
+// ****************** GameControls ******************
+// change and use this. seriously.
+class GameControls {
+  constructor() {
+    this.selectedBases = new Set();
+    this.numberOfBases = 2;
+    this.init();
+  }
+
+  init() {
+    this.renderBaseButtons();
+    this.setupEventListeners();
+  }
+
+  renderBaseButtons() {
+    // button creation logic
+    supportedBases.forEach((base) => {
+      const button = document.createElement('button');
+      button.textContent = `${base.label}`;
+      button.dataset.base = base.base;
+      button.classList.add('base-button');
+      // if (base.isCommon) button.classList.add('common-base'); // fix supportedBases - add isCommon
+
+      button.addEventListener('click', () => {
+        if (selectedBases.has(base.base)) {
+          button.classList.remove('selected');
+          selectedBases.delete(base.base);
+        } else {
+          if (selectedBases.size >= numberOfBases) {
+            // change this to be responsive to NumberOfBases!! (not only 4, also 2)
+            console.log('Maximum of bases reached');
+            return;
+          }
+          selectedBases.add(base.base);
+          button.classList.add('selected');
+        }
+        updateSelectedBases();
+      });
+
+      document.querySelector('.base-buttons-container').appendChild(button);
+    });
+  }
+
+  setupEventListeners() {
+    document.getElementById('bases-count').addEventListener('change', (e) => {
+      this.numberOfBases = e.target.valueAsNumber || 2;
+    });
+  }
+}
+
+const gameControls = new GameControls();
+
+// OLD CODE instead of GameControls, but still in use:
+
+// CREATE BUTTONS FOR BASE SELECTION DYNAMICALLY
+//const selectedBases = new Set(); // exchange selectedSystems with SelectedBases later! (TOP)
+function createSystemButtons() {
+  supportedBases.forEach((base) => {
+    const button = document.createElement('button');
+    button.textContent = `${base.label}`;
+    button.dataset.base = base.base;
+    button.classList.add('base-button');
+    // if (base.isCommon) button.classList.add('common-base'); // fix supportedBases - add isCommon
+
+    button.addEventListener('click', () => {
+      if (selectedBases.has(base.base)) {
+        button.classList.remove('selected');
+        selectedBases.delete(base.base);
+      } else {
+        if (selectedBases.size >= numberOfBases) {
+          // change this to be responsive to NumberOfBases!! (not only 4, also 2)
+          console.log('Maximum of bases reached');
+          return;
+        }
+        selectedBases.add(base.base);
+        button.classList.add('selected');
+      }
+      updateSelectedBases();
+    });
+
+    document.querySelector('.base-buttons-container').appendChild(button);
+  });
+}
+createSystemButtons();
+
+function updateSelectedBases() {
+  const selectedBasesContainer = document.querySelector('.selected-bases');
+  selectedBasesContainer.innerHTML = '';
+  selectedBases.forEach((base) => {
+    const baseObj = supportedBases.find((opt) => opt.base === base);
+    const tag = document.createElement('span');
+    tag.textContent = `${baseObj.label}`;
+    tag.classList.add('selected-tag');
+    selectedBasesContainer.appendChild(tag);
+  });
 }
 
 // ****************** BaseBlocks ******************
@@ -188,32 +329,10 @@ export class BaseBlock {
     // check for match it the array is full
     if (selectedCount === numberOfMatches) {
       checkForMatch();
+      // TO DO:  (#todoaftertest)
+      // LOCK BOARD !!!
+      // happens in checkForMatch, on the other hand.
     }
-
-    // OLD CODE:
-    // delete later
-    /* 
-    if (this === firstBlock) {
-      this.deselect();
-      this.isFirst = false;
-      return;
-    }
-
-    if (!firstBlock) {
-      firstBlock = this;
-      this.isFirst = true;
-    } else if (!(firstBlock === this)) {
-      secondBlock = this;
-      this.isSecond = true;
-    }
-    this.element.classList.remove('deselected');
-    this.element.classList.add('selected');
-
-    // at the end!!
-    if (secondBlock) {
-      checkForMatch();
-    }
-     */
   };
   deselect() {
     if (selectedCount <= 0) {
@@ -232,19 +351,6 @@ export class BaseBlock {
     } else {
       console.error('Block not found in selectedBlocks array!');
     }
-
-    // OLD CODE:
-    /*
-    if (this.isFirst) {
-      firstBlock = null;
-      this.isFirst = false;
-    } else if (this.isSecond) {
-      secondBlock = null;
-      this.isSecond = false;
-    } else return;
-    this.element.classList.remove('selected');
-    this.element.classList.add('deselected');
-    */
   }
   disableQuick() {
     // Fast-disable: mark matched, remove event listener and update classes.
@@ -334,12 +440,23 @@ export class BlockSet {
     }
   }
 
-  createDefaultSystems(number) {
+  /*   createDefaultSystems(number) {
     return [
-      new SystemId(1, 'BIN', '(2)', 2),
-      new SystemId(2, 'OCT', '(8)', 8),
-      new SystemId(3, 'DEC', '(10)', 10),
-      new SystemId(4, 'HEX', '(16)', 16),
+      new SystemId('BIN', '₂', 2),
+      new SystemId('OCT', '₈', 8),
+      new SystemId('DEC', '', 10),
+      new SystemId('HEX', '₁₆', 16),
+    ];
+  } */
+
+  // delete this code:
+  // I don't actually need this anymore.
+  createDefaultSystems() {
+    return [
+      supportedBases[0], // BIN (base 2)
+      supportedBases[6], // OCT (base 8)
+      supportedBases[8], // DEC (base 10)
+      supportedBases[14], // HEX (base 16)
     ];
   }
 }
@@ -349,18 +466,37 @@ export class BlockSet {
 // startGame with user settings
 // called when user clicks "Start Game" button
 // expoted for testing purposes
+// TO-DO:
+// let user change setSize
+// sanitize inputs
+// write input checks and/or error messages (unlinkly, but numberOfBases = -400 is eeevil)
 export function startGame() {
   // get user settings
-  // TO-DO:
-  // let user change setSize
-  // sanitize inputs
-  // write input checks and/or error messages (unlinkly, but numberOfBases = -400 is eeevil)
   startingRange = document.getElementById('starting-range').valueAsNumber || 10;
   numberOfBases = parseInt(document.getElementById('bases-count').value, 10);
   numberOfMatches = parseInt(
     document.getElementById('matches-count').value,
     10
   );
+
+  // reset selected systems
+  selectedSystems.length = 0;
+
+  // quick fix, refactor later:
+  selectedSystems = Array.from(selectedBases).map((base) =>
+    supportedBases.find((system) => system.base === base)
+  );
+
+  // a temporary array, later to be substituted by user input:
+  const chosenBases = [1, 2, 5];
+  // for loop through all the bases i got:
+  supportedBases.forEach((system, i) => {
+    for (let j = 0; j < chosenBases.length; j++) {
+      if (system.base === chosenBases[j]) {
+        selectedSystems.push(system);
+      }
+    }
+  });
 
   console.log(
     `Starting game with range: ${startingRange}, bases: ${numberOfBases}, matches: ${numberOfMatches}`
@@ -422,54 +558,6 @@ export function checkWin() {
       `Matches found: ${matchesFound}/${setSize / numberOfMatches}. Keep going!`
     );
   }
-
-  // OLD CODE:
-  // to be deleted later
-  /*   const totalMatches = blockSet.size / numberOfMatches;
-  if (matchesFound === totalMatches) {
-    // Find unmatched blocks (blocks that were not marked matched)
-    const unmatchedBlocks = blockSet.blocks.filter((block) => !block.matched);
-
-    // If there are no unmatched blocks, it's a normal win — celebrate and return
-    if (unmatchedBlocks.length === 0) {
-      console.log('You win!');
-      confetti({
-        particleCount: 200,
-        spread: 70,
-        origin: { y: 0.6 },
-      });
-      return;
-    }
-
-    // If all remaining unmatched blocks are showing the same face, warn about cheating
-    const firstBase = unmatchedBlocks[0]?.face;
-    const allSameBase = unmatchedBlocks.every(
-      (block) => block.face === firstBase
-    );
-
-    if (allSameBase) {
-      console.log(
-        'All unmatched blocks are facing the same base — possible cheating detected.'
-      );
-      confetti({
-        particleCount: 100,
-        spread: 50,
-        colors: ['#363636ff', '#888888ff', '#c5c5c5ff'],
-      });
-      alert(
-        'Nice, but all unmatched blocks are facing the same base. Try matching different bases!'
-      );
-      return;
-    }
-
-    // Otherwise, normal win flow
-    console.log('You win!');
-    confetti({
-      particleCount: 200,
-      spread: 70,
-      origin: { y: 0.6 },
-    });
-  } */
 }
 
 // restart the game with the old settings
@@ -485,7 +573,11 @@ export function restart() {
   time = 0;
   document.querySelector('.score').textContent = score;
   // Create a new BlockSet
-  selectedSystems.length = 0;
+  //selectedSystems.length = 0;
+
+  // use old selected sytems here. pass new selected sytems in startGame() // start with new values
+
+  /* // DELETE OLD CODE 
   // update the systems ( = bases ) the user selected:
   for (let i = 0; i < numberOfBases; i++) {
     // For now, just cycle through the common systems
@@ -511,6 +603,8 @@ export function restart() {
         break;
     }
   }
+ */
+
   const blockSet = new BlockSet(
     setSize,
     numberOfMatches,
@@ -599,18 +693,20 @@ export function resetBoard() {
 
 console.assert(true, 'Testing setup works!'); // node js assert module, perhaps?
 
-// Common Number Systems (for first version):
-const bin = new SystemId(1, 'BIN', '(2)', 2);
-const dec = new SystemId(2, 'DEC', '(10)', 10);
-const hex = new SystemId(3, 'HEX', '(16)', 16);
-const oct = new SystemId(4, 'OCT', '(8)', 8);
+// delete old code:
+/* // Common Number Systems (for first version):
+const bin = new SystemId('BIN', '(2)', 2);
+const dec = new SystemId('DEC', '(10)', 10);
+const hex = new SystemId('HEX', '(16)', 16);
+const oct = new SystemId('OCT', '(8)', 8);
+ */
 
 // update the systems ( = bases ) the user selected:
 // const selectedSystems = ["bin", "oct", "dec", "hex"];
-selectedSystems.push(bin);
-selectedSystems.push(dec);
-selectedSystems.push(hex);
-selectedSystems.push(oct);
+selectedSystems.push(supportedBases[0]);
+selectedSystems.push(supportedBases[6]);
+selectedSystems.push(supportedBases[8]);
+selectedSystems.push(supportedBases[14]);
 
 const blockSet = new BlockSet(
   setSize,
