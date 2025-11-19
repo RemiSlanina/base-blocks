@@ -150,6 +150,7 @@ h1 {
   font-size: 4.236rem;
   margin-top: var(--golden-minor-rem);
   text-align: center;
+  margin-top: calc(var(--golden-major) * 1rem);
 }
 
 h2 {
@@ -363,5 +364,6 @@ img {
   }
   .block {
     min-width: 20svw;
+    font-size: 1rem;
   }
 }

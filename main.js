@@ -1,51 +1,26 @@
-//import { nanoid } from "nanoid"; // generate IDs
-
-// ************************ VARS ************************
-//const bases = ["bin", "oct", "dec", "hex"];
-
-/* 
-  ALLOWED SET SIZES for match 2: 
-  2x2
-  4x4
-  4x5
-  4x6
-  6x6
-  8x8
-  8x10
-*/
-
 // ****************************** Vars ******************************
-const grid = document.querySelector('.grid-container'); 
-const selectedSystems = []; 
-let trackFlips = true; 
+const grid = document.querySelector('.grid-container');
+let trackFlips = true;
 let flipCount = 0;
 const restartButton = document.getElementById('restart-button');
 let lockBoard = false;
 let score = 0;
 let time = 0;
 const blocks = [];
-let startingRange = 10;
+let startingRange = 1;
 let setSize = 16; // number of blocks, must be even
 let numberOfMatches = 2;
-let firstBlock, secondBlock; 
+let firstBlock, secondBlock;
 
-
-restartButton.addEventListener('click', restart);
 // ****************************** Helper Functions ******************************
-
 // TO-DOs
 function setSelectedBlocks(num) {
-  // TO-DO: variable blocks instead of firstBlock, secondBlock 
-} 
-
-
+  // TO-DO: variable blocks instead of firstBlock, secondBlock
+}
 // ****************************** Classes ******************************
-
-// ****************** NumberSystems ******************
-
+// ****************** SystemId ******************
 class SystemId {
-  constructor(systemId, label, badge, base) {
-    this.systemId = systemId; // e.g., 1 for binary, 2 for decimal, etc.
+  constructor(label, badge, base) {
     this.label = label; // e.g., "BIN", "DEC"
     this.badge = badge; // e.g., "(2)", "(10)"
     this.base = base; // the actual base (2, 10, 16, 8)
@@ -54,9 +29,40 @@ class SystemId {
     return num.toString(this.base).toUpperCase() + this.badge;
   }
 }
+// collection of systemIds used in the game:
+const supportedBases = [
+  new SystemId('BIN', '₂', 2),
+  new SystemId('3', '₃', 3),
+  new SystemId('4', '₄', 4),
+  new SystemId('5', '₅', 5),
+  new SystemId('6', '₆', 6),
+  new SystemId('7', '₇', 7),
+  new SystemId('OCT', '₈', 8),
+  new SystemId('9', '₉', 9),
+  new SystemId('DEC', '', 10),
+  new SystemId('11', '₁₁', 11),
+  new SystemId('12', '₁₂', 12),
+  new SystemId('13', '₁₃', 13),
+  new SystemId('14', '₁₄', 14),
+  new SystemId('15', '₁₅', 15),
+  new SystemId('HEX', '₁₆', 16),
+  new SystemId('17', '₁₇', 17),
+  new SystemId('18', '₁₈', 18),
+  new SystemId('19', '₁₉', 19),
+  new SystemId('20', '₂₀', 20),
+  new SystemId('21', '₂₁', 21),
+  new SystemId('22', '₂₂', 22),
+  new SystemId('23', '₂₃', 23),
+  new SystemId('24', '₂₄', 24),
+  new SystemId('25', '₂₅', 25),
+  new SystemId('26', '₂₆', 26),
+  new SystemId('27', '₂₇', 27),
+  new SystemId('28', '₂₈', 28),
+  new SystemId('29', '₂₉', 29),
+  new SystemId('30', '₃₀', 30),
+];
 
 // ****************** BaseBlocks ******************
-
 class BaseBlock {
   constructor(id, number, systems, face = 0, matched = false) {
     this.id = id;
@@ -70,11 +76,9 @@ class BaseBlock {
     this.element.classList.add('block', this.baseClasses[this.face]);
     this.isFirst = false;
     this.isSecond = false;
-
     /* ****************** RIGHT CLICK: ****************** */
     this.selectBound = this.select.bind(this);
     this.element.addEventListener('click', this.selectBound);
-
     /* ****************** LEFT CLICK: ****************** */
     this.element.addEventListener('contextmenu', (e) => {
       e.preventDefault();
@@ -82,10 +86,10 @@ class BaseBlock {
       this.element.textContent = this.getCurrentDisplay();
     });
   }
-  generateInterface(){
-  this.element.textContent = this.getCurrentDisplay();
-  grid.appendChild(this.element);
-  this.element.title = "Right-click to flip the block";
+  generateInterface() {
+    this.element.textContent = this.getCurrentDisplay();
+    grid.appendChild(this.element);
+    this.element.title = 'Right-click to flip the block';
   }
   getCurrentDisplay() {
     return this.systems[this.face].toDisplay(this.number);
@@ -97,7 +101,7 @@ class BaseBlock {
     this.face = (this.face + 1) % this.systems.length;
     // Add the new class
     this.element.classList.add(this.baseClasses[this.face]);
-    // you pay for flipping with socre penalty: 
+    // you pay for flipping with socre penalty:
     //score--; // Penalty for flipping
     // In BaseBlock.flip():
     if (trackFlips) {
@@ -116,7 +120,6 @@ class BaseBlock {
       this.isFirst = false;
       return;
     }
-
     if (!firstBlock) {
       firstBlock = this;
       this.isFirst = true;
@@ -127,7 +130,6 @@ class BaseBlock {
     this.element.classList.remove('deselected');
     this.element.classList.add('selected');
     //.log(`selected ${this.getCurrentDisplay()}`);
-
     // at the end!!
     if (secondBlock) {
       checkForMatch();
@@ -145,7 +147,7 @@ class BaseBlock {
     this.element.classList.add('deselected');
     //.log(`deselected ${this.getCurrentDisplay()}`);
   }
-  disableBypassed() {
+  disable() {
     /* this.element.classList.remove("selected");
     this.element.classList.add("deselected"); */
     //this.deselect();
@@ -161,61 +163,50 @@ class BaseBlock {
       return;
     }
   }
-  // FOR TROUBLESHOOTING:
-  disable() {
-    // Clone the element to remove all listeners (nuclear option)
-    const newElement = this.element.cloneNode(true);
-    this.element.parentNode.replaceChild(newElement, this.element);
-    this.element = newElement;
-    this.element.classList.add('disabled');
-    this.deselect();
-  }
 }
 
-
-// ****************** BlockSet ****************** 
+// ****************** BlockSet ******************
 class BlockSet {
   constructor(size, matches, startingRange, systemIds) {
     this.size = size || 16; // total number of blocks
     this.matches = matches || 2; // number of matches per group
     this.startingRange = startingRange || 12; // starting range for numbers
     this.blocks = [];
-    this.systemIds = systemIds || this.createDefaultSystems(); 
     this.createBlocks();
     this.selectedBlocks = [];
   }
-
   createBlocks() {
-    let debucgger = 0; 
+    let debucgger = 0;
     //create blocks
-    for (let i = this.startingRange;i < (this.size / this.matches) + this.startingRange; i++) {
-for (let j = 0; j < this.matches; j++) {
-    let block = new BaseBlock(
-      Math.floor(Math.random() * 900) + 100,
-      i,
-      selectedSystems,
-      Math.floor(Math.random() * selectedSystems.length)
-    );
-    this.blocks.push(block); 
-    //.log(`debuggger value: ${debucgger} for number: ${i} match: ${j}`);
-    debucgger++;
-  }
+    for (
+      let i = this.startingRange;
+      i < this.size / this.matches + this.startingRange;
+      i++
+    ) {
+      for (let j = 0; j < this.matches; j++) {
+        let block = new BaseBlock(
+          Math.floor(Math.random() * 900) + 100,
+          i,
+          gameControls.getSelectedBases(),
+          Math.floor(Math.random() * gameControls.getSelectedBases().length)
+        );
+        this.blocks.push(block);
+        //.log(`debuggger value: ${debucgger} for number: ${i} match: ${j}`);
+        debucgger++;
+      }
       // const number = this.startRange + i;
-     // const systems = this.createNumberSystems(number);
-     // const block = new BaseBlock(i, number, systems);
+      // const systems = this.createNumberSystems(number);
+      // const block = new BaseBlock(i, number, systems);
       //this.blocks.push(block);
       //this.block.generateInterface();
     }
-
-      this.shuffleBlocks();
-
+    this.shuffleBlocks();
     // generate blocks interface
-      this.blocks.forEach((block) => {  
-        //.log(block);
-        block.generateInterface();
-      });
+    this.blocks.forEach((block) => {
+      //.log(block);
+      block.generateInterface();
+    });
   }
-
   shuffleBlocks() {
     // Fisher-Yates Shuffle Algorithm
     for (let i = this.blocks.length - 1; i > 0; i--) {
@@ -223,22 +214,57 @@ for (let j = 0; j < this.matches; j++) {
       [this.blocks[i], this.blocks[j]] = [this.blocks[j], this.blocks[i]];
     }
   }
+}
 
-  createDefaultSystems(number) {
-    return [
-      new SystemId(1, "BIN", "(2)", 2),
-      new SystemId(2, "OCT", "(8)", 8),
-      new SystemId(3, "DEC", "(10)", 10),
-      new SystemId(4, "HEX", "(16)", 16),
+// ****************** GameControls ******************
+class GameControls {
+  constructor() {
+    this.selectedBases = [];
+    this.blockSet = null;
+  }
+  addBase(systemId) {
+    this.selectedBases.push(systemId);
+  }
+  removeBase(systemId) {
+    this.selectedBases = this.selectedBases.filter((base) => base !== systemId);
+  }
+  createDefaultSystems() {
+    this.selectedBases = [
+      new SystemId('BIN', '₂', 2),
+      new SystemId('OCT', '₈', 8),
+      new SystemId('DEC', '', 10),
+      new SystemId('HEX', '₁₆', 16),
     ];
+  }
+  getSelectedBases() {
+    return [...this.selectedBases];
+  }
+
+  initializeBlockSet() {
+    this.blockSet = new BlockSet(
+      setSize,
+      numberOfMatches,
+      startingRange,
+      this.getSelectedBases()
+    );
+  }
+
+  restart() {
+    console.log('gamecontrols.restart: Restarting the game...');
+    // Clear existing blocks from the grid
+    grid.innerHTML = '';
+    // Reset score and time
+    score = 0;
+    time = 0;
+    document.querySelector('.score').textContent = score;
+    // Create a new BlockSet
+    this.initializeBlockSet();
   }
 }
 
-
-// ************************ ENGINE ************************ 
-
+// ************************ ENGINE ************************
+/* 
 function restart() {
-  // TO-DO: implement restart
   console.log('Restarting the game...');
   // Clear existing blocks from the grid
   grid.innerHTML = '';
@@ -247,20 +273,24 @@ function restart() {
   time = 0;
   document.querySelector('.score').textContent = score;
   // Create a new BlockSet
-  const blockSet = new BlockSet(setSize, numberOfMatches, startingRange, selectedSystems);
+  const blockSet = new BlockSet(
+    setSize,
+    numberOfMatches,
+    startingRange,
+    gameControls.getSelectedBases()
+  );
 }
-
+ */
 function checkForMatch() {
   setTimeout(() => {
-    console.log('check hello');
+    // return if either block is null (safety check)
+    if (!firstBlock || !secondBlock) return;
     if (firstBlock.number === secondBlock.number) {
-      //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
       firstBlock.disable();
       secondBlock.disable();
       //lockBoard = false; in resetBoard (below)
       score += numberOfMatches * 20; // Reward for a match
       document.querySelector('.score').textContent = score;
-      console.log("It's a match!");
     } else {
       firstBlock.deselect();
       secondBlock.deselect();
@@ -268,101 +298,50 @@ function checkForMatch() {
     resetBoard();
   }, 300);
 }
-
 function resetBoard() {
-  //console.log(firstBlock.isSecond);
-  //console.log(secondBlock.isSecond);
-  //firstBlock.isFirst = false;
   firstBlock = null;
-  //secondBlock.isFirst = false;
   secondBlock = null;
   lockBoard = false;
 }
 
-// ************************ Testing ************************
+// ************************ INSTANTIATE GAME CONTROLS ************************
 
-// Common Number Systems (for first version):
-const bin = new SystemId(1, 'BIN', '(2)', 2);
-const dec = new SystemId(2, 'DEC', '(10)', 10);
-const hex = new SystemId(3, 'HEX', '(16)', 16);
-const oct = new SystemId(4, 'OCT', '(8)', 8);
+const gameControls = new GameControls();
+gameControls.createDefaultSystems();
+gameControls.initializeBlockSet();
 
-// update the systems ( = bases ) the user selected:
-// const selectedSystems = ["bin", "oct", "dec", "hex"];
-selectedSystems.push(bin);
-selectedSystems.push(dec);
-selectedSystems.push(hex);
-selectedSystems.push(oct);
+// ************************ EVENT LISTENERS ************************
 
-const blockSet = new BlockSet(setSize, numberOfMatches, startingRange, selectedSystems); 
-
-
-/* 
-// lets say the user selects 4 bases: bin, oct, dec, hex
-for (
-  let i = startingRange;
-  i < setSize / numberOfMatches + startingRange;
-  i++
-) {
-  for (let j = 0; j < numberOfMatches; j++) {
-    let block = new BaseBlock(
-      Math.floor(Math.random() * 900) + 100,
-      i,
-      selectedSystems,
-      Math.floor(Math.random() * selectedSystems.length)
-    );
-    blocks.push(block);
-  }
-}
-
-// Shuffle the blocks for the game
-// -0.5 to +0.5 -> negative switch element
-blocks.sort(() => Math.random() - 0.5);
-
-blocks.forEach((block) => {
-  //block.element.textContent = block.getCurrentDisplay();
-  //grid.appendChild(block.element);
-  block.generateInterface();
-});
-
- */ 
-
-//const blockSet = new BlockSet(setSize, numberOfMatches, startingRange, selectedSystems); 
-// blockSet.createBlocks(); 
+restartButton.addEventListener(
+  'click',
+  gameControls.restart.bind(gameControls)
+);
+// ************************ Run Test Game ************************
 
 // ************************ Dark Mode ************************
-
 // ************************ Dark Mode ************************
-
 // Load saved theme if there is any
 const savedTheme = localStorage.getItem('theme');
 if (savedTheme) {
   document.documentElement.setAttribute('data-theme', savedTheme);
 }
-
 // Toggle theme and save preference
 document.getElementById('theme-toggle').addEventListener('click', () => {
   const currentTheme = document.documentElement.getAttribute('data-theme');
   const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-
   document.documentElement.setAttribute('data-theme', newTheme);
   localStorage.setItem('theme', newTheme);
 });
-
 const currentTheme = document.documentElement.getAttribute('data-theme');
 console.log(currentTheme); // "dark", "light", or null
-
 // ************************ ACCORDION ************************
-
 const accordions = document.getElementsByClassName('accordion');
 //console.log(accordions);
-
 for (let i = 0; i < accordions.length; i++) {
   accordions[i].addEventListener('click', (e) => {
     // button: stay active
     e.target.classList.toggle('active');
     // toggle accordion panels
-
     //let panel = this.nextElementSibling;
     let panel = e.target.nextElementSibling;
     if (panel.style.display === 'block') {
