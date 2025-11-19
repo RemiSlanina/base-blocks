@@ -10,13 +10,9 @@ const blocks = [];
 let startingRange = 1;
 let setSize = 16; // number of blocks, must be even
 let numberOfMatches = 2;
-let firstBlock, secondBlock;
 
 // ****************************** Helper Functions ******************************
-// TO-DOs
-function setSelectedBlocks(num) {
-  // TO-DO: variable blocks instead of firstBlock, secondBlock
-}
+
 // ****************************** Classes ******************************
 // ****************** SystemId ******************
 class SystemId {
@@ -115,53 +111,66 @@ class BaseBlock {
       console.log('Block is disabled, cannot select');
       return;
     }
-    if (this === firstBlock) {
-      this.deselect();
-      this.isFirst = false;
+    if (lockBoard) {
+      console.log('Board is locked, cannot select');
       return;
     }
-    if (!firstBlock) {
-      firstBlock = this;
-      this.isFirst = true;
-    } else if (!(firstBlock === this)) {
-      secondBlock = this;
-      this.isSecond = true;
+    if (this.element.classList.contains('selected')) {
+      this.deselect();
+      return;
     }
+
+    if (gameControls.selectedBlocksCount === numberOfMatches) {
+      console.log('Selection limit reached, cannot select more blocks');
+      return;
+    }
+    if (gameControls.selectedBlocksCount > numberOfMatches) {
+      console.error('Selected count exceeded limit, this should not happen!');
+      return;
+    }
+
+    console.log(`selected ${this.getCurrentDisplay()}`);
     this.element.classList.remove('deselected');
     this.element.classList.add('selected');
-    //.log(`selected ${this.getCurrentDisplay()}`);
-    // at the end!!
-    if (secondBlock) {
-      checkForMatch();
+    gameControls.selectedBlocks.push(this);
+    gameControls.selectedBlocksCount++;
+
+    if (gameControls.selectedBlocksCount === numberOfMatches) {
+      lockBoard = true;
+      gameControls.checkForMatch();
     }
   };
   deselect() {
-    if (this.isFirst) {
-      firstBlock = null;
-      this.isFirst = false;
-    } else if (this.isSecond) {
-      secondBlock = null;
-      this.isSecond = false;
-    } else return;
-    this.element.classList.remove('selected');
-    this.element.classList.add('deselected');
-    //.log(`deselected ${this.getCurrentDisplay()}`);
-  }
-  disable() {
-    /* this.element.classList.remove("selected");
-    this.element.classList.add("deselected"); */
-    //this.deselect();
-    this.element.removeEventListener('click', this.selectBound);
-    this.deselect();
-    this.element.classList.add('disabled');
-    //console.log(`disabled ${this.getCurrentDisplay()}`);
-    //console.log('After disable:', this.element.classList);
-    if (this.element.classList.contains('disabled')) {
-      //console.log(
-      //  `${this.getCurrentDisplay()} is disabled after calling disable()`
-      //);
+    if (!this.element.classList.contains('selected')) {
+      console.log('Block is not selected, cannot deselect');
       return;
     }
+    if (lockBoard) {
+      console.log('Board is locked, cannot deselect');
+      return;
+    }
+    if (gameControls.selectedBlocksCount < 0) {
+      console.error(
+        'Selected blocks count is negative, this should not happen!'
+      );
+      return;
+    }
+
+    this.element.classList.remove('selected');
+    this.element.classList.add('deselected');
+    gameControls.selectedBlocks = gameControls.selectedBlocks.filter(
+      (block) => block !== this
+    );
+    gameControls.selectedBlocksCount--;
+    console.log(`deselected ${this.getCurrentDisplay()}`);
+  }
+  disable() {
+    this.element.removeEventListener('click', this.selectBound);
+    this.deselect();
+    if (this.element.classList.contains('disabled')) {
+      return;
+    }
+    this.element.classList.add('disabled');
   }
 }
 
@@ -173,7 +182,6 @@ class BlockSet {
     this.startingRange = startingRange || 12; // starting range for numbers
     this.blocks = [];
     this.createBlocks();
-    this.selectedBlocks = [];
   }
   createBlocks() {
     let debucgger = 0;
@@ -191,19 +199,12 @@ class BlockSet {
           Math.floor(Math.random() * gameControls.getSelectedBases().length)
         );
         this.blocks.push(block);
-        //.log(`debuggger value: ${debucgger} for number: ${i} match: ${j}`);
         debucgger++;
       }
-      // const number = this.startRange + i;
-      // const systems = this.createNumberSystems(number);
-      // const block = new BaseBlock(i, number, systems);
-      //this.blocks.push(block);
-      //this.block.generateInterface();
     }
     this.shuffleBlocks();
     // generate blocks interface
     this.blocks.forEach((block) => {
-      //.log(block);
       block.generateInterface();
     });
   }
@@ -221,6 +222,8 @@ class GameControls {
   constructor() {
     this.selectedBases = [];
     this.blockSet = null;
+    this.selectedBlocks = [];
+    this.selectedBlocksCount = 0;
   }
   addBase(systemId) {
     this.selectedBases.push(systemId);
@@ -248,9 +251,13 @@ class GameControls {
       this.getSelectedBases()
     );
   }
+  start() {
+    console.log('Starting the game...');
+    this.initializeBlockSet();
+  }
 
   restart() {
-    console.log('gamecontrols.restart: Restarting the game...');
+    console.log('Restarting the game...');
     // Clear existing blocks from the grid
     grid.innerHTML = '';
     // Reset score and time
@@ -258,51 +265,65 @@ class GameControls {
     time = 0;
     document.querySelector('.score').textContent = score;
     // Create a new BlockSet
-    this.initializeBlockSet();
+    this.start();
+  }
+
+  checkForMatch() {
+    console.log('Checking for match...');
+    setTimeout(() => {
+      if (this.selectedBlocks.length !== 2) {
+        console.error(
+          'checkForMatch called with incorrect number of selected blocks'
+        );
+        return;
+      }
+
+      lockBoard = true;
+      let allMatch = true;
+      const firstNumber = this.selectedBlocks[0].number;
+      for (let i = 1; i < this.selectedBlocks.length; i++) {
+        if (this.selectedBlocks[i].number !== firstNumber) {
+          allMatch = false;
+          break;
+        }
+      }
+
+      if (allMatch) {
+        lockBoard = false;
+        console.log('Blocks match!');
+        this.selectedBlocks.forEach((block) => block.disable());
+        lockBoard = true; // Keep the board locked after a successful match
+        score += numberOfMatches * 20; // Reward for a match
+        document.querySelector('.score').textContent = score;
+      } else {
+        this.selectedBlocks.forEach((block) => block.deselect());
+      }
+
+      this.checkWinCondition();
+
+      this.resetBoard();
+    }, 300);
+  }
+  checkWinCondition() {
+    const allDisabled = this.blockSet.blocks.every((block) =>
+      block.element.classList.contains('disabled')
+    );
+    if (allDisabled) {
+      console.log('Congratulations! You have matched all blocks!');
+      alert('Congratulations! You have matched all blocks!');
+      // Optionally, you can restart the game or offer to restart
+      this.restart();
+    }
+  }
+
+  resetBoard() {
+    this.selectedBlocks = [];
+    this.selectedBlocksCount = 0;
+    lockBoard = false;
   }
 }
 
 // ************************ ENGINE ************************
-/* 
-function restart() {
-  console.log('Restarting the game...');
-  // Clear existing blocks from the grid
-  grid.innerHTML = '';
-  // Reset score and time
-  score = 0;
-  time = 0;
-  document.querySelector('.score').textContent = score;
-  // Create a new BlockSet
-  const blockSet = new BlockSet(
-    setSize,
-    numberOfMatches,
-    startingRange,
-    gameControls.getSelectedBases()
-  );
-}
- */
-function checkForMatch() {
-  setTimeout(() => {
-    // return if either block is null (safety check)
-    if (!firstBlock || !secondBlock) return;
-    if (firstBlock.number === secondBlock.number) {
-      firstBlock.disable();
-      secondBlock.disable();
-      //lockBoard = false; in resetBoard (below)
-      score += numberOfMatches * 20; // Reward for a match
-      document.querySelector('.score').textContent = score;
-    } else {
-      firstBlock.deselect();
-      secondBlock.deselect();
-    }
-    resetBoard();
-  }, 300);
-}
-function resetBoard() {
-  firstBlock = null;
-  secondBlock = null;
-  lockBoard = false;
-}
 
 // ************************ INSTANTIATE GAME CONTROLS ************************
 
