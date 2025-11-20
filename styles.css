@@ -173,32 +173,41 @@ h2 {
 /* ****************** GRID: ****************** */
 .grid-container {
   display: grid;
-  grid-template-columns: repeat(auto-fill, var(--block-size));
-  gap: 5px;
+  /* grid-template-columns: repeat(auto-fill, var(--block-size)); */
   justify-content: center; /* center the whole grid */
   align-content: start;
-  perspective: 1000px;
+  grid-template-columns: repeat(4, 120px);
+  grid-template-rows: repeat(4, 120px);
+  gap: 10px;
+  perspective: 9000px;
 }
 
 /* ****************** BLOCKS: ****************** */
 
 .block {
-  width: var(--block-size);
+  /*   width: var(--block-size);
   height: var(--block-size);
   box-sizing: border-box;
-
   text-align: center;
   place-content: center;
   color: var(--text-box);
   font-size: 1.382rem;
-  font-weight: 800;
+  font-weight: 800; */
 
   /* overflow: hidden; */
 
-  position: relative;
+  /*   position: relative;
   transform-style: flat;
   transform-style: preserve-3d;
-  transition: transform 0.8s ease;
+  transition: transform 0.8s ease; */
+
+  width: 120px;
+  height: 120px;
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform 0.5s;
+  cursor: pointer;
+  border-radius: 5px;
 }
 /* .block:hover {
   background-color: var(--box-medium-primary);
@@ -206,14 +215,28 @@ h2 {
 } */
 
 .face {
-  position: absolute;
+/*   position: absolute;
   inset: 0;
   display: flex;
   align-items: center;
   justify-content: center;
   backface-visibility: hidden;
   box-sizing: border-box;
-  border: var(--face-border) solid #2a2a2a;
+  border: var(--face-border) solid #2a2a2a; */
+
+       position: absolute;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      backface-visibility: hidden;
+      border: 1px solid #999;
+      font-size: 24px;
+      font-weight: bold;
+      color: #333;
+      box-sizing: border-box;
+    }
 }
 
 .hidden-face {
@@ -242,22 +265,22 @@ h2 {
 } */
 
 .face-0 {
-  transform: rotateY(0deg) translateZ(70px);
+  transform: rotateY(0deg)  translateZ(60px);
 }
 .face-1 {
-  transform: rotateY(90deg) translateZ(70px);
+  transform: rotateY(90deg) translateZ(60px);
 }
 .face-2 {
-  transform: rotateY(180deg) translateZ(70px);
+  transform: rotateY(180deg) translateZ(60px);
 }
 .face-3 {
-  transform: rotateY(-90deg) translateZ(70px);
+  transform: rotateY(-90deg) translateZ(60px);
 }
 .face-top {
-  transform: rotateX(90deg) translateZ(70px);
+  transform: rotateX(90deg) translateZ(60px);
 }
 .face-bottom {
-  transform: rotateX(-90deg) translateZ(70px);
+  transform: rotateX(-90deg) translateZ(60px);
 }
 
 /* 
