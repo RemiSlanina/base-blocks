@@ -198,7 +198,7 @@ h2 {
   position: relative;
   transform-style: flat;
   transform-style: preserve-3d;
-  transition: transform 0.2s ease;
+  transition: transform 0.8s ease;
 }
 /* .block:hover {
   background-color: var(--box-medium-primary);
@@ -214,9 +214,11 @@ h2 {
   backface-visibility: hidden;
   box-sizing: border-box;
   border: var(--face-border) solid #2a2a2a;
-  /* for testing purposes */
-  /* background: rgba(100, 150, 250, 0.9); */
-  /* border: 2px solid #fff; */
+}
+
+.hidden-face {
+  opacity: 0;
+  border: none;
 }
 /* 
 .block {
@@ -238,29 +240,24 @@ h2 {
   box-sizing: border-box;
   border: var(--face-border) solid #2a2a2a;
 } */
+
 .face-0 {
-  transform: rotateY(0deg)
-    translateZ(calc(var(--block-size) / 2 - var(--face-border)));
+  transform: rotateY(0deg) translateZ(70px);
 }
 .face-1 {
-  transform: rotateY(90deg)
-    translateZ(calc(var(--block-size) / 2 - var(--face-border)));
+  transform: rotateY(90deg) translateZ(70px);
 }
 .face-2 {
-  transform: rotateY(180deg)
-    translateZ(calc(var(--block-size) / 2 - var(--face-border)));
+  transform: rotateY(180deg) translateZ(70px);
 }
 .face-3 {
-  transform: rotateY(-90deg)
-    translateZ(calc(var(--block-size) / 2 - var(--face-border)));
+  transform: rotateY(-90deg) translateZ(70px);
 }
 .face-top {
-  transform: rotateX(90deg)
-    translateZ(calc(var(--block-size) / 2 - var(--face-border)));
+  transform: rotateX(90deg) translateZ(70px);
 }
 .face-bottom {
-  transform: rotateX(-90deg)
-    translateZ(calc(var(--block-size) / 2 - var(--face-border)));
+  transform: rotateX(-90deg) translateZ(70px);
 }
 
 /* 

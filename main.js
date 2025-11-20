@@ -168,7 +168,6 @@ class BaseBlock {
   getDisplayFor(i) {
     return this.systems[i].toDisplay(this.number);
   }
-
   // get the display for the CURRENTLY SHOWN face
   getCurrentDisplay() {
     return this.getDisplayFor(this.activeFaceIndex);
