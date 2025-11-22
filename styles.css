@@ -156,6 +156,43 @@ h1 {
 h2 {
   font-size: 1.618rem;
 }
+.choose-bases {
+  text-align: center;
+  margin-bottom: var(--spacing-unit);
+}
+.choose-bases p {
+  margin-bottom: calc(var(--golden-minor) * 1rem);
+}
+.choose-bases label {
+  margin: 0 calc(var(--golden-minor) * 0.5rem);
+}
+.choose-bases button {
+  margin-top: var(--spacing-unit);
+}
+.base1-button {
+  background-color: var(--box-light-primary);
+  border: 2px solid var(--box-dark-primary);
+}
+.base2-button {
+  background-color: var(--box-light-secondary);
+  border: 2px solid var(--box-dark-secondary);
+}
+.base3-button {
+  background-color: var(--box-light-tertiary);
+  border: 2px solid var(--box-dark-tertiary);
+}
+.base4-button {
+  background-color: var(--box-light-quaternary);
+  border: 2px solid var(--box-dark-quaternary);
+}
+.base5-button {
+  background-color: var(--box-light-quinary);
+  border: 2px solid var(--box-dark-quinary);
+}
+.base6-button {
+  background-color: var(--box-light-senary);
+  border: 2px solid var(--box-dark-senary);
+}
 /* ****************** GRID: ****************** */
 .grid-container {
   display: grid;
@@ -359,6 +396,9 @@ img {
 
 /* adjust gap and box size  */
 @media (max-width: 600px) {
+  h1 {
+    font-size: 3rem;
+  }
   .grid-container {
     gap: 3px;
   }

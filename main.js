@@ -1,8 +1,9 @@
 // ****************************** Vars ******************************
 const grid = document.querySelector('.grid-container');
+const restartButton = document.getElementById('restart-button');
+const levelDisplay = document.querySelector('.level');
 let trackFlips = true;
 let flipCount = 0;
-const restartButton = document.getElementById('restart-button');
 let lockBoard = false;
 let score = 0;
 let time = 0;
@@ -261,7 +262,7 @@ class GameControls {
     // Clear existing blocks from the grid
     grid.innerHTML = '';
     // Reset score and time
-    startingRange = 1;
+    startingRange = 1; // 36 for testing
     score = 0;
     time = 0;
     document.querySelector('.score').textContent = score;
@@ -273,11 +274,12 @@ class GameControls {
     console.log('Continuing with higher values...');
     // Clear existing blocks from the grid
     grid.innerHTML = '';
-    // Reset score and time
-    //score = 0;
+    // Update starting range
     startingRange++;
-    time = 0;
-    document.querySelector('.score').textContent = score;
+    levelDisplay.textContent = startingRange;
+    //time = 0;
+    //score = 0;
+    //document.querySelector('.score').textContent = score;
     // Create a new BlockSet
     this.start();
   }
@@ -304,6 +306,33 @@ class GameControls {
 
       if (allMatch) {
         lockBoard = false;
+        if (this.selectedBlocks[0].number === 42) {
+          // actually this would be a pain if this happens multiple times...
+          // so maybe only show once per game?
+          const lifeUniverseElement = document.querySelector(
+            '.life-universe-everything'
+          );
+          if (lifeUniverseElement) {
+            lifeUniverseElement.textContent =
+              '🎉 You found the answer to life, the universe and everything! 🎉';
+          }
+          lifeUniverseElement.style.display = 'block';
+          /* 
+         // actually this would be a pain if this happens multiple times...
+
+          confetti({
+            particleCount: 150,
+            angle: 60,
+            spread: 55,
+            origin: { x: 0, y: 0.6 },
+            colors: ['#ff0000', '#00ff00', '#0000ff'],
+            shapes: ['circle', 'square'],
+            scalar: 1.2,
+            zIndex: 1000,
+          });
+           */
+          console.log('The answer to life, the universe and everything!');
+        }
         console.log('Blocks match!');
         this.selectedBlocks.forEach((block) => block.disable());
         lockBoard = true; // Keep the board locked after a successful match
@@ -325,10 +354,23 @@ class GameControls {
       block.element.classList.contains('disabled')
     );
     if (allDisabled) {
-      console.log('Congratulations! You have matched all blocks!');
-      alert('Congratulations! You have matched all blocks!');
+      //console.log('Congratulations! You have matched all blocks!');
+      //alert('Congratulations! You have matched all blocks!');
       // Optionally, you can restart the game or offer to restart
       this.continue();
+      if (startingRange == 8) {
+        alert('Great job! You have reached Level ' + startingRange + '!');
+      } else if (startingRange == 16) {
+        alert('Fantastic! You have reached Level ' + startingRange + '!');
+      } else if (startingRange == 32) {
+        alert('Amazing! You have reached Level ' + startingRange + '!');
+      } else if (startingRange == 64) {
+        alert(
+          'Incredible! You have reached Level ' +
+            startingRange +
+            '!\nYou completed the game! Proceed at your own risk!'
+        );
+      }
     }
   }
 
