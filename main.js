@@ -261,7 +261,21 @@ class GameControls {
     // Clear existing blocks from the grid
     grid.innerHTML = '';
     // Reset score and time
+    startingRange = 1;
     score = 0;
+    time = 0;
+    document.querySelector('.score').textContent = score;
+    // Create a new BlockSet
+    this.start();
+  }
+
+  continue() {
+    console.log('Continuing with higher values...');
+    // Clear existing blocks from the grid
+    grid.innerHTML = '';
+    // Reset score and time
+    //score = 0;
+    startingRange++;
     time = 0;
     document.querySelector('.score').textContent = score;
     // Create a new BlockSet
@@ -296,6 +310,8 @@ class GameControls {
         score += numberOfMatches * 20; // Reward for a match
         document.querySelector('.score').textContent = score;
       } else {
+        lockBoard = false;
+        console.log('Blocks do not match.');
         this.selectedBlocks.forEach((block) => block.deselect());
       }
 
@@ -312,7 +328,7 @@ class GameControls {
       console.log('Congratulations! You have matched all blocks!');
       alert('Congratulations! You have matched all blocks!');
       // Optionally, you can restart the game or offer to restart
-      this.restart();
+      this.continue();
     }
   }
 
