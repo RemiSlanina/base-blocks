@@ -6,6 +6,7 @@
     <title>Base Blocks</title>
     <link rel="stylesheet" type="text/css" href="styles.css" />
     <script src="main.js" type="module" defer></script>
+    <script src="/confetti.browser.min.js"></script>
   </head>
   <body>
     <button id="theme-toggle" aria-label="Toggle dark mode">Dark Mode</button>
@@ -43,14 +44,24 @@
         </div>
       </div>
 
-      <div>
-        <p class="life-universe-everything"></p>
-        <p class="manual-text">
-          Memory like concept - match across bases 💙 <br />
-          Find two matching values across different number systems.
-        </p>
-        <p>Try to reach Level 8 for a start ... up to level 64</p>
-        <p><span class="thank-you-message"></span></p>
+      <div class="below-game">
+        <div class="instructions-container">
+          <p class="instructions">
+            Memory like concept - match across bases 💙 <br />
+            Find two matching values across different number systems.
+          </p>
+          <p class="instructions">
+            Play using the mouse: left click to select, right click to flip
+            <br />
+            Play using the keyboard: Enter to select, Space to flip
+          </p>
+
+          <p class="instructions">
+            Try to reach Level 8 for a start ... up to level 64
+          </p>
+          <p class="life-universe-everything"></p>
+          <p><span class="thank-you-message"></span></p>
+        </div>
       </div>
       <div class="accordion-container">
         <button class="accordion">I guess this is math?</button>

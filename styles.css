@@ -105,6 +105,12 @@
 /* *********************************************** */
 
 /* ****************** BODY: ****************** */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  border: 1px solid transparent;
+}
 
 body {
   display: grid;
@@ -124,9 +130,20 @@ body {
   padding: 0.8rem;
   text-align: center;
 }
-.manual-text {
+.instructions {
+  margin-top: calc(var(--golden-minor) * 1rem);
+  margin-bottom: calc(var(--golden-minor) * 1rem);
+  text-align: left;
+}
+.below-game {
   display: flex;
-  place-content: center;
+  justify-content: center;
+  margin-top: var(--spacing-unit);
+  margin-bottom: var(--spacing-unit);
+}
+.instructions-container {
+  width: fit-content;
+  max-width: var(--max-width-screen, 90vw);
 }
 
 button {

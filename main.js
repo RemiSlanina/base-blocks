@@ -70,13 +70,32 @@ class BaseBlock {
     /* for CSS manipulation:  */
     this.baseClasses = ['base1', 'base2', 'base3', 'base4', 'base5', 'base6'];
     this.element = document.createElement('div');
+    this.element.setAttribute('role', 'button');
+    this.element.setAttribute('tabindex', '0'); // Make it focusable
     this.element.classList.add('block', this.baseClasses[this.face]);
     this.element.setAttribute(
       'aria-label',
       `Block showing number ${this.getCurrentDisplay()}`
     );
-    this.isFirst = false;
-    this.isSecond = false;
+    this.isFirst = false; // delete these and test later
+    this.isSecond = false; // they are not used anywhere else
+
+    // Event Listeners for interaction:
+    // Play using the mouse: left click to select, right click to flip
+    // Play using the keyboard: Enter to select, Space to flip
+
+    /* ****************** Keyboard: ****************** */
+    this.element.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        this.select(); // Select on Enter or Space
+      } else if (e.key === ' ') {
+        e.preventDefault();
+        this.flip(); // Flip on Space
+        this.element.textContent = this.getCurrentDisplay();
+      }
+    });
+
     /* ****************** RIGHT CLICK: ****************** */
     this.selectBound = this.select.bind(this);
     this.element.addEventListener('click', this.selectBound);
@@ -243,6 +262,7 @@ class GameControls {
     this.blockSet = null;
     this.selectedBlocks = [];
     this.selectedBlocksCount = 0;
+    this.hasFiredConfettiFor42 = false; // to avoid multiple confetti firings
   }
   addBase(systemId) {
     this.selectedBases.push(systemId);
@@ -280,7 +300,17 @@ class GameControls {
     // Clear existing blocks from the grid
     grid.innerHTML = '';
     // Reset score and time
-    startingRange = 1; // 36 for testing
+    this.hasFiredConfettiFor42 = false; // Reset confetti flag on restart
+    // reset life-universe-everything message
+    const lifeUniverseElement = document.querySelector(
+      '.life-universe-everything'
+    );
+    if (lifeUniverseElement) {
+      lifeUniverseElement.style.display = 'none';
+      lifeUniverseElement.textContent = '';
+    }
+    startingRange = 1; // 36 for testing otherwise 1
+    levelDisplay.textContent = startingRange;
     score = 0;
     time = 0;
     document.querySelector('.score').textContent = score;
@@ -324,7 +354,11 @@ class GameControls {
 
       if (allMatch) {
         lockBoard = false;
-        if (this.selectedBlocks[0].number === 42) {
+        if (
+          this.selectedBlocks[0].number === 42 &&
+          !this.hasFiredConfettiFor42
+        ) {
+          this.hasFiredConfettiFor42 = true;
           // actually this would be a pain if this happens multiple times...
           // so maybe only show once per game?
           const lifeUniverseElement = document.querySelector(
@@ -332,23 +366,23 @@ class GameControls {
           );
           if (lifeUniverseElement) {
             lifeUniverseElement.textContent =
-              '🎉 You found the answer to life, the universe and everything! 🎉';
+              'You found the answer to life, the universe and everything! (42)';
           }
           lifeUniverseElement.style.display = 'block';
-          /* 
-         // actually this would be a pain if this happens multiple times...
+
+          // actually this would be a pain if this happens multiple times...
 
           confetti({
-            particleCount: 150,
-            angle: 60,
-            spread: 55,
+            particleCount: 126,
+            angle: 42,
+            spread: 42,
             origin: { x: 0, y: 0.6 },
             colors: ['#ff0000', '#00ff00', '#0000ff'],
             shapes: ['circle', 'square'],
             scalar: 1.2,
             zIndex: 1000,
           });
-           */
+
           console.log('The answer to life, the universe and everything!');
         }
         console.log('Blocks match!');
