@@ -71,6 +71,10 @@ class BaseBlock {
     this.baseClasses = ['base1', 'base2', 'base3', 'base4', 'base5', 'base6'];
     this.element = document.createElement('div');
     this.element.classList.add('block', this.baseClasses[this.face]);
+    this.element.setAttribute(
+      'aria-label',
+      `Block showing number ${this.getCurrentDisplay()}`
+    );
     this.isFirst = false;
     this.isSecond = false;
     /* ****************** RIGHT CLICK: ****************** */
@@ -105,6 +109,10 @@ class BaseBlock {
       score = Math.max(0, score - 1); // Penalty for flipping
     }
     document.querySelector('.score').textContent = score;
+    this.element.setAttribute(
+      'aria-label',
+      `Block with value ${this.getCurrentDisplay()}`
+    );
   }
   select = () => {
     //console.trace();
@@ -136,6 +144,11 @@ class BaseBlock {
     gameControls.selectedBlocks.push(this);
     gameControls.selectedBlocksCount++;
 
+    this.element.setAttribute(
+      'aria-label',
+      `Selected block with value ${this.getCurrentDisplay()}`
+    );
+
     if (gameControls.selectedBlocksCount === numberOfMatches) {
       lockBoard = true;
       gameControls.checkForMatch();
@@ -164,6 +177,11 @@ class BaseBlock {
     );
     gameControls.selectedBlocksCount--;
     console.log(`deselected ${this.getCurrentDisplay()}`);
+
+    this.element.setAttribute(
+      'aria-label',
+      `Dselected block with value ${this.getCurrentDisplay()}`
+    );
   }
   disable() {
     this.element.removeEventListener('click', this.selectBound);

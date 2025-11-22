@@ -6,10 +6,9 @@
     <title>Base Blocks</title>
     <link rel="stylesheet" type="text/css" href="styles.css" />
     <script src="main.js" type="module" defer></script>
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
   </head>
   <body>
-    <button id="theme-toggle">Dark Mode</button>
+    <button id="theme-toggle" aria-label="Toggle dark mode">Dark Mode</button>
 
     <h1>Base Blocks</h1>
 
@@ -37,12 +36,15 @@
 
         <p>Level: <span class="level">1</span></p>
         <div class="actions">
-          <button id="restart-button">Restart</button>
+          <button id="restart-button" aria-label="Restart the game">
+            Restart
+          </button>
           <br />
         </div>
       </div>
 
       <div>
+        <p class="life-universe-everything"></p>
         <p class="manual-text">
           Memory like concept - match across bases 💙 <br />
           Find two matching values across different number systems.
