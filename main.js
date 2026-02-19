@@ -7,12 +7,63 @@ let flipCount = 0;
 let lockBoard = false;
 let score = 0;
 let time = 0;
-const blocks = [];
+//const blocks = []; // didn't use that anymore, did I?
 let startingRange = 1;
 let setSize = 16; // number of blocks, must be even
 let numberOfMatches = 2;
 
 // ****************************** Helper Functions ******************************
+
+function findDuplicateMatches(blocks) {
+  if (!Array.isArray(blocks)) {
+    console.log('Invalid type error! [] expected.');
+    return;
+  }
+  const duplicateMatches = [];
+  // check if these are actually blocks...
+  for (let i = 0; i < blocks.length - 1; i++) {
+    for (let j = i + 1; j < blocks.length; j++) {
+      // if (i === j) {
+      //   // the same element
+      //   continue;
+      // }
+      if (blocks[i].number === blocks[j].number) {
+        if (blocks[i].face === blocks[j].face) {
+          duplicateMatches.push([blocks[i], blocks[j]]);
+        }
+      }
+    }
+  }
+  console.log(`duplicateMatches: ${duplicateMatches}`);
+  return duplicateMatches;
+}
+
+function resolveDuplicateMatches(matches) {
+  // why is matches undefined?
+  matches.forEach(flipDuplicatePair);
+}
+
+// i must be careful not to trigger the counter flipCount when flipping them, even though
+// do not seem to use them right now. possibly disabling trackFlips temporarily.
+function flipDuplicatePair(pair) {
+  // TODO: check type of pair
+  let [block1, block2] = pair; // destructuring
+  if (!(block1 instanceof BaseBlock) || !(block2 instanceof BaseBlock)) {
+    // can i do this?
+    console.error('Invalid type error!');
+    return;
+  }
+
+  const previous = trackFlips;
+  trackFlips = false;
+
+  // flip ONE block (if you flip both, they will both have the same base again)
+  block1.flipAndRender();
+  // block1.flip();
+  // block1.element.textContent = block1.getCurrentDisplay();
+
+  trackFlips = previous;
+}
 
 // ****************************** Classes ******************************
 // ****************** SystemId ******************
@@ -91,8 +142,9 @@ class BaseBlock {
         this.select(); // Select on Enter or Space
       } else if (e.key === ' ') {
         e.preventDefault();
-        this.flip(); // Flip on Space
-        this.element.textContent = this.getCurrentDisplay();
+        this.flipAndRender();
+        // this.flip(); // Flip on Space
+        // this.element.textContent = this.getCurrentDisplay();
       }
     });
 
@@ -114,7 +166,20 @@ class BaseBlock {
   getCurrentDisplay() {
     return this.systems[this.face].toDisplay(this.number);
   }
+  flipAndRender() {
+    this.flip();
+    this.render();
+  }
+  render() {
+    // update the textContent (the display)
+    this.element.textContent = this.getCurrentDisplay();
+    this.element.setAttribute(
+      'aria-label',
+      `Block with value ${this.getCurrentDisplay()}`
+    );
+  }
   flip() {
+    // update css
     // Remove the old class
     this.element.classList.remove(this.baseClasses[this.face]);
     // Update the face index (cycle back to 0 if at the end)
@@ -128,10 +193,6 @@ class BaseBlock {
       score = Math.max(0, score - 1); // Penalty for flipping
     }
     document.querySelector('.score').textContent = score;
-    this.element.setAttribute(
-      'aria-label',
-      `Block with value ${this.getCurrentDisplay()}`
-    );
   }
   select = () => {
     //console.trace();
@@ -289,6 +350,13 @@ class GameControls {
       startingRange,
       this.getSelectedBases()
     );
+
+    //works, but only at startup, not at level up:
+    let duplicates;
+    do {
+      duplicates = findDuplicateMatches(gameControls.blockSet.blocks);
+      resolveDuplicateMatches(duplicates);
+    } while (findDuplicateMatches(gameControls.blockSet.blocks).length > 0); // while the array it is not empty
   }
   start() {
     console.log('Starting the game...');
@@ -440,7 +508,15 @@ class GameControls {
 const gameControls = new GameControls();
 gameControls.createDefaultSystems();
 gameControls.initializeBlockSet();
+// const duplicates = findDuplicateMatches(gameControls.blockSet.blocks); // this is ugly and should be gameControls methods
+// resolveDuplicateMatches(duplicates);
 
+// //works, but only at startup, not at level up:
+// let duplicates;
+// do {
+//   duplicates = findDuplicateMatches(gameControls.blockSet.blocks);
+//   resolveDuplicateMatches(duplicates);
+// } while (findDuplicateMatches(gameControls.blockSet.blocks).length > 0); // while the array it is not empty
 // ************************ EVENT LISTENERS ************************
 
 restartButton.addEventListener(

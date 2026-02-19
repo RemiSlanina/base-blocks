@@ -49,7 +49,7 @@ or:
 MIT for the code:
 
 - The **code** in this repository is licensed under the [MIT License](./LICENSE).
-- The **artwork, images, and design assets** are © Remi Slanina.
+- The **artwork, images, and design assets** are © Remi Slanina. Please credit me if you use them.
 
 You may:
 
@@ -69,6 +69,6 @@ Thank you for visiting. Have fun playing :)
 
 ---
 
-Also in dark mode
+Also in light mode
 
 ![Screenshot 2](/assets/screenshots/Screenshot-2-WIP.png)
