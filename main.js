@@ -11,22 +11,20 @@ let time = 0;
 let startingRange = 1;
 let setSize = 16; // number of blocks, must be even
 let numberOfMatches = 2;
+let countAlerts = 0;
+let maxAlerts = 2;
 
 // ****************************** Helper Functions ******************************
 
 function findDuplicateMatches(blocks) {
   if (!Array.isArray(blocks)) {
     console.log('Invalid type error! [] expected.');
-    return;
+    return [];
   }
   const duplicateMatches = [];
   // check if these are actually blocks...
   for (let i = 0; i < blocks.length - 1; i++) {
     for (let j = i + 1; j < blocks.length; j++) {
-      // if (i === j) {
-      //   // the same element
-      //   continue;
-      // }
       if (blocks[i].number === blocks[j].number) {
         if (blocks[i].face === blocks[j].face) {
           duplicateMatches.push([blocks[i], blocks[j]]);
@@ -39,18 +37,19 @@ function findDuplicateMatches(blocks) {
 }
 
 function resolveDuplicateMatches(matches) {
-  // why is matches undefined?
   matches.forEach(flipDuplicatePair);
 }
 
-// i must be careful not to trigger the counter flipCount when flipping them, even though
-// do not seem to use them right now. possibly disabling trackFlips temporarily.
 function flipDuplicatePair(pair) {
-  // TODO: check type of pair
+  if (!Array.isArray(pair) || pair.length !== 2) {
+    console.error('Invalid pair: ', pair);
+    return;
+  }
+
   let [block1, block2] = pair; // destructuring
   if (!(block1 instanceof BaseBlock) || !(block2 instanceof BaseBlock)) {
     // can i do this?
-    console.error('Invalid type error!');
+    console.error('Invalid block type in pair: ', block1, block2);
     return;
   }
 
@@ -59,8 +58,6 @@ function flipDuplicatePair(pair) {
 
   // flip ONE block (if you flip both, they will both have the same base again)
   block1.flipAndRender();
-  // block1.flip();
-  // block1.element.textContent = block1.getCurrentDisplay();
 
   trackFlips = previous;
 }
@@ -143,8 +140,6 @@ class BaseBlock {
       } else if (e.key === ' ') {
         e.preventDefault();
         this.flipAndRender();
-        // this.flip(); // Flip on Space
-        // this.element.textContent = this.getCurrentDisplay();
       }
     });
 
@@ -351,13 +346,30 @@ class GameControls {
       this.getSelectedBases()
     );
 
-    //works, but only at startup, not at level up:
-    let duplicates;
-    do {
-      duplicates = findDuplicateMatches(gameControls.blockSet.blocks);
-      resolveDuplicateMatches(duplicates);
-    } while (findDuplicateMatches(gameControls.blockSet.blocks).length > 0); // while the array it is not empty
+    // resolve duplicates every time a new set is initializied:
+    try {
+      let duplicates;
+      do {
+        duplicates = findDuplicateMatches(gameControls.blockSet.blocks);
+        // duplicates = 'pizza'; // testing...
+        if (duplicates.length === 0) break; // to be sure;
+        if (countAlerts > maxAlerts) {
+          console.error(
+            `Something's not right: countAlerts exceeded limits! GameControls: initializeBlockSet()`
+          );
+          break; // prevent endless loops
+        }
+        resolveDuplicateMatches(duplicates);
+      } while (findDuplicateMatches(gameControls.blockSet.blocks).length > 0); // while the array it is not empty
+    } catch (e) {
+      console.log('Failed to resolve duplicates: ', e);
+      // Alert the user:
+      alert('Something went wrong. Restarting the level...');
+      countAlerts++;
+      this.restart();
+    }
   }
+
   start() {
     console.log('Starting the game...');
     this.initializeBlockSet();
@@ -465,6 +477,7 @@ class GameControls {
       }
 
       this.checkWinCondition();
+      countAlerts = 0; // assuming the game was running fine for a minute
 
       this.resetBoard();
     }, 300);
