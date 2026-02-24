@@ -7,7 +7,8 @@ let flipCount = 0;
 let lockBoard = false;
 let score = 0;
 let time = 0;
-let startingRange = 1;
+let gameRange = 2; // 2- 9
+let levelCount = 2;
 let setSize = 16; // number of blocks, must be even
 let numberOfMatches = 2;
 let countAlerts = 0;
@@ -36,7 +37,7 @@ const HEX_INDEX = 3;
  * Write a helper function that converts one block of a pair to binary, if none is binary.
  * This is to avoid boredom with numbers below 8 (oct) or 10 (dec).
  * @param {Block[]} blocks
- * @returns
+ * @returns {void}
  */
 function flipToBinary(blocks) {
   // console.log(`param blocks: ${blocks}`);
@@ -83,14 +84,18 @@ function findMatches(blocks) {
     }
   }
 
-  // console.log(`matches: ${matches}`);
   return matches;
 }
 
 /**
+ * @typedef {Object} Block
+ * @property {number} number
+ * @property {face} number
+ */
+/**
  * Helper function that returns duplicate matches (same base).
- * @param {*} blocks.
- * @returns blocks
+ * @param {Block[]} blocks
+ * @returns {[Block, Block][]}
  */
 function findDuplicateMatches(blocks) {
   if (!Array.isArray(blocks)) {
@@ -112,10 +117,20 @@ function findDuplicateMatches(blocks) {
   return duplicateMatches;
 }
 
+/**
+ * Helper function that resolves any duplicate matches (same base and number)
+ * @param  {[BaseBlock, BaseBlock]} matches
+ * @returns {void}
+ */
 function resolveDuplicateMatches(matches) {
   matches.forEach(flipDuplicatePair);
 }
 
+/**
+ * Helper function that flips any duplicate matches/pairs (same base and number)
+ * @param {[BaseBlock, BaseBlock]} pair
+ * @returns {void}
+ */
 function flipDuplicatePair(pair) {
   if (!Array.isArray(pair) || pair.length !== 2) {
     console.error('Invalid pair: ', pair);
@@ -140,6 +155,7 @@ function flipDuplicatePair(pair) {
 
 // ****************************** Classes ******************************
 // ****************** SystemId ******************
+
 class SystemId {
   constructor(label, badge, base) {
     this.label = label; // e.g., "BIN", "DEC"
@@ -364,10 +380,10 @@ class BaseBlock {
 
 // ****************** BlockSet ******************
 class BlockSet {
-  constructor(size, matches, startingRange, systemIds) {
+  constructor(size, matches, gameRange, systemIds) {
     this.size = size || 16; // total number of blocks
     this.matches = matches || 2; // number of matches per group
-    this.startingRange = startingRange || 12; // starting range for numbers
+    this.gameRange = gameRange || 12; // starting range for numbers
     this.blocks = [];
     this.createBlocks();
   }
@@ -377,8 +393,8 @@ class BlockSet {
     let debucgger = 0;
     //create blocks
     for (
-      let i = this.startingRange;
-      i < this.size / this.matches + this.startingRange;
+      let i = this.gameRange;
+      i < this.size / this.matches + this.gameRange;
       i++
     ) {
       for (let j = 0; j < this.matches; j++) {
@@ -387,6 +403,7 @@ class BlockSet {
           i,
           gameControls.getSelectedBases()
         );
+
         this.blocks.push(block);
         debucgger++;
       }
@@ -444,7 +461,7 @@ class GameControls {
     this.blockSet = new BlockSet(
       setSize,
       numberOfMatches,
-      startingRange,
+      gameRange,
       this.getSelectedBases()
     );
 
@@ -471,7 +488,7 @@ class GameControls {
       this.restart();
     }
 
-    if (startingRange <= 7) {
+    if (gameRange <= 7) {
       flipToBinary(this.blockSet.blocks);
     }
   }
@@ -495,8 +512,8 @@ class GameControls {
       lifeUniverseElement.style.display = 'none';
       lifeUniverseElement.textContent = '';
     }
-    startingRange = 1; // 36 for testing otherwise 1
-    levelDisplay.textContent = startingRange;
+    gameRange = 1; // 36 for testing otherwise 1
+    levelDisplay.textContent = gameRange;
     score = 0;
     time = 0;
     document.querySelector('.score').textContent = score;
@@ -509,8 +526,8 @@ class GameControls {
     // Clear existing blocks from the grid
     grid.innerHTML = '';
     // Update starting range
-    startingRange++;
-    levelDisplay.textContent = startingRange;
+    levelCount++;
+    levelDisplay.textContent = levelCount;
     //time = 0;
     //score = 0;
     //document.querySelector('.score').textContent = score;
@@ -597,16 +614,16 @@ class GameControls {
       //alert('Congratulations! You have matched all blocks!');
       // Optionally, you can restart the game or offer to restart
       this.continue();
-      if (startingRange == 8) {
-        alert('Great job! You have reached Level ' + startingRange + '!');
-      } else if (startingRange == 16) {
-        alert('Fantastic! You have reached Level ' + startingRange + '!');
-      } else if (startingRange == 32) {
-        alert('Amazing! You have reached Level ' + startingRange + '!');
-      } else if (startingRange == 64) {
+      if (levelCount == 8) {
+        alert('Great job! You have reached Level ' + levelCount + '!');
+      } else if (levelCount == 16) {
+        alert('Fantastic! You have reached Level ' + levelCount + '!');
+      } else if (levelCount == 32) {
+        alert('Amazing! You have reached Level ' + levelCount + '!');
+      } else if (levelCount == 64) {
         alert(
           'Incredible! You have reached Level ' +
-            startingRange +
+            levelCount +
             '!\nYou completed the game! Proceed at your own risk!'
         );
       }
@@ -672,17 +689,20 @@ for (let i = 0; i < accordions.length; i++) {
 
 // TODO-List:
 
-// 1. write two functions:
-// shuffle colors vs. fixed colors
-// bin = yellow
-// oct = purple-ish
-// dec = orange-ish
-// hex = green
+// change game logic:
+
+// add penalty for wrong guesses
 
 // change game progression:
 // stay with easier blocks for beginners
 // only sprinkle in bigger blocks to avoid frustration
 // maybe vary set size instead
 
+// 1. write two functions:
+// shuffle colors vs. fixed colors
+// bin = yellow
+// oct = purple-ish
+// dec = orange-ish
+// hex = green
 // beginner: more blocks / sprinkled larger nums
 // advanced: scale up or start with larger number (optional)

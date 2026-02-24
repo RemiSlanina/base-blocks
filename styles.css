@@ -1,3 +1,35 @@
+/* ****************** fontface ****************** */
+
+/* TODO : change fonts to something like Roboto or Quattrocento */
+
+/* Libre Franklin - Regular (variable) */
+@font-face {
+  font-family: 'Libre Franklin';
+  src: url('./fonts/LibreFranklin-VariableFont_wght.ttf') format('truetype');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Libre Franklin - Italic (variable) */
+@font-face {
+  font-family: 'Libre Franklin';
+  src: url('./fonts/LibreFranklin-Italic-VariableFont_wght.ttf')
+    format('truetype');
+  font-weight: 100 900;
+  font-style: italic;
+  font-display: swap;
+}
+
+/* Dosis - Regular (variable) */
+@font-face {
+  font-family: 'Dosis';
+  src: url('./fonts/Dosis-VariableFont_wght.ttf') format('truetype');
+  font-weight: 200 800;
+  font-style: normal;
+  font-display: swap;
+}
+
 :root {
   /* Light theme (default) */
   --text-primary: #212529;
@@ -63,8 +95,8 @@
   --golden-ration-boxes: calc(var(--golden-ratio) * 100px);
 
   /* Spacing & fonts */
-  --font-main: 'Libre Franklin', sans-serif;
-  --font-heading: 'Petit Formal Script', cursive;
+
+  --font-main: system-ui, sans-serif;
   --spacing-unit: 1rem;
   --max-width-buttons: 6rem; /* for buttons */
   --max-width-screen: 90dvw;
@@ -130,20 +162,23 @@ body {
   padding: 0.8rem;
   text-align: center;
 }
-.instructions {
-  margin-top: calc(var(--golden-minor) * 1rem);
-  margin-bottom: calc(var(--golden-minor) * 1rem);
-  text-align: left;
-}
+
 .below-game {
-  display: flex;
-  justify-content: center;
   margin-top: var(--spacing-unit);
   margin-bottom: var(--spacing-unit);
 }
 .instructions-container {
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
   width: fit-content;
   max-width: var(--max-width-screen, 90vw);
+}
+
+.instructions {
+  margin-top: calc(var(--golden-minor) * 1rem);
+  margin-bottom: calc(var(--golden-minor) * 1rem);
+  text-align: center;
 }
 
 button {
@@ -359,35 +394,6 @@ h2 {
 /* ****************** IMG FIX ****************** */
 img {
   opacity: 0.6;
-}
-/* ****************** fontface ****************** */
-
-/* Libre Franklin - Regular (variable) */
-@font-face {
-  font-family: 'Libre Franklin';
-  src: url('./fonts/LibreFranklin-VariableFont_wght.ttf') format('truetype');
-  font-weight: 100 900;
-  font-style: normal;
-  font-display: swap;
-}
-
-/* Libre Franklin - Italic (variable) */
-@font-face {
-  font-family: 'Libre Franklin';
-  src: url('./fonts/LibreFranklin-Italic-VariableFont_wght.ttf')
-    format('truetype');
-  font-weight: 100 900;
-  font-style: italic;
-  font-display: swap;
-}
-
-/* Dosis - Regular (variable) */
-@font-face {
-  font-family: 'Dosis';
-  src: url('./fonts/Dosis-VariableFont_wght.ttf') format('truetype');
-  font-weight: 200 800;
-  font-style: normal;
-  font-display: swap;
 }
 
 /* ****************** @media ****************** */
