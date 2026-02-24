@@ -387,28 +387,75 @@ class BlockSet {
     this.blocks = [];
     this.createBlocks();
   }
+
+  ceateAndPushBlock(i) {
+    let block = new BaseBlock(
+      Math.floor(Math.random() * 900) + 100,
+      i,
+      gameControls.getSelectedBases()
+    );
+    this.blocks.push(block);
+    // debucgger++;
+    // console.log(`blocks: ${this.blocks}`);
+    return block;
+  }
+
   createBlocks() {
-    // class BaseBlock {
-    // constructor(id, number, systems, face = 0, matched = false) {
+    // reminder: BaseBlock(id, number, systems, face = 0, matched = false)
     let debucgger = 0;
-    //create blocks
+
+    // first, create an array for big nums to sprinkle in
+    let bigBadNums = [];
+    for (let i = 0; i < 4; i++) {
+      bigBadNums.push(Math.floor(Math.random() * 66));
+    }
+
+    // create blocks
     for (
       let i = this.gameRange;
       i < this.size / this.matches + this.gameRange;
       i++
     ) {
       for (let j = 0; j < this.matches; j++) {
-        let block = new BaseBlock(
-          Math.floor(Math.random() * 900) + 100,
-          i,
-          gameControls.getSelectedBases()
-        );
+        // at higher levels: mix in difficult numbers
+        let block;
 
-        this.blocks.push(block);
-        debucgger++;
+        if (levelCount > 0 && levelCount < 10) {
+          if (i === 7) {
+            console.log('hello 7');
+            block = new BaseBlock(
+              Math.floor(Math.random() * 900) + 100,
+              bigBadNums[0],
+              gameControls.getSelectedBases()
+            );
+            this.blocks.push(block);
+            debucgger++;
+
+            console.log(`blocks: ${this.blocks}`);
+          } else {
+            console.log('hello not 7');
+            block = this.ceateAndPushBlock(i);
+          }
+        } else {
+          // block = new BaseBlock(
+          //   Math.floor(Math.random() * 900) + 100,
+          //   i,
+          //   gameControls.getSelectedBases()
+          // );
+          // this.blocks.push(block);
+
+          block = this.ceateAndPushBlock(i);
+          debucgger++;
+          console.log(`blocks: ${this.blocks}`);
+        }
+
+        // this.blocks.push(block);
+        // debucgger++;
       }
     }
     // Math.floor(Math.random() * gameControls.getSelectedBases().length);
+
+    console.log(`blocks: ${this.blocks}`);
 
     this.shuffleFacesOfBlockSet();
     this.shuffleBlocks();
@@ -417,6 +464,7 @@ class BlockSet {
       block.generateInterface();
     });
   }
+
   shuffleBlocks() {
     // Fisher-Yates Shuffle Algorithm
     for (let i = this.blocks.length - 1; i > 0; i--) {
