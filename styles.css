@@ -1,6 +1,6 @@
 /* ****************** fontface ****************** */
 
-/* TODO : change fonts to something like Roboto or Quattrocento */
+/* TODO : change fonts to something like Roboto or Quattrocento Sans */
 
 /* Libre Franklin - Regular (variable) */
 @font-face {
@@ -137,6 +137,7 @@
 /* *********************************************** */
 
 /* ****************** BODY: ****************** */
+
 * {
   box-sizing: border-box;
   margin: 0;
@@ -157,13 +158,16 @@ body {
 }
 .display {
   display: flex;
-  gap: 4rem;
-  place-content: center;
-  padding: 0.8rem;
+  align-items: center;
+  justify-content: center;
   text-align: center;
+  gap: 4rem;
+  padding: 0.8rem;
 }
 
 .below-game {
+  display: flex;
+  justify-content: center;
   margin-top: var(--spacing-unit);
   margin-bottom: var(--spacing-unit);
 }
@@ -200,9 +204,9 @@ button {
 
 h1 {
   font-size: 4.236rem;
-  margin-top: var(--golden-minor-rem);
-  text-align: center;
+  margin-bottom: calc(var(--golden-major) * 1rem);
   margin-top: calc(var(--golden-major) * 1rem);
+  text-align: center;
 }
 
 h2 {
@@ -245,17 +249,17 @@ h2 {
   background-color: var(--box-light-senary);
   border: 2px solid var(--box-dark-senary);
 }
-/* ****************** GRID: ****************** */
+/* ********************* GRID: ********************* */
 .grid-container {
   display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
   width: fit-content;
   max-width: var(
     --max-width-screen,
     90vw
   ); /* fall back to 90vw if the variable with 90dvw fails */
   justify-content: center;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 5px;
+  gap: 3rem;
   place-content: center;
   margin: 0 auto;
 }
@@ -361,44 +365,16 @@ h2 {
   z-index: 2;
 }
 
-/* ****************** ACCORDION: ****************** */
-
-/* .accordion-container {
-  background-color: purple;
-  border: 4px solid lime;
-} */
-
-.accordion {
-  cursor: pointer;
-  min-width: 0dvw;
-  width: var(--max-width-screen);
-  height: 2rem;
-  color: var(--text-secondary);
-  background-color: var(--bg-secondary);
-  border: none;
-  border-radius: 4px;
-  text-align: left;
-  font-weight: 600;
-}
-.active,
-.accordion:hover {
-  background-color: var(--accent-reverse);
-}
-.panel {
-  padding: 0 1.6rem;
-  display: none;
-  /*   max-height: 0;
-  overflow: hidden; 
-  transition: max-height 0.2s ease-out;  */
-}
-/* ****************** IMG FIX ****************** */
-img {
-  opacity: 0.6;
-}
-
 /* ****************** @media ****************** */
 
 @media (max-width: 960px) {
+  .grid-container {
+    h1 {
+      margin-bottom: 2rem;
+      margin-top: 2rem;
+    }
+    gap: 3rem;
+  }
   .block {
     min-width: 15svw;
   }
@@ -406,6 +382,9 @@ img {
 
 /* wrap boxes with display flex for smaller screens */
 @media (max-width: 600px) {
+  h1 {
+    margin-bottom: 1.6rem;
+  }
   .grid-container {
     display: flex;
     flex-wrap: wrap;
@@ -419,8 +398,13 @@ img {
 
 /* adjust gap and box size  */
 @media (max-width: 600px) {
+  #theme-toggle {
+    top: 0.5rem;
+    padding: calc(var(--golden-minor) * 0.8rem);
+  }
   h1 {
     font-size: 3rem;
+    margin-bottom: 1rem;
   }
   .grid-container {
     gap: 3px;

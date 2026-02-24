@@ -20,6 +20,14 @@ const OCT_INDEX = 1;
 const DEC_INDEX = 2;
 const HEX_INDEX = 3;
 
+// ****************************** Debug Mode ******************************
+
+// comment out after testing:
+
+gameRange = 3; // 2- 9 base game starting
+levelCount = 2;
+setSize = 16; // number of blocks, must be even
+
 // ****************************** Helper Functions ******************************
 
 /**
@@ -400,7 +408,46 @@ class BlockSet {
     return block;
   }
 
+  createContinuousBlocks() {
+    /**
+     * Create Blocks from gameRange to gameRange + 7
+     * No "big bad numbers" sprinkled in.
+     */
+    let debucgger = 0;
+    //create blocks
+    for (
+      let i = this.gameRange;
+      i < this.size / this.matches + this.gameRange;
+      i++
+    ) {
+      for (let j = 0; j < this.matches; j++) {
+        let block = new BaseBlock(
+          Math.floor(Math.random() * 900) + 100,
+          i,
+          gameControls.getSelectedBases()
+        );
+
+        this.blocks.push(block);
+        debucgger++;
+      }
+    }
+    // Math.floor(Math.random() * gameControls.getSelectedBases().length);
+
+    this.shuffleFacesOfBlockSet();
+    this.shuffleBlocks();
+    // generate blocks interface
+    this.blocks.forEach((block) => {
+      block.generateInterface();
+    });
+  }
+
   createBlocks() {
+    /**
+     * Create Blocks for balanced difficulty
+     * from gameRange to gameRange + 7, but bigger numbers get
+     * sprinkled in as the game progresses.
+     */
+
     // reminder: BaseBlock(id, number, systems, face = 0, matched = false)
     let debucgger = 0;
 
@@ -420,7 +467,7 @@ class BlockSet {
         // at higher levels: mix in difficult numbers
         let block;
 
-        if (levelCount > 0 && levelCount < 10) {
+        if (levelCount >= 5 && levelCount < 15) {
           if (i === 7) {
             console.log('hello 7');
             block = new BaseBlock(
@@ -537,6 +584,7 @@ class GameControls {
     }
 
     if (gameRange <= 7) {
+      // change this to collect all pairs <8 instead of gameRange
       flipToBinary(this.blockSet.blocks);
     }
   }

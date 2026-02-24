@@ -1,0 +1,168 @@
+{
+  "difficultNumbersPool": [
+    10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28,
+    29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40
+  ],
+  "levels": [
+    {
+      "level": 1,
+      "setSize": 16,
+      "min": 2,
+      "max": 9,
+      "howManyDifficultPairs": 0,
+      "allowedDifficultNumbers": []
+    },
+    {
+      "level": 2,
+      "setSize": 16,
+      "min": 2,
+      "max": 9,
+      "howManyDifficultPairs": 1,
+      "allowedDifficultNumbers": [10]
+    },
+    {
+      "level": 3,
+      "setSize": 18,
+      "min": 2,
+      "max": 9,
+      "howManyDifficultPairs": 1,
+      "allowedDifficultNumbers": [10, 11]
+    },
+    {
+      "level": 4,
+      "setSize": 18,
+      "min": 3,
+      "max": 10,
+      "howManyDifficultPairs": 1,
+      "allowedDifficultNumbers": [10, 11, 12]
+    },
+    {
+      "level": 5,
+      "setSize": 20,
+      "min": 3,
+      "max": 10,
+      "howManyDifficultPairs": 1,
+      "allowedDifficultNumbers": [10, 11, 12, 13]
+    },
+    {
+      "level": 6,
+      "setSize": 20,
+      "min": 4,
+      "max": 11,
+      "howManyDifficultPairs": 1,
+      "allowedDifficultNumbers": [12, 13, 14]
+    },
+    {
+      "level": 7,
+      "setSize": 20,
+      "min": 4,
+      "max": 11,
+      "howManyDifficultPairs": 2,
+      "allowedDifficultNumbers": [12, 13, 14, 15]
+    },
+    {
+      "level": 8,
+      "setSize": 22,
+      "min": 4,
+      "max": 11,
+      "howManyDifficultPairs": 2,
+      "allowedDifficultNumbers": [13, 14, 15, 16]
+    },
+    {
+      "level": 9,
+      "setSize": 22,
+      "min": 5,
+      "max": 12,
+      "howManyDifficultPairs": 2,
+      "allowedDifficultNumbers": [14, 15, 16, 17]
+    },
+    {
+      "level": 10,
+      "setSize": 24,
+      "min": 5,
+      "max": 12,
+      "howManyDifficultPairs": 2,
+      "allowedDifficultNumbers": [15, 16, 17, 18]
+    },
+    {
+      "level": 11,
+      "setSize": 24,
+      "min": 5,
+      "max": 12,
+      "howManyDifficultPairs": 3,
+      "allowedDifficultNumbers": [16, 17, 18, 19, 20]
+    },
+    {
+      "level": 12,
+      "setSize": 24,
+      "min": 6,
+      "max": 13,
+      "howManyDifficultPairs": 3,
+      "allowedDifficultNumbers": [17, 18, 19, 20, 21]
+    },
+    {
+      "level": 13,
+      "setSize": 26,
+      "min": 6,
+      "max": 13,
+      "howManyDifficultPairs": 3,
+      "allowedDifficultNumbers": [18, 19, 20, 21, 22]
+    },
+    {
+      "level": 14,
+      "setSize": 26,
+      "min": 7,
+      "max": 14,
+      "howManyDifficultPairs": 3,
+      "allowedDifficultNumbers": [19, 20, 21, 22, 23]
+    },
+    {
+      "level": 15,
+      "setSize": 28,
+      "min": 7,
+      "max": 14,
+      "howManyDifficultPairs": 4,
+      "allowedDifficultNumbers": [20, 21, 22, 23, 24, 25]
+    },
+    {
+      "level": 16,
+      "setSize": 28,
+      "min": 8,
+      "max": 15,
+      "howManyDifficultPairs": 4,
+      "allowedDifficultNumbers": [21, 22, 23, 24, 25, 26]
+    },
+    {
+      "level": 17,
+      "setSize": 30,
+      "min": 8,
+      "max": 15,
+      "howManyDifficultPairs": 4,
+      "allowedDifficultNumbers": [22, 23, 24, 25, 26, 27]
+    },
+    {
+      "level": 18,
+      "setSize": 30,
+      "min": 9,
+      "max": 16,
+      "howManyDifficultPairs": 5,
+      "allowedDifficultNumbers": [23, 24, 25, 26, 27, 28, 29]
+    },
+    {
+      "level": 19,
+      "setSize": 32,
+      "min": 9,
+      "max": 16,
+      "howManyDifficultPairs": 5,
+      "allowedDifficultNumbers": [24, 25, 26, 27, 28, 29, 30]
+    },
+    {
+      "level": 20,
+      "setSize": 32,
+      "min": 10,
+      "max": 17,
+      "howManyDifficultPairs": 6,
+      "allowedDifficultNumbers": [25, 26, 27, 28, 29, 30, 31, 32]
+    }
+  ]
+}
