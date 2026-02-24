@@ -7,15 +7,91 @@ let flipCount = 0;
 let lockBoard = false;
 let score = 0;
 let time = 0;
-//const blocks = []; // didn't use that anymore, did I?
 let startingRange = 1;
 let setSize = 16; // number of blocks, must be even
 let numberOfMatches = 2;
 let countAlerts = 0;
 let maxAlerts = 2;
 
+// face indices in gameControls.selectedBases in V1 (!!!)
+const BIN_INDEX = 0;
+const OCT_INDEX = 1;
+const DEC_INDEX = 2;
+const HEX_INDEX = 3;
+
 // ****************************** Helper Functions ******************************
 
+/**
+ * @typedef {Object} SystemId
+ * @property {string} label
+ */
+
+/**
+ * @typedef {Object} Block
+ * @property {number} number
+ * @property {SystemId[]} systems
+ */
+
+/**
+ * Write a helper function that converts one block of a pair to binary, if none is binary.
+ * This is to avoid boredom with numbers below 8 (oct) or 10 (dec).
+ * @param {Block[]} blocks
+ * @returns
+ */
+function flipToBinary(blocks) {
+  // console.log(`param blocks: ${blocks}`);
+  //do something
+  const pairs = findMatches(blocks);
+  console.log(`pairs: ${pairs}`);
+  pairs.forEach((p) => {
+    if (
+      p[0].systems[p[0].face].label == 'BIN' ||
+      p[1].systems[p[1].face].label == 'BIN'
+    ) {
+      // if ONE of them is already binary, skip this step
+      return;
+    }
+    // otherwise make one of them binary god grant me strength.
+    // TODO
+    // i guess i will find the binary number system and use a method called findNumberSystem
+    while (p[0].face != 0) {
+      p[0].flipAndRender();
+    }
+  });
+}
+
+/**
+ * @typedef {Object} Block
+ * @property {number} number
+ */
+
+/**
+ * Find matching blocks with the same numeric value
+ * @param {Block[]} blocks
+ * @returns {[Block, Block][]}
+ */
+function findMatches(blocks) {
+  // console.log(`param blocks: ${blocks}`);
+  const matches = [];
+
+  for (let i = 0; i < blocks.length; i++) {
+    for (let j = i + 1; j < blocks.length; j++) {
+      if (blocks[i].number === blocks[j].number) {
+        // match
+        matches.push([blocks[i], blocks[j]]);
+      }
+    }
+  }
+
+  // console.log(`matches: ${matches}`);
+  return matches;
+}
+
+/**
+ * Helper function that returns duplicate matches (same base).
+ * @param {*} blocks.
+ * @returns blocks
+ */
 function findDuplicateMatches(blocks) {
   if (!Array.isArray(blocks)) {
     console.log('Invalid type error! [] expected.');
@@ -67,7 +143,7 @@ function flipDuplicatePair(pair) {
 class SystemId {
   constructor(label, badge, base) {
     this.label = label; // e.g., "BIN", "DEC"
-    this.badge = badge; // e.g., "(2)", "(10)"
+    this.badge = badge; // e.g., "₂", ""
     this.base = base; // the actual base (2, 10, 16, 8)
   }
   toDisplay(num) {
@@ -115,8 +191,16 @@ class BaseBlock {
     this.systems = systems; // array of SystemId objects
     this.face = face; // index of the current system => systemId
     this.matched = matched;
+
+    /*  Faces: */
+    // for v1, stick to these 4 bases: (see global vars)
+    // they should actually be in this order:
+    // const BIN_INDEX = 0;
+    // const OCT_INDEX = 1;
+    // const DEC_INDEX = 2;
+    // const HEX_INDEX = 3;
     /* for CSS manipulation:  */
-    this.baseClasses = ['base1', 'base2', 'base3', 'base4', 'base5', 'base6'];
+    this.baseClasses = ['base1', 'base2', 'base3', 'base4', 'base5', 'base6']; // 5 and 6 are for v2
     this.element = document.createElement('div');
     this.element.setAttribute('role', 'button');
     this.element.setAttribute('tabindex', '0'); // Make it focusable
@@ -266,6 +350,16 @@ class BaseBlock {
     }
     this.element.classList.add('disabled');
   }
+
+  shuffleFaces() {
+    let randomness = Math.floor(
+      Math.random() * gameControls.getSelectedBases().length
+    );
+    // console.log(`randomness: ${randomness}`);
+    for (let i = 0; i < randomness; i++) {
+      this.flipAndRender();
+    }
+  }
 }
 
 // ****************** BlockSet ******************
@@ -278,6 +372,8 @@ class BlockSet {
     this.createBlocks();
   }
   createBlocks() {
+    // class BaseBlock {
+    // constructor(id, number, systems, face = 0, matched = false) {
     let debucgger = 0;
     //create blocks
     for (
@@ -289,13 +385,15 @@ class BlockSet {
         let block = new BaseBlock(
           Math.floor(Math.random() * 900) + 100,
           i,
-          gameControls.getSelectedBases(),
-          Math.floor(Math.random() * gameControls.getSelectedBases().length)
+          gameControls.getSelectedBases()
         );
         this.blocks.push(block);
         debucgger++;
       }
     }
+    // Math.floor(Math.random() * gameControls.getSelectedBases().length);
+
+    this.shuffleFacesOfBlockSet();
     this.shuffleBlocks();
     // generate blocks interface
     this.blocks.forEach((block) => {
@@ -309,12 +407,16 @@ class BlockSet {
       [this.blocks[i], this.blocks[j]] = [this.blocks[j], this.blocks[i]];
     }
   }
+  shuffleFacesOfBlockSet() {
+    // console.log('shuffleFacesOfBlockSet getting executed');
+    this.blocks.forEach((b) => b.shuffleFaces());
+  }
 }
 
 // ****************** GameControls ******************
 class GameControls {
   constructor() {
-    this.selectedBases = [];
+    this.selectedBases = []; // 0 should be binary, 1 oct, 2 dec, 4 hex
     this.blockSet = null;
     this.selectedBlocks = [];
     this.selectedBlocksCount = 0;
@@ -367,6 +469,10 @@ class GameControls {
       alert('Something went wrong. Restarting the level...');
       countAlerts++;
       this.restart();
+    }
+
+    if (startingRange <= 7) {
+      flipToBinary(this.blockSet.blocks);
     }
   }
 
@@ -521,15 +627,7 @@ class GameControls {
 const gameControls = new GameControls();
 gameControls.createDefaultSystems();
 gameControls.initializeBlockSet();
-// const duplicates = findDuplicateMatches(gameControls.blockSet.blocks); // this is ugly and should be gameControls methods
-// resolveDuplicateMatches(duplicates);
 
-// //works, but only at startup, not at level up:
-// let duplicates;
-// do {
-//   duplicates = findDuplicateMatches(gameControls.blockSet.blocks);
-//   resolveDuplicateMatches(duplicates);
-// } while (findDuplicateMatches(gameControls.blockSet.blocks).length > 0); // while the array it is not empty
 // ************************ EVENT LISTENERS ************************
 
 restartButton.addEventListener(
@@ -571,3 +669,20 @@ for (let i = 0; i < accordions.length; i++) {
     }
   });
 }
+
+// TODO-List:
+
+// 1. write two functions:
+// shuffle colors vs. fixed colors
+// bin = yellow
+// oct = purple-ish
+// dec = orange-ish
+// hex = green
+
+// change game progression:
+// stay with easier blocks for beginners
+// only sprinkle in bigger blocks to avoid frustration
+// maybe vary set size instead
+
+// beginner: more blocks / sprinkled larger nums
+// advanced: scale up or start with larger number (optional)
