@@ -8,7 +8,7 @@ let lockBoard = false;
 let score = 0;
 let time = 0;
 let gameRange = 2; // 2- 9
-let levelCount = 2;
+let levelCount = 1;
 let setSize = 16; // number of blocks, must be even
 let numberOfMatches = 2;
 let countAlerts = 0;
@@ -25,10 +25,29 @@ const HEX_INDEX = 3;
 // comment out after testing:
 
 gameRange = 3; // 2- 9 base game starting
-levelCount = 2;
-setSize = 16; // number of blocks, must be even
+levelCount = 1;
+setSize = 2; // number of blocks, must be even
 
-// ****************************** Helper Functions ******************************
+// ****************************** Fetching Data ******************************
+// move this to gameControls later.
+//let levels = [];
+
+// async function fetchLevels() {
+//   try {
+//     const response = await fetch('./data/levels.json');
+//     if (!response.ok) {
+//       throw new Error(`Error fetching json: ${response.status}`);
+//     }
+//     const data = await response.json();
+//     console.log('levels fetched: ', data);
+//     return data;
+//   } catch (e) {
+//     console.error('Error fetching json: ', e);
+//   }
+// }
+// const levels = fetchLevels();
+
+// ***************************** Helper Functions *****************************
 
 /**
  * @typedef {Object} SystemId
@@ -441,6 +460,42 @@ class BlockSet {
     });
   }
 
+  /**
+   * Generate Blocks without any difficult numbers sprinkled in.
+   */
+  createSimpleBlocks() {
+    // class BaseBlock {
+    // constructor(id, number, systems, face = 0, matched = false) {
+    let debucgger = 0;
+    //create blocks
+    for (
+      let i = this.gameRange;
+      i < this.size / this.matches + this.gameRange;
+      i++
+    ) {
+      for (let j = 0; j < this.matches; j++) {
+        let block = new BaseBlock(
+          Math.floor(Math.random() * 900) + 100,
+          i,
+          gameControls.getSelectedBases()
+        );
+
+        this.blocks.push(block);
+        debucgger++;
+      }
+    }
+    // Math.floor(Math.random() * gameControls.getSelectedBases().length);
+
+    this.shuffleFacesOfBlockSet();
+    this.shuffleBlocks();
+    // generate blocks interface
+    this.blocks.forEach((block) => {
+      block.generateInterface();
+    });
+  }
+
+  // TODO: continue here, with createBlocks
+  // you need to update it to reflect the levels
   createBlocks() {
     /**
      * Create Blocks for balanced difficulty
@@ -450,6 +505,8 @@ class BlockSet {
 
     // reminder: BaseBlock(id, number, systems, face = 0, matched = false)
     let debucgger = 0;
+
+    // this was just a first test, this is not the final implementation
 
     // first, create an array for big nums to sprinkle in
     let bigBadNums = [];
@@ -530,6 +587,7 @@ class GameControls {
   constructor() {
     this.selectedBases = []; // 0 should be binary, 1 oct, 2 dec, 4 hex
     this.blockSet = null;
+    this.levels = [];
     this.selectedBlocks = [];
     this.selectedBlocksCount = 0;
     this.hasFiredConfettiFor42 = false; // to avoid multiple confetti firings
@@ -540,6 +598,42 @@ class GameControls {
   removeBase(systemId) {
     this.selectedBases = this.selectedBases.filter((base) => base !== systemId);
   }
+
+  async fetchLevels() {
+    try {
+      const response = await fetch('./data/levels.json');
+      if (!response.ok) {
+        throw new Error(`Error fetching json: ${response.status}`);
+      }
+
+      this.levels = await response.json();
+      console.log('levels fetched: ', this.levels);
+      //return this.levels;
+    } catch (e) {
+      console.error('Error fetching json: ', e);
+    }
+  }
+
+  // set or update the stats for levels... maybe a class Level later.
+  setLevelStats() {
+    if (this.levels.levels.length == 0) {
+      console.error('Levels not found!');
+      return;
+    }
+    if (levelCount < 1 || levelCount > this.levels.levels.length) {
+      console.error(
+        'levelCount < 1 or > than available data. Not good. levelCount: ',
+        levelCount
+      );
+      return;
+    }
+    setSize = this.levels.levels[levelCount - 1].setSize;
+    console.log(`setSize after updating: ${setSize}`);
+    StaticRange = this.levels.levels[levelCount - 1].min;
+    // add in the difficult numbers
+    // TODO : amount of difficult numbers
+  }
+
   createDefaultSystems() {
     this.selectedBases = [
       new SystemId('BIN', '₂', 2),
@@ -618,11 +712,16 @@ class GameControls {
   }
 
   continue() {
+    if (levelCount >= this.levels.levels.length) {
+      alert('You beat the game! 🎉');
+      return;
+    }
     console.log('Continuing with higher values...');
     // Clear existing blocks from the grid
     grid.innerHTML = '';
     // Update starting range
     levelCount++;
+    gameControls.setLevelStats();
     levelDisplay.textContent = levelCount;
     //time = 0;
     //score = 0;
@@ -740,6 +839,7 @@ class GameControls {
 const gameControls = new GameControls();
 gameControls.createDefaultSystems();
 gameControls.initializeBlockSet();
+gameControls.fetchLevels();
 
 // ************************ EVENT LISTENERS ************************
 
