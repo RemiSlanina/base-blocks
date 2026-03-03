@@ -1,3 +1,11 @@
+/**
+ * TODO: Next steps
+ * - [ ] Test current game logic (especially BlockSet.createBlocks())
+ * - [ ] Replace global level vars (setSize, gameRange, etc.) with Level class (see down below)
+ * - [ ] Update GameControls to use Level instances
+ * - [ ] Test edge cases (e.g., missing levels, wrong difficulty)
+ */
+
 // ****************************** Vars ******************************
 const grid = document.querySelector('.grid-container');
 const restartButton = document.getElementById('restart-button');
@@ -24,9 +32,9 @@ const HEX_INDEX = 3;
 
 // comment out after testing:
 
-gameRange = 3; // 2- 9 base game starting
-levelCount = 1;
-setSize = 2; // number of blocks, must be even
+// gameRange = 3; // 2- 9 base game starting
+// levelCount = 1;
+// setSize = 2; // number of blocks, must be even
 
 // ****************************** Fetching Data ******************************
 // move this to gameControls later.
@@ -70,7 +78,7 @@ function flipToBinary(blocks) {
   // console.log(`param blocks: ${blocks}`);
   //do something
   const pairs = findMatches(blocks);
-  console.log(`pairs: ${pairs}`);
+  // console.log(`pairs: ${pairs}`);
   pairs.forEach((p) => {
     if (
       p[0].systems[p[0].face].label == 'BIN' ||
@@ -140,7 +148,7 @@ function findDuplicateMatches(blocks) {
       }
     }
   }
-  console.log(`duplicateMatches: ${duplicateMatches}`);
+  // console.log(`duplicateMatches: ${duplicateMatches}`);
   return duplicateMatches;
 }
 
@@ -422,7 +430,6 @@ class BlockSet {
       gameControls.getSelectedBases()
     );
     this.blocks.push(block);
-    // debucgger++;
     // console.log(`blocks: ${this.blocks}`);
     return block;
   }
@@ -432,7 +439,6 @@ class BlockSet {
      * Create Blocks from gameRange to gameRange + 7
      * No "big bad numbers" sprinkled in.
      */
-    let debucgger = 0;
     //create blocks
     for (
       let i = this.gameRange;
@@ -447,7 +453,6 @@ class BlockSet {
         );
 
         this.blocks.push(block);
-        debucgger++;
       }
     }
     // Math.floor(Math.random() * gameControls.getSelectedBases().length);
@@ -466,7 +471,6 @@ class BlockSet {
   createSimpleBlocks() {
     // class BaseBlock {
     // constructor(id, number, systems, face = 0, matched = false) {
-    let debucgger = 0;
     //create blocks
     for (
       let i = this.gameRange;
@@ -481,7 +485,7 @@ class BlockSet {
         );
 
         this.blocks.push(block);
-        debucgger++;
+        // debucgger++;
       }
     }
     // Math.floor(Math.random() * gameControls.getSelectedBases().length);
@@ -504,66 +508,42 @@ class BlockSet {
      */
 
     // reminder: BaseBlock(id, number, systems, face = 0, matched = false)
-    let debucgger = 0;
 
-    // this was just a first test, this is not the final implementation
+    const level = gameControls.levels.levels[levelCount - 1];
+    const difficultNumbers = level.allowedDifficultNumbers;
+    const howManyDifficult = level.howManyDifficultPairs;
 
-    // first, create an array for big nums to sprinkle in
-    let bigBadNums = [];
-    for (let i = 0; i < 4; i++) {
-      bigBadNums.push(Math.floor(Math.random() * 66));
-    }
-
-    // create blocks
+    // create "normal" blocks
     for (
-      let i = this.gameRange;
-      i < this.size / this.matches + this.gameRange;
+      let i = level.min;
+      i < level.min + (this.size / this.matches - howManyDifficult);
       i++
     ) {
       for (let j = 0; j < this.matches; j++) {
-        // at higher levels: mix in difficult numbers
-        let block;
-
-        if (levelCount >= 5 && levelCount < 15) {
-          if (i === 7) {
-            console.log('hello 7');
-            block = new BaseBlock(
-              Math.floor(Math.random() * 900) + 100,
-              bigBadNums[0],
-              gameControls.getSelectedBases()
-            );
-            this.blocks.push(block);
-            debucgger++;
-
-            console.log(`blocks: ${this.blocks}`);
-          } else {
-            console.log('hello not 7');
-            block = this.ceateAndPushBlock(i);
-          }
-        } else {
-          // block = new BaseBlock(
-          //   Math.floor(Math.random() * 900) + 100,
-          //   i,
-          //   gameControls.getSelectedBases()
-          // );
-          // this.blocks.push(block);
-
-          block = this.ceateAndPushBlock(i);
-          debucgger++;
-          console.log(`blocks: ${this.blocks}`);
-        }
-
-        // this.blocks.push(block);
-        // debucgger++;
+        let block = new BaseBlock(
+          Math.floor(Math.random() * 900) + 100,
+          i,
+          gameControls.getSelectedBases()
+        );
+        this.blocks.push(block);
       }
     }
-    // Math.floor(Math.random() * gameControls.getSelectedBases().length);
 
-    console.log(`blocks: ${this.blocks}`);
+    // create difficult numbers
+    for (let i = 0; i < howManyDifficult; i++) {
+      const index = Math.floor(Math.random() * difficultNumbers.length);
+      for (let j = 0; j < this.matches; j++) {
+        let block = new BaseBlock(
+          Math.floor(Math.random() * 900) + 100,
+          difficultNumbers[index],
+          gameControls.getSelectedBases()
+        );
+        this.blocks.push(block);
+      }
+    }
 
     this.shuffleFacesOfBlockSet();
     this.shuffleBlocks();
-    // generate blocks interface
     this.blocks.forEach((block) => {
       block.generateInterface();
     });
@@ -617,15 +597,12 @@ class GameControls {
   // set or update the stats for levels... maybe a class Level later.
   setLevelStats() {
     if (this.levels.levels.length == 0) {
-      console.error('Levels not found!');
-      return;
+      throw new Error('Levels data is empty!');
     }
     if (levelCount < 1 || levelCount > this.levels.levels.length) {
-      console.error(
-        'levelCount < 1 or > than available data. Not good. levelCount: ',
-        levelCount
+      throw new Error(
+        `Invalid levelCount: ${levelCount} (max: ${this.levels.levels.length})`
       );
-      return;
     }
     setSize = this.levels.levels[levelCount - 1].setSize;
     console.log(`setSize after updating: ${setSize}`);
@@ -711,23 +688,40 @@ class GameControls {
     this.start();
   }
 
-  continue() {
-    if (levelCount >= this.levels.levels.length) {
-      alert('You beat the game! 🎉');
+  continue(retries = 0) {
+    if (retries > 3) {
+      alert('Too many errors. Restarting game.');
+      // set back to level 1 (?)
+      if (levelCount < 1) levelCount = 1; // I guess
+      if (levelCount > this.levels.levels.length) {
+        levelCount = this.levels.levels.length - 2;
+      } // i am too tired
+      levelCount = 1; // fix this later: find a starting point.
+      gameControls.setLevelStats();
+      levelDisplay.textContent = level;
+      this.restart();
       return;
     }
-    console.log('Continuing with higher values...');
-    // Clear existing blocks from the grid
-    grid.innerHTML = '';
-    // Update starting range
-    levelCount++;
-    gameControls.setLevelStats();
-    levelDisplay.textContent = levelCount;
-    //time = 0;
-    //score = 0;
-    //document.querySelector('.score').textContent = score;
-    // Create a new BlockSet
-    this.start();
+    try {
+      if (levelCount >= this.levels.levels.length) {
+        alert('You beat the game! 🎉');
+        return;
+      }
+      // console.log('Continuing with higher values...');
+      // Clear existing blocks from the grid
+      grid.innerHTML = '';
+      // Update starting range
+      levelCount++;
+      gameControls.setLevelStats();
+      levelDisplay.textContent = levelCount;
+      //time = 0;
+      //score = 0;
+      //document.querySelector('.score').textContent = score;
+      // Create a new BlockSet
+      this.start();
+    } catch (e) {
+      this.continue(retries + 1);
+    }
   }
 
   checkForMatch() {
@@ -838,8 +832,22 @@ class GameControls {
 
 const gameControls = new GameControls();
 gameControls.createDefaultSystems();
-gameControls.initializeBlockSet();
-gameControls.fetchLevels();
+
+async function startGame() {
+  try {
+    await gameControls.fetchLevels();
+    gameControls.initializeBlockSet();
+  } catch (error) {
+    console.error('Error starting game:', error);
+    alert('Failed to start the game. Please try again.');
+  }
+}
+
+startGame();
+
+// gameControls.fetchLevels().then(() => {
+//   gameControls.initializeBlockSet();
+// });
 
 // ************************ EVENT LISTENERS ************************
 
@@ -865,23 +873,24 @@ document.getElementById('theme-toggle').addEventListener('click', () => {
 });
 const currentTheme = document.documentElement.getAttribute('data-theme');
 console.log(currentTheme); // "dark", "light", or null
-// ************************ ACCORDION ************************
-const accordions = document.getElementsByClassName('accordion');
-//console.log(accordions);
-for (let i = 0; i < accordions.length; i++) {
-  accordions[i].addEventListener('click', (e) => {
-    // button: stay active
-    e.target.classList.toggle('active');
-    // toggle accordion panels
-    //let panel = this.nextElementSibling;
-    let panel = e.target.nextElementSibling;
-    if (panel.style.display === 'block') {
-      panel.style.display = 'none';
-    } else {
-      panel.style.display = 'block';
-    }
-  });
-}
+
+// // ************************ ACCORDION ************************
+// const accordions = document.getElementsByClassName('accordion');
+// //console.log(accordions);
+// for (let i = 0; i < accordions.length; i++) {
+//   accordions[i].addEventListener('click', (e) => {
+//     // button: stay active
+//     e.target.classList.toggle('active');
+//     // toggle accordion panels
+//     //let panel = this.nextElementSibling;
+//     let panel = e.target.nextElementSibling;
+//     if (panel.style.display === 'block') {
+//       panel.style.display = 'none';
+//     } else {
+//       panel.style.display = 'block';
+//     }
+//   });
+// }
 
 // TODO-List:
 
@@ -902,3 +911,47 @@ for (let i = 0; i < accordions.length; i++) {
 // hex = green
 // beginner: more blocks / sprinkled larger nums
 // advanced: scale up or start with larger number (optional)
+
+// TODO: use a class for levels and destructuring
+// adapt the levels: there are 20 chilled levels, and there are 20 "challenge"
+// fill in sensible data for the challenge levels
+// TODO:
+class Level {
+  level = 1;
+  difficulty = 'chilled';
+  setSize = 16;
+  min = 2;
+  max = 9;
+  howManyDifficultPairs = 0;
+  allowedDifficultNumbers = [];
+
+  constructor(levelNumber, difficulty = 'chilled') {
+    this.level = levelNumber;
+    this.difficulty = difficulty;
+  }
+
+  async fetchLevel() {
+    const response = await fetch('./data/levels.json');
+    const json = await response.json();
+    const levelData = json.levels.find(
+      (l) => l.level === this.level && l.difficulty === this.difficulty
+    );
+    if (levelData) {
+      ({
+        setSize: this.setSize,
+        min: this.min,
+        max: this.max,
+        howManyDifficultPairs: this.howManyDifficultPairs,
+        allowedDifficultNumbers: this.allowedDifficultNumbers,
+      } = levelData);
+    } else {
+      console.error(
+        `Level ${this.level} (${this.difficulty}) not found in levels.json`
+      );
+    }
+  }
+}
+
+// Usage:
+const level = new Level(1, 'chilled');
+await level.fetchLevel();

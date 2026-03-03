@@ -1,5 +1,5 @@
 /* ****************** fontface ****************** */
-
+/* Don't use them at the moment: */
 /* TODO : change fonts to something like Roboto or Quattrocento Sans */
 
 /* Libre Franklin - Regular (variable) */
@@ -92,6 +92,8 @@
   /* Derived values */
   --aspect-ratio: calc(var(--golden-ratio) * 3 / 2);
   --golden-minor-rem: calc(var(--golden-minor) * 1rem);
+  --box-width-max: 100px;
+  --box-width-min: 70px;
   --golden-ration-boxes: calc(var(--golden-ratio) * 100px);
 
   /* Spacing & fonts */
@@ -259,7 +261,7 @@ h2 {
     90vw
   ); /* fall back to 90vw if the variable with 90dvw fails */
   justify-content: center;
-  gap: 3rem;
+  gap: 3px;
   place-content: center;
   margin: 0 auto;
 }
@@ -270,8 +272,8 @@ h2 {
   text-align: center;
   place-content: center;
   aspect-ratio: 3/3;
-  min-width: 10svw;
-  max-width: var(--golden-ration-boxes);
+  min-width: var(--box-width-min);
+  max-width: var(--box-width-max);
   background-color: var(--accent-2);
   /*   border: 1px solid white; */
   /* color: var(--box-dark-primary); */
@@ -373,10 +375,7 @@ h2 {
       margin-bottom: 2rem;
       margin-top: 2rem;
     }
-    gap: 3rem;
-  }
-  .block {
-    min-width: 15svw;
+    gap: 3px;
   }
 }
 
@@ -388,11 +387,8 @@ h2 {
   .grid-container {
     display: flex;
     flex-wrap: wrap;
-    gap: 3px; /* adjust gap  */
+    gap: 3px;
     justify-content: center;
-  }
-  .block {
-    min-width: 20svw; /* adjust box size */
   }
 }
 
@@ -410,7 +406,6 @@ h2 {
     gap: 3px;
   }
   .block {
-    min-width: 20svw;
     font-size: 1rem;
   }
 }
