@@ -271,12 +271,36 @@ class BaseBlock {
     this.element.addEventListener('keydown', (e) => {
       if (e.key === 'Enter') {
         e.preventDefault();
-        this.select(); // Select on Enter or Space
+        this.select(); // Select on Enter
       } else if (e.key === ' ') {
+        // Flip on Space
         e.preventDefault();
         this.flipAndRender();
       }
     });
+
+    /* ****************** Mobile: ****************** */
+    this.touchStartX = 0; // for swiping -
+    this.touchEndX = 0; // range
+
+    this.element.addEventListener(
+      'touchstart',
+      (e) => {
+        this.touchStartX = e.changedTouches[0].screenX;
+      },
+      { passive: true }
+    );
+
+    this.element.addEventListener(
+      'touchend',
+      (e) => {
+        this.touchEndX = e.changedTouches[0].screenX;
+        this.handleSwipe();
+      },
+      { passive: true }
+    );
+
+    /* ****************** Mouse: ****************** */
 
     /* ****************** RIGHT CLICK: ****************** */
     this.selectBound = this.select.bind(this);
@@ -287,6 +311,18 @@ class BaseBlock {
       this.flip();
       this.element.textContent = this.getCurrentDisplay();
     });
+  }
+
+  /* ****************** Methods: ****************** */
+  handleSwipe() {
+    const swipeThreshold = 30; // Minimum 30 pixels for swipe
+    if (this.touchEndX - this.touchStartX > swipeThreshold) {
+      this.flipAndRender(); // swipe right
+    } else if (this.touchStartX - this.touchEndX > swipeThreshold) {
+      // swipe left
+      this.flipLeft();
+      this.render();
+    }
   }
   generateInterface() {
     this.element.textContent = this.getCurrentDisplay();
@@ -309,16 +345,22 @@ class BaseBlock {
     );
   }
   flip() {
-    // update css
     // Remove the old class
     this.element.classList.remove(this.baseClasses[this.face]);
-    // Update the face index (cycle back to 0 if at the end)
+    // Update the face index unsing mod:
     this.face = (this.face + 1) % this.systems.length;
     // Add the new class
     this.element.classList.add(this.baseClasses[this.face]);
-    // you pay for flipping with socre penalty:
-    //score--; // Penalty for flipping
-    // In BaseBlock.flip():
+    if (trackFlips) {
+      score = Math.max(0, score - 1); // Penalty for flipping
+    }
+    document.querySelector('.score').textContent = score;
+  }
+  flipLeft() {
+    this.element.classList.remove(this.baseClasses[this.face]);
+    this.face = (this.face - 1 + this.systems.length) % this.systems.length; // avoid negative mod
+    // in JavaScript, modulo can be negative (f.e. divide by -1) -> add systems.length.
+    this.element.classList.add(this.baseClasses[this.face]);
     if (trackFlips) {
       score = Math.max(0, score - 1); // Penalty for flipping
     }
