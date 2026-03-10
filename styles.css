@@ -92,9 +92,15 @@
   /* Derived values */
   --aspect-ratio: calc(var(--golden-ratio) * 3 / 2);
   --golden-minor-rem: calc(var(--golden-minor) * 1rem);
-  --box-width-max: 100px;
-  --box-width-min: 70px;
   --golden-ration-boxes: calc(var(--golden-ratio) * 100px);
+
+  /* New Box Sizes: */
+  --box-width-max-large-screens: 130px;
+  --box-width-min-large-screens: 110px;
+  --box-width-max: 100px;
+  --box-width-min: 90px;
+  --box-width-max-very-small-screen: 80px;
+  --box-width-min-very-small-screen: 70px;
 
   /* Spacing & fonts */
 
@@ -206,13 +212,15 @@ button {
 
 h1 {
   font-size: 4.236rem;
-  margin-bottom: calc(var(--golden-major) * 1rem);
+  margin-bottom: 1.4rem;
   margin-top: calc(var(--golden-major) * 1rem);
   text-align: center;
 }
 
 h2 {
   font-size: 1.618rem;
+  text-align: center;
+  margin-bottom: calc(var(--golden-major) * 1rem);
 }
 .choose-bases {
   text-align: center;
@@ -254,15 +262,16 @@ h2 {
 /* ********************* GRID: ********************* */
 .grid-container {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+  /* grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); */
+  grid-template-columns: repeat(8, 1fr);
   width: fit-content;
   max-width: var(
     --max-width-screen,
     90vw
   ); /* fall back to 90vw if the variable with 90dvw fails */
-  justify-content: center;
-  gap: 3px;
   place-content: center;
+  place-items: center;
+  gap: 5px;
   margin: 0 auto;
 }
 
@@ -270,10 +279,11 @@ h2 {
 
 .block {
   text-align: center;
+  place-items: center;
   place-content: center;
   aspect-ratio: 3/3;
-  min-width: var(--box-width-min);
-  max-width: var(--box-width-max);
+  min-width: var(--box-width-min-large-screens);
+  max-width: var(--box-width-max-large-screens);
   background-color: var(--accent-2);
   /*   border: 1px solid white; */
   /* color: var(--box-dark-primary); */
@@ -368,31 +378,40 @@ h2 {
 }
 
 /* ****************** @media ****************** */
-
-@media (max-width: 960px) {
+/* larger screens */
+@media (min-width: 1320px) {
   .grid-container {
-    h1 {
-      margin-bottom: 2rem;
-      margin-top: 2rem;
-    }
-    gap: 3px;
+    grid-template-columns: repeat(8, 1fr);
+    gap: 5px;
+  }
+  h1 {
+    margin-bottom: 2rem;
+    margin-top: 2rem;
+  }
+  .block {
+    max-width: var(--box-width-max-large-screens);
+    min-width: var(--box-width-min-large-screens);
   }
 }
 
-/* wrap boxes with display flex for smaller screens */
-@media (max-width: 600px) {
+/* medium screens */
+@media (max-width: 960px) {
+  .grid-container {
+    grid-template-columns: repeat(4, 1fr);
+  }
+  .block {
+    max-width: var(--box-width-max);
+    min-width: var(--box-width-min);
+  }
   h1 {
     margin-bottom: 1.6rem;
   }
   .grid-container {
-    display: flex;
-    flex-wrap: wrap;
     gap: 3px;
-    justify-content: center;
   }
 }
 
-/* adjust gap and box size  */
+/* small screens  */
 @media (max-width: 600px) {
   #theme-toggle {
     top: 0.5rem;
@@ -402,10 +421,28 @@ h2 {
     font-size: 3rem;
     margin-bottom: 1rem;
   }
+  h2 {
+    font-size: 1rem;
+    margin-bottom: 1rem;
+  }
   .grid-container {
+    grid-template-columns: repeat(4, 1fr);
     gap: 3px;
   }
   .block {
     font-size: 1rem;
+    max-width: var(--box-width-max);
+    min-width: var(--box-width-min);
+  }
+}
+
+@media (max-width: 340px) {
+  .grid-container {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+  }
+  .block {
+    max-width: var(--box-width-max-very-small-screen);
+    min-width: var(--box-width-min-very-small-screen);
   }
 }
