@@ -2,7 +2,7 @@
 
 A memory-style game where players match numbers across different number systems.
 
-> WIP (WORK IN PROGRESS)
+> WIP (WORK IN PROGRESS). Test it: https://base-blocks.vercel.app/
 
 [![Screenshot 1](/assets/screenshots/Screenshot-1-WIP.png)](https://base-blocks.vercel.app/)
 
@@ -49,13 +49,6 @@ or:
 MIT for the code:
 
 - The **code** in this repository is licensed under the [MIT License](./LICENSE).
-- The **artwork, images, and design assets** are © Remi Slanina. Please credit me if you use them.
-
-You may:
-
-- ✅ Use or adapt the **code** freely (MIT).
-- ✅ Use the **artwork** for personal or educational purposes, with **credit**.
-- ❌ Not use the artwork or images for **commercial purposes** without explicit permission.
 
 This means:
 

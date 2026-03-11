@@ -376,6 +376,18 @@ h2 {
   transition: transform 0.2s ease;
   z-index: 2;
 }
+.see-code {
+  color: var(--text-primary);
+}
+.see-code:link {
+  color: var(--accent-2);
+}
+.see-code:visited {
+  color: var(--text-secondary);
+}
+.see-code:hover {
+  color: var(--accent);
+}
 
 /* ****************** @media ****************** */
 /* larger screens */
@@ -430,7 +442,6 @@ h2 {
     gap: 3px;
   }
   .block {
-    font-size: 1rem;
     max-width: var(--box-width-max);
     min-width: var(--box-width-min);
   }
@@ -442,6 +453,7 @@ h2 {
     gap: 1px;
   }
   .block {
+    font-size: 1rem;
     max-width: var(--box-width-max-very-small-screen);
     min-width: var(--box-width-min-very-small-screen);
   }
