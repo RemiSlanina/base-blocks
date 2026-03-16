@@ -6,6 +6,8 @@
  * - [ ] Test edge cases (e.g., missing levels, wrong difficulty)
  */
 
+//const { template } = require('@babel/core');
+
 // ****************************** Vars ******************************
 const grid = document.querySelector('.grid-container');
 const restartButton = document.getElementById('restart-button');
@@ -13,11 +15,11 @@ const levelDisplay = document.querySelector('.level');
 let trackFlips = true;
 let flipCount = 0;
 let lockBoard = false;
-let score = 0;
-let highScore = JSON.parse(localStorage.getItem('basBlocksHighScore')) || 0;
+// let score = 0;
+// let highScore = JSON.parse(localStorage.getItem('basBlocksHighScore')) || 0;
 let time = 0;
 let gameRange = 2; // 2- 9
-let levelCount = 1;
+// let currentLevel = 1;
 let setSize = 16; // number of blocks, must be even
 let numberOfMatches = 2;
 let countAlerts = 0;
@@ -70,6 +72,8 @@ const HEX_INDEX = 3;
 function flipToBinary(blocks) {
   // console.log(`param blocks: ${blocks}`);
   //do something
+  const tempFlipTrack = trackFlips;
+  trackFlips = false;
   const pairs = findMatches(blocks);
   // console.log(`pairs: ${pairs}`);
   pairs.forEach((p) => {
@@ -87,6 +91,7 @@ function flipToBinary(blocks) {
       p[0].flipAndRender();
     }
   });
+  trackFlips = tempFlipTrack;
 }
 
 /**
@@ -345,9 +350,10 @@ class BaseBlock {
     // Add the new class
     this.element.classList.add(this.baseClasses[this.face]);
     if (trackFlips) {
-      score = Math.max(0, score - 1); // Penalty for flipping
+      gameControls.score = Math.max(0, gameControls.score - 1); // Penalty for flipping
+      // document.querySelector('.score').textContent = gameControls.score;
+      gameControls.updateScoreDisplay();
     }
-    document.querySelector('.score').textContent = score;
   }
   flipLeft() {
     this.element.classList.remove(this.baseClasses[this.face]);
@@ -355,9 +361,10 @@ class BaseBlock {
     // in JavaScript, modulo can be negative (f.e. divide by -1) -> add systems.length.
     this.element.classList.add(this.baseClasses[this.face]);
     if (trackFlips) {
-      score = Math.max(0, score - 1); // Penalty for flipping
+      gameControls.score = Math.max(0, gameControls.score - 1); // Penalty for flipping
+      // document.querySelector('.score').textContent = gameControls.score;
+      gameControls.updateScoreDisplay();
     }
-    document.querySelector('.score').textContent = score;
   }
   select = () => {
     //console.trace();
@@ -544,7 +551,7 @@ class BlockSet {
 
     // reminder: BaseBlock(id, number, systems, face = 0, matched = false)
 
-    const level = gameControls.levels.levels[levelCount - 1];
+    const level = gameControls.levels.levels[gameControls.currentLevel - 1];
     const difficultNumbers = level.allowedDifficultNumbers;
     const howManyDifficult = level.howManyDifficultPairs;
 
@@ -606,7 +613,39 @@ class GameControls {
     this.selectedBlocks = [];
     this.selectedBlocksCount = 0;
     this.hasFiredConfettiFor42 = false; // to avoid multiple confetti firings
+
+    this.currentLevel = 1;
+    this.score = 0;
+    this.highScore =
+      JSON.parse(localStorage.getItem('baseBlocksHighScore')) || 0;
+    this.updateHighScoreDisplay();
   }
+
+  // ****************** GameControls Methods ******************
+
+  updateScoreDisplay() {
+    document.querySelector('.score').textContent = this.score;
+  }
+
+  updateHighScoreDisplay() {
+    document.querySelector('.high-score').textContent = this.highScore;
+  }
+
+  setHighScore(h) {
+    if (h > this.highScore) {
+      this.highScore = h;
+      localStorage.setItem(
+        'baseBlocksHighScore',
+        JSON.stringify(this.highScore)
+      );
+      this.updateHighScoreDisplay();
+    }
+  }
+
+  getHighScore() {
+    return JSON.parse(localStorage.getItem('baseBlocksHighScore')) || 0;
+  }
+
   addBase(systemId) {
     this.selectedBases.push(systemId);
   }
@@ -634,14 +673,17 @@ class GameControls {
     if (this.levels.levels.length == 0) {
       throw new Error('Levels data is empty!');
     }
-    if (levelCount < 1 || levelCount > this.levels.levels.length) {
+    if (
+      this.currentLevel < 1 ||
+      this.currentLevel > this.levels.levels.length
+    ) {
       throw new Error(
-        `Invalid levelCount: ${levelCount} (max: ${this.levels.levels.length})`
+        `Invalid currentLevel: ${this.currentLevel} (max: ${this.levels.levels.length})`
       );
     }
-    setSize = this.levels.levels[levelCount - 1].setSize;
+    setSize = this.levels.levels[this.currentLevel - 1].setSize;
     console.log(`setSize after updating: ${setSize}`);
-    StaticRange = this.levels.levels[levelCount - 1].min;
+    StaticRange = this.levels.levels[this.currentLevel - 1].min;
     // add in the difficult numbers
     // TODO : amount of difficult numbers
   }
@@ -698,6 +740,9 @@ class GameControls {
   start() {
     console.log('Starting the game...');
     this.initializeBlockSet();
+    // i guess i do this double now...?
+    gameControls.score = 0;
+    this.updateScoreDisplay();
   }
 
   restart() {
@@ -714,12 +759,13 @@ class GameControls {
       lifeUniverseElement.style.display = 'none';
       lifeUniverseElement.textContent = '';
     }
-    gameRange = 1; // 36 for testing otherwise 1
-    levelDisplay.textContent = gameRange;
-    score = 0;
+    // gameRange = 1; // 36 for testing otherwise 1
+    //levelDisplay.textContent = gameRange; // no, do this for newGame()
+    //gameControls.score = 0;
+    // document.querySelector('.score').textContent = gameControls.score;
+    //gameControls.updateScoreDisplay();
     time = 0;
     gameControls.setLevelStats();
-    document.querySelector('.score').textContent = score;
     // Create a new BlockSet
     this.start();
   }
@@ -728,18 +774,18 @@ class GameControls {
     if (retries > 3) {
       alert('Too many errors. Restarting game.');
       // set back to level 1 (?)
-      if (levelCount < 1) levelCount = 1; // I guess
-      if (levelCount > this.levels.levels.length) {
-        levelCount = this.levels.levels.length - 2;
+      if (this.currentLevel < 1) this.currentLevel = 1; // I guess
+      if (this.currentLevel > this.levels.levels.length) {
+        this.currentLevel = this.levels.levels.length - 2;
       } // i am too tired
-      levelCount = 1; // fix this later: find a starting point.
+      this.currentLevel = 1; // fix this later: find a starting point.
       gameControls.setLevelStats();
       levelDisplay.textContent = level;
       this.restart();
       return;
     }
     try {
-      if (levelCount >= this.levels.levels.length) {
+      if (this.currentLevel >= this.levels.levels.length) {
         alert('You beat the game! 🎉');
         return;
       }
@@ -747,12 +793,10 @@ class GameControls {
       // Clear existing blocks from the grid
       grid.innerHTML = '';
       // Update starting range
-      levelCount++;
+      this.currentLevel++;
       gameControls.setLevelStats();
-      levelDisplay.textContent = levelCount;
-      //time = 0;
-      //score = 0;
-      //document.querySelector('.score').textContent = score;
+      levelDisplay.textContent = this.currentLevel;
+
       // Create a new BlockSet
       this.start();
     } catch (e) {
@@ -816,8 +860,9 @@ class GameControls {
         console.log('Blocks match!');
         this.selectedBlocks.forEach((block) => block.disable());
         lockBoard = true; // Keep the board locked after a successful match
-        score += numberOfMatches * 20; // Reward for a match
-        document.querySelector('.score').textContent = score;
+        gameControls.score += numberOfMatches * 20; // Reward for a match
+        // document.querySelector('.score').textContent = gameControls.score;
+        gameControls.updateScoreDisplay();
       } else {
         lockBoard = false;
         console.log('Blocks do not match.');
@@ -839,30 +884,30 @@ class GameControls {
       //alert('Congratulations! You have matched all blocks!');
       // Optionally, you can restart the game or offer to restart
       // this.continue();
-      // if (levelCount == 8) {
-      //   alert('Great job! You have reached Level ' + levelCount + '!');
-      // } else if (levelCount == 16) {
-      //   alert('Fantastic! You have reached Level ' + levelCount + '!');
-      // } else if (levelCount == 32) {
-      //   alert('Amazing! You have reached Level ' + levelCount + '!');
-      // } else if (levelCount == 64) {
+      // if (currentLevel == 8) {
+      //   alert('Great job! You have reached Level ' + currentLevel + '!');
+      // } else if (currentLevel == 16) {
+      //   alert('Fantastic! You have reached Level ' + currentLevel + '!');
+      // } else if (currentLevel == 32) {
+      //   alert('Amazing! You have reached Level ' + currentLevel + '!');
+      // } else if (currentLevel == 64) {
       //   alert(
       //     'Incredible! You have reached Level ' +
-      //       levelCount +
+      //       currentLevel +
       //       '!\nYou completed the game! Proceed at your own risk!'
       //   );
       // }
 
       this.continue();
       // do some animation on levels 5, 10, 20 and so on:
-      switch (levelCount) {
+      switch (this.currentLevel) {
         case 10:
-          alert('Great job! You have reached Level ' + levelCount + '!');
+          alert('Great job! You have reached Level ' + this.currentLevel + '!');
           break;
         case 20:
           alert(
             'Fantastic! You have reached Level ' +
-              levelCount +
+              this.currentLevel +
               '!\nYou completed the game! Proceed at your own risk!'
           );
           break;
@@ -870,9 +915,12 @@ class GameControls {
 
       // update high score:
       // refactor this and make score and high score variables of gameControls later:
-      if (highScore < score) highScore = score;
-      document.querySelector('.high-score').textContent = highScore;
-      localStorage.setItem('basBlocksHighScore', JSON.stringify(highScore));
+      if (gameControls.highScore < gameControls.score)
+        gameControls.setHighScore(gameControls.score);
+
+      // if (highScore < score) highScore = score;
+      // document.querySelector('.high-score').textContent = highScore;
+      // localStorage.setItem('basBlocksHighScore', JSON.stringify(highScore));
     }
   }
 
@@ -953,7 +1001,7 @@ console.log(currentTheme); // "dark", "light", or null
 // comment out after testing:
 
 // gameRange = 3; // 2- 9 base game starting
-// levelCount = 5;
+// gameControls.currentLevel = 5;
 // gameControls.setLevelStats();
 // gameControls.restart();
 // highScore = 4535;
