@@ -6,40 +6,12 @@ const levelDisplay = document.querySelector('.level');
 // TODO : use flipCount and time
 let flipCount = 0;
 let time = 0;
-// let lockBoard = false;
-// let score = 0;
-// let highScore = JSON.parse(localStorage.getItem('basBlocksHighScore')) || 0;
-// let gameRange = 2; // 2- 9
-// let currentLevel = 1;
-// let setSize = 16; // number of blocks, must be even
-// let numberOfMatches = 2;
-// let countAlerts = 0;
-// let maxAlerts = 2;
 
 // face indices in gameControls.selectedBases in V1 (!!!)
 const BIN_INDEX = 0;
 const OCT_INDEX = 1;
 const DEC_INDEX = 2;
 const HEX_INDEX = 3;
-
-// ****************************** Fetching Data ******************************
-// move this to gameControls later.
-//let levels = [];
-
-// async function fetchLevels() {
-//   try {
-//     const response = await fetch('./data/levels.json');
-//     if (!response.ok) {
-//       throw new Error(`Error fetching json: ${response.status}`);
-//     }
-//     const data = await response.json();
-//     console.log('levels fetched: ', data);
-//     return data;
-//   } catch (e) {
-//     console.error('Error fetching json: ', e);
-//   }
-// }
-// const levels = fetchLevels();
 
 // ***************************** Helper Functions *****************************
 
@@ -178,7 +150,7 @@ function flipDuplicatePair(pair) {
 }
 
 // ****************************** Classes ******************************
-// ****************** SystemId ******************
+//            ****************** SystemId ******************
 
 class SystemId {
   constructor(label, badge, base) {
@@ -223,7 +195,7 @@ const supportedBases = [
   new SystemId('30', '₃₀', 30),
 ];
 
-// ****************** BaseBlocks ******************
+//           ****************** BaseBlocks ******************
 class BaseBlock {
   constructor(id, number, systems, face = 0, matched = false) {
     this.id = id;
@@ -232,7 +204,7 @@ class BaseBlock {
     this.face = face; // index of the current system => systemId
     this.matched = matched;
 
-    /*  Faces: */
+    /*  Faces: (inernal note) */
     // for v1, stick to these 4 bases: (see global vars)
     // they should actually be in this order:
     // const BIN_INDEX = 0;
@@ -463,7 +435,6 @@ class BlockSet {
       gameControls.getSelectedBases()
     );
     this.blocks.push(block);
-    // console.log(`blocks: ${this.blocks}`);
     return block;
   }
 
@@ -472,7 +443,7 @@ class BlockSet {
      * Create Blocks from gameRange to gameRange + 7
      * No "big bad numbers" sprinkled in.
      */
-    //create blocks
+
     for (
       let i = this.gameRange;
       i < this.size / this.matches + this.gameRange;
@@ -488,7 +459,6 @@ class BlockSet {
         this.blocks.push(block);
       }
     }
-    // Math.floor(Math.random() * gameControls.getSelectedBases().length);
 
     this.shuffleFacesOfBlockSet();
     this.shuffleBlocks();
@@ -521,7 +491,6 @@ class BlockSet {
         // debucgger++;
       }
     }
-    // Math.floor(Math.random() * gameControls.getSelectedBases().length);
 
     this.shuffleFacesOfBlockSet();
     this.shuffleBlocks();
@@ -531,8 +500,6 @@ class BlockSet {
     });
   }
 
-  // TODO: continue here, with createBlocks
-  // you need to update it to reflect the levels
   createBlocks() {
     /**
      * Create Blocks for balanced difficulty
@@ -590,7 +557,6 @@ class BlockSet {
     }
   }
   shuffleFacesOfBlockSet() {
-    // console.log('shuffleFacesOfBlockSet getting executed');
     this.blocks.forEach((b) => b.shuffleFaces());
   }
 }
@@ -825,9 +791,9 @@ class GameControls {
         return;
       }
       this.currentLevel++;
-      //hallo
+
       this.updateLevelDisplay();
-      //document.querySelector('.level').textContent = this.currentLevel;
+
       await this.loadCurrentLevel();
       this.restart();
     } catch (e) {
@@ -874,8 +840,6 @@ class GameControls {
           }
           lifeUniverseElement.style.display = 'block';
 
-          // actually this would be a pain if this happens multiple times...
-
           confetti({
             particleCount: 126,
             angle: 42,
@@ -893,7 +857,7 @@ class GameControls {
         this.selectedBlocks.forEach((block) => block.disable());
         this.lockBoard = true; // Keep the board locked after a successful match
         gameControls.score += this.numberOfMatches * 20; // Reward for a match
-        // document.querySelector('.score').textContent = gameControls.score;
+
         gameControls.updateScoreDisplay();
       } else {
         this.lockBoard = false;
@@ -913,7 +877,7 @@ class GameControls {
     );
     if (allDisabled) {
       this.continue();
-      // do some animation on levels 5, 10, 20 and so on:
+      // TO-DO add some animation on levels 5, 10, 20 and so on
       switch (this.currentLevel) {
         case 10:
           alert('Great job! You have reached Level ' + this.currentLevel + '!');
@@ -927,14 +891,8 @@ class GameControls {
           break;
       }
 
-      // update high score:
-      // refactor this and make score and high score variables of gameControls later:
       if (gameControls.highScore < gameControls.score)
         gameControls.setHighScore(gameControls.score);
-
-      // if (highScore < score) highScore = score;
-      // document.querySelector('.high-score').textContent = highScore;
-      // localStorage.setItem('basBlocksHighScore', JSON.stringify(highScore));
     }
   }
 
@@ -963,10 +921,6 @@ async function startGame() {
 }
 
 startGame();
-
-// gameControls.fetchLevels().then(() => {
-//   gameControls.initializeBlockSet();
-// });
 
 // ************************ EVENT LISTENERS ************************
 
@@ -1022,30 +976,3 @@ console.log(currentTheme); // "dark", "light", or null
 // document.querySelector('.high-score').textContent = highScore;
 // localStorage.setItem('basBlocksHighScore', JSON.stringify(highScore));
 // setSize = 2; // number of blocks, must be even
-
-// ****************************** TODO List ******************************
-
-// TODO-List:
-
-// change game logic:
-
-// add penalty for wrong guesses
-
-// change game progression:
-// stay with easier blocks for beginners
-// only sprinkle in bigger blocks to avoid frustration
-// maybe vary set size instead
-
-// 1. write two functions:
-// shuffle colors vs. fixed colors
-// bin = yellow
-// oct = purple-ish
-// dec = orange-ish
-// hex = green
-// beginner: more blocks / sprinkled larger nums
-// advanced: scale up or start with larger number (optional)
-
-// TODO: use a class for levels and destructuring
-// adapt the levels: there are 20 chilled levels, and there are 20 "challenge"
-// fill in sensible data for the challenge levels
-// TODO:

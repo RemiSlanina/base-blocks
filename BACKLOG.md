@@ -1,12 +1,14 @@
 # BACKLOG (aka "Things I’ll Do When I’m Not Hyperfixating")
 
 - [ ] Add proper impressum (DACH requirements)
-- [ ] Test current game logic (especially BlockSet.createBlocks())
-- [ ] Replace global level vars (setSize, gameRange, etc.) with Level class (see down below)
-- [ ] Update GameControls to use Level instances
+- [ ] Add delete highscore
+- [ ] Add difficulty picking (2 modes)
 - [ ] Test edge cases (e.g., missing levels, wrong difficulty)
 - [ ] implement fliptohex():
 - [ ] substitute "you reached level 5" with bouncing blocks or colorful background.
+- [ ] growing set vs. normal mode (4x4 or 8x8) with arrow keys
+- [ ] legal note (impressum) + GDPR
+- [ ] add some animation on levels 5, 10, 20 and so on checkWinCondition()
 
 ```
     if (this.gameRange > 20) {
@@ -37,3 +39,39 @@
 
 
 ```
+
+// ******\*\*******\*\*******\*\******* TODO List ******\*\*******\*\*******\*\*******
+
+// TODO-List main.js:
+
+// change game logic:
+
+// add penalty for wrong guesses
+
+// change game progression:
+// stay with easier blocks for beginners
+// only sprinkle in bigger blocks to avoid frustration
+// maybe vary set size instead
+
+// 1. write two functions:
+// shuffle colors vs. fixed colors
+// bin = yellow
+// oct = purple-ish
+// dec = orange-ish
+// hex = green
+// beginner: more blocks / sprinkled larger nums
+// advanced: scale up or start with larger number (optional)
+
+// TODO: use a class for levels and destructuring
+// adapt the levels: there are 20 chilled levels, and there are 20 "challenge"
+// fill in sensible data for the challenge levels
+// TODO:
+
+<!-- TO-DO-list index.html:
+    ADD interactive demo
+    A tiny interactive demo in the accordion
+    (e.g., click +1 in binary, watch it go 1, 10, 11, 100…).
+    ADD Timer Button + logic
+    ADD a Demo for the game (How to play)
+    change fonts to something like Roboto or Quattrocento Sans
+    -->
