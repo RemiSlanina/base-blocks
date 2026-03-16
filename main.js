@@ -1,29 +1,20 @@
-/**
- * TODO: Next steps
- * - [ ] Test current game logic (especially BlockSet.createBlocks())
- * - [ ] Replace global level vars (setSize, gameRange, etc.) with Level class (see down below)
- * - [ ] Update GameControls to use Level instances
- * - [ ] Test edge cases (e.g., missing levels, wrong difficulty)
- */
-
-//const { template } = require('@babel/core');
-
-// ****************************** Vars ******************************
+// ************************* Vars *************************
 const grid = document.querySelector('.grid-container');
 const restartButton = document.getElementById('restart-button');
 const levelDisplay = document.querySelector('.level');
-let trackFlips = true;
+// let trackFlips = true;
+// TODO : use flipCount and time
 let flipCount = 0;
-let lockBoard = false;
+let time = 0;
+// let lockBoard = false;
 // let score = 0;
 // let highScore = JSON.parse(localStorage.getItem('basBlocksHighScore')) || 0;
-let time = 0;
-let gameRange = 2; // 2- 9
+// let gameRange = 2; // 2- 9
 // let currentLevel = 1;
-let setSize = 16; // number of blocks, must be even
-let numberOfMatches = 2;
-let countAlerts = 0;
-let maxAlerts = 2;
+// let setSize = 16; // number of blocks, must be even
+// let numberOfMatches = 2;
+// let countAlerts = 0;
+// let maxAlerts = 2;
 
 // face indices in gameControls.selectedBases in V1 (!!!)
 const BIN_INDEX = 0;
@@ -72,8 +63,8 @@ const HEX_INDEX = 3;
 function flipToBinary(blocks) {
   // console.log(`param blocks: ${blocks}`);
   //do something
-  const tempFlipTrack = trackFlips;
-  trackFlips = false;
+  const tempFlipTrack = gameControls.trackFlips;
+  gameControls.trackFlips = false;
   const pairs = findMatches(blocks);
   // console.log(`pairs: ${pairs}`);
   pairs.forEach((p) => {
@@ -91,7 +82,7 @@ function flipToBinary(blocks) {
       p[0].flipAndRender();
     }
   });
-  trackFlips = tempFlipTrack;
+  gameControls.trackFlips = tempFlipTrack;
 }
 
 /**
@@ -177,13 +168,13 @@ function flipDuplicatePair(pair) {
     return;
   }
 
-  const previous = trackFlips;
-  trackFlips = false;
+  const previous = gameControls.trackFlips;
+  gameControls.trackFlips = false;
 
   // flip ONE block (if you flip both, they will both have the same base again)
   block1.flipAndRender();
 
-  trackFlips = previous;
+  gameControls.trackFlips = previous;
 }
 
 // ****************************** Classes ******************************
@@ -349,7 +340,7 @@ class BaseBlock {
     this.face = (this.face + 1) % this.systems.length;
     // Add the new class
     this.element.classList.add(this.baseClasses[this.face]);
-    if (trackFlips) {
+    if (gameControls.trackFlips) {
       gameControls.score = Math.max(0, gameControls.score - 1); // Penalty for flipping
       // document.querySelector('.score').textContent = gameControls.score;
       gameControls.updateScoreDisplay();
@@ -360,7 +351,7 @@ class BaseBlock {
     this.face = (this.face - 1 + this.systems.length) % this.systems.length; // avoid negative mod
     // in JavaScript, modulo can be negative (f.e. divide by -1) -> add systems.length.
     this.element.classList.add(this.baseClasses[this.face]);
-    if (trackFlips) {
+    if (gameControls.trackFlips) {
       gameControls.score = Math.max(0, gameControls.score - 1); // Penalty for flipping
       // document.querySelector('.score').textContent = gameControls.score;
       gameControls.updateScoreDisplay();
@@ -372,7 +363,7 @@ class BaseBlock {
       console.log('Block is disabled, cannot select');
       return;
     }
-    if (lockBoard) {
+    if (gameControls.lockBoard) {
       console.log('Board is locked, cannot select');
       return;
     }
@@ -381,11 +372,11 @@ class BaseBlock {
       return;
     }
 
-    if (gameControls.selectedBlocksCount === numberOfMatches) {
+    if (gameControls.selectedBlocksCount === gameControls.numberOfMatches) {
       console.log('Selection limit reached, cannot select more blocks');
       return;
     }
-    if (gameControls.selectedBlocksCount > numberOfMatches) {
+    if (gameControls.selectedBlocksCount > gameControls.numberOfMatches) {
       console.error('Selected count exceeded limit, this should not happen!');
       return;
     }
@@ -401,8 +392,8 @@ class BaseBlock {
       `Selected block with value ${this.getCurrentDisplay()}`
     );
 
-    if (gameControls.selectedBlocksCount === numberOfMatches) {
-      lockBoard = true;
+    if (gameControls.selectedBlocksCount === gameControls.numberOfMatches) {
+      gameControls.lockBoard = true;
       gameControls.checkForMatch();
     }
   };
@@ -411,7 +402,7 @@ class BaseBlock {
       console.log('Block is not selected, cannot deselect');
       return;
     }
-    if (lockBoard) {
+    if (gameControls.lockBoard) {
       console.log('Board is locked, cannot deselect');
       return;
     }
@@ -604,6 +595,55 @@ class BlockSet {
   }
 }
 
+// ****************** Level ******************
+
+class Level {
+  constructor(levelNumber, difficulty = 'chilled') {
+    this.level = levelNumber;
+    this.difficulty = difficulty;
+    this.setSize = 16;
+    this.min = 2;
+    this.max = 9;
+    this.howManyDifficultPairs = 0;
+    this.allowedDifficultNumbers = [];
+  }
+
+  async fetchLevel(levelsData) {
+    // Accept levelsData as a parameter instead of fetching it internally
+    const levelData = levelsData.levels.find(
+      (l) => l.level === this.level && l.difficulty === this.difficulty
+    );
+
+    // Hardcoded fallback for levels > 20
+    if (this.level > 20 && levelsData.difficultNumbersPool) {
+      this.setSize = 32;
+      this.min = 1;
+      this.max = 8;
+      this.howManyDifficultPairs = 8;
+      this.allowedDifficultNumbers = levelsData.difficultNumbersPool;
+      console.log(
+        `Level ${this.level} has ${this.howManyDifficultPairs} difficult pairs.`
+      );
+      return;
+    }
+
+    // Populate from levelsData for levels 1-20
+    if (levelData) {
+      ({
+        setSize: this.setSize,
+        min: this.min,
+        max: this.max,
+        howManyDifficultPairs: this.howManyDifficultPairs,
+        allowedDifficultNumbers: this.allowedDifficultNumbers,
+      } = levelData);
+    } else {
+      console.error(
+        `Level ${this.level} (${this.difficulty}) not found in levels.json`
+      );
+    }
+  }
+}
+
 // ****************** GameControls ******************
 class GameControls {
   constructor() {
@@ -619,6 +659,13 @@ class GameControls {
       JSON.parse(localStorage.getItem('baseBlocksHighScore')) || 0;
     this.updateHighScoreDisplay();
     this.currentLevelData = null;
+    this.gameRange = 2; // 2- 9
+    this.setSize = 16; // number of blocks, must be even
+    this.numberOfMatches = 2;
+    this.trackFlips = true;
+    this.lockBoard = false;
+    this.countAlerts = 0;
+    this.maxAlerts = 2;
   }
 
   // ****************** GameControls Methods ******************
@@ -648,11 +695,11 @@ class GameControls {
     if (!this.currentLevelData) {
       throw new Error('No level data loaded!');
     }
-    setSize = this.currentLevelData.setSize;
-    gameRange = this.currentLevelData.min;
-    numberOfMatches = 2; // Default, or fetch from level data if needed
+    this.setSize = this.currentLevelData.setSize;
+    this.gameRange = this.currentLevelData.min;
+    this.numberOfMatches = 2; // Default, or fetch from level data if needed
     console.log(
-      `Level ${this.currentLevel}: setSize=${setSize}, gameRange=${gameRange}`
+      `Level ${this.currentLevel}: setSize=${this.setSize}, gameRange=${this.gameRange}`
     );
   }
 
@@ -662,6 +709,9 @@ class GameControls {
 
   updateHighScoreDisplay() {
     document.querySelector('.high-score').textContent = this.highScore;
+  }
+  updateLevelDisplay() {
+    document.querySelector('.level').textContent = this.currentLevel;
   }
 
   setHighScore(h) {
@@ -673,6 +723,10 @@ class GameControls {
       );
       this.updateHighScoreDisplay();
     }
+  }
+  clearHighScore() {
+    this.highScore = 0;
+    this.updateHighScoreDisplay();
   }
 
   getHighScore() {
@@ -700,9 +754,9 @@ class GameControls {
 
   initializeBlockSet() {
     this.blockSet = new BlockSet(
-      setSize,
-      numberOfMatches,
-      gameRange,
+      this.setSize,
+      this.numberOfMatches,
+      this.gameRange,
       this.getSelectedBases()
     );
 
@@ -713,7 +767,7 @@ class GameControls {
         duplicates = findDuplicateMatches(gameControls.blockSet.blocks);
         // duplicates = 'pizza'; // testing...
         if (duplicates.length === 0) break; // to be sure;
-        if (countAlerts > maxAlerts) {
+        if (this.countAlerts > this.maxAlerts) {
           console.error(
             `Something's not right: countAlerts exceeded limits! GameControls: initializeBlockSet()`
           );
@@ -725,11 +779,11 @@ class GameControls {
       console.log('Failed to resolve duplicates: ', e);
       // Alert the user:
       alert('Something went wrong. Restarting the level...');
-      countAlerts++;
+      this.countAlerts++;
       this.restart();
     }
 
-    if (gameRange <= 7) {
+    if (this.gameRange <= 7) {
       // change this to collect all pairs <8 instead of gameRange
       flipToBinary(this.blockSet.blocks);
     }
@@ -771,6 +825,9 @@ class GameControls {
         return;
       }
       this.currentLevel++;
+      //hallo
+      this.updateLevelDisplay();
+      //document.querySelector('.level').textContent = this.currentLevel;
       await this.loadCurrentLevel();
       this.restart();
     } catch (e) {
@@ -789,7 +846,7 @@ class GameControls {
         return;
       }
 
-      lockBoard = true;
+      this.lockBoard = true;
       let allMatch = true;
       const firstNumber = this.selectedBlocks[0].number;
       for (let i = 1; i < this.selectedBlocks.length; i++) {
@@ -800,7 +857,7 @@ class GameControls {
       }
 
       if (allMatch) {
-        lockBoard = false;
+        this.lockBoard = false;
         if (
           this.selectedBlocks[0].number === 42 &&
           !this.hasFiredConfettiFor42
@@ -834,18 +891,18 @@ class GameControls {
         }
         console.log('Blocks match!');
         this.selectedBlocks.forEach((block) => block.disable());
-        lockBoard = true; // Keep the board locked after a successful match
-        gameControls.score += numberOfMatches * 20; // Reward for a match
+        this.lockBoard = true; // Keep the board locked after a successful match
+        gameControls.score += this.numberOfMatches * 20; // Reward for a match
         // document.querySelector('.score').textContent = gameControls.score;
         gameControls.updateScoreDisplay();
       } else {
-        lockBoard = false;
+        this.lockBoard = false;
         console.log('Blocks do not match.');
         this.selectedBlocks.forEach((block) => block.deselect());
       }
 
       this.checkWinCondition();
-      countAlerts = 0; // assuming the game was running fine for a minute
+      this.countAlerts = 0; // assuming the game was running fine for a minute
 
       this.resetBoard();
     }, 300);
@@ -884,7 +941,7 @@ class GameControls {
   resetBoard() {
     this.selectedBlocks = [];
     this.selectedBlocksCount = 0;
-    lockBoard = false;
+    this.lockBoard = false;
   }
 }
 
@@ -957,7 +1014,7 @@ console.log(currentTheme); // "dark", "light", or null
 
 // comment out after testing:
 
-// gameRange = 3; // 2- 9 base game starting
+// gameControls.gameRange = 3; // 2- 9 base game starting
 // gameControls.currentLevel = 21;
 // gameControls.setLevelStats();
 // gameControls.restart();
@@ -992,52 +1049,3 @@ console.log(currentTheme); // "dark", "light", or null
 // adapt the levels: there are 20 chilled levels, and there are 20 "challenge"
 // fill in sensible data for the challenge levels
 // TODO:
-
-// ****************** Level ******************
-
-class Level {
-  constructor(levelNumber, difficulty = 'chilled') {
-    this.level = levelNumber;
-    this.difficulty = difficulty;
-    this.setSize = 16;
-    this.min = 2;
-    this.max = 9;
-    this.howManyDifficultPairs = 0;
-    this.allowedDifficultNumbers = [];
-  }
-
-  async fetchLevel(levelsData) {
-    // Accept levelsData as a parameter instead of fetching it internally
-    const levelData = levelsData.levels.find(
-      (l) => l.level === this.level && l.difficulty === this.difficulty
-    );
-
-    // Hardcoded fallback for levels > 20
-    if (this.level > 20 && levelsData.difficultNumbersPool) {
-      this.setSize = 32;
-      this.min = 1;
-      this.max = 8;
-      this.howManyDifficultPairs = 8;
-      this.allowedDifficultNumbers = levelsData.difficultNumbersPool;
-      console.log(
-        `Level ${this.level} has ${this.howManyDifficultPairs} difficult pairs.`
-      );
-      return;
-    }
-
-    // Populate from levelsData for levels 1-20
-    if (levelData) {
-      ({
-        setSize: this.setSize,
-        min: this.min,
-        max: this.max,
-        howManyDifficultPairs: this.howManyDifficultPairs,
-        allowedDifficultNumbers: this.allowedDifficultNumbers,
-      } = levelData);
-    } else {
-      console.error(
-        `Level ${this.level} (${this.difficulty}) not found in levels.json`
-      );
-    }
-  }
-}
