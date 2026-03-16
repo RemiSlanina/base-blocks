@@ -581,12 +581,12 @@ class Level {
     );
 
     // Hardcoded fallback for levels > 20
-    if (this.level > 20 && levelsData.difficultNumbersPool) {
+    if (this.level > 20 && levelsData.numbersPool) {
       this.setSize = 32;
       this.min = 1;
       this.max = 8;
       this.howManyDifficultPairs = 8;
-      this.allowedDifficultNumbers = levelsData.difficultNumbersPool;
+      this.allowedDifficultNumbers = levelsData.numbersPool;
       console.log(
         `Level ${this.level} has ${this.howManyDifficultPairs} difficult pairs.`
       );
@@ -882,7 +882,7 @@ class GameControls {
         case 10:
           alert('Great job! You have reached Level ' + this.currentLevel + '!');
           break;
-        case 20:
+        case 21:
           alert(
             'Fantastic! You have reached Level ' +
               this.currentLevel +
@@ -900,6 +900,13 @@ class GameControls {
     this.selectedBlocks = [];
     this.selectedBlocksCount = 0;
     this.lockBoard = false;
+  }
+
+  // for testing/debugging:
+  setLevel(n) {
+    this.currentLevel = n;
+    this.loadCurrentLevel().then(() => this.restart());
+    this.updateLevelDisplay();
   }
 }
 
@@ -976,3 +983,4 @@ console.log(currentTheme); // "dark", "light", or null
 // document.querySelector('.high-score').textContent = highScore;
 // localStorage.setItem('basBlocksHighScore', JSON.stringify(highScore));
 // setSize = 2; // number of blocks, must be even
+// gameControls.setLevel(19);

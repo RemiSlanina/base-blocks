@@ -1,6 +1,5 @@
 # BACKLOG (aka "Things I’ll Do When I’m Not Hyperfixating")
 
-- [ ] Add proper impressum (DACH requirements)
 - [ ] Add delete highscore
 - [ ] Add difficulty picking (2 modes)
 - [ ] Test edge cases (e.g., missing levels, wrong difficulty)
@@ -9,6 +8,12 @@
 - [ ] growing set vs. normal mode (4x4 or 8x8) with arrow keys
 - [ ] legal note (impressum) + GDPR
 - [ ] add some animation on levels 5, 10, 20 and so on checkWinCondition()
+- [ ] sometimes pairs are doubles due to new logic
+- [ ] add divided numbers (i.e. 1001 1000 instead of 10011000)
+- [ ] you beat the game notification arrives 1 level early (got it after finishing level 19)
+- [ ] after finishing all 20 levels and getting numbers fom numbersPool, it actually feels like it is getting easier. i must remove "1" though. maybe really go up to 256 who knows. must check block size.
+- [ ] add a "cookie" notification for dark mode etc
+- [ ] update privacy policy once i use sql
 
 ```
     if (this.gameRange > 20) {
@@ -30,7 +35,7 @@
 
   --->
 
-  "difficultNumbersPool": [
+  "numbersPool": [
     1, 2, 3, 4, 5, 6, 7, 8, 9,
     10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28,
     29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47,
@@ -40,7 +45,7 @@
 
 ```
 
-// ******\*\*******\*\*******\*\******* TODO List ******\*\*******\*\*******\*\*******
+// **\*\***\*\***\*\***\*\***\*\***\*\***\*\*** TODO List **\*\***\*\***\*\***\*\***\*\***\*\***\*\***
 
 // TODO-List main.js:
 
