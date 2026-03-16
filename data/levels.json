@@ -227,39 +227,50 @@
 
     {
       "level": 1,
-      "difficulty": "chilled",
+      "difficulty": "challenge",
       "setSize": 16,
       "min": 2,
       "max": 9,
-      "howManyDifficultPairs": 0,
-      "allowedDifficultNumbers": []
+      "howManyDifficultPairs": 1,
+      "allowedDifficultNumbers": [10, 11, 12, 13, 14, 15]
     },
     {
       "level": 2,
       "difficulty": "challenge",
       "setSize": 16,
-      "min": 2,
-      "max": 9,
-      "howManyDifficultPairs": 1,
-      "allowedDifficultNumbers": [10, 11, 12, 13]
+      "min": 3,
+      "max": 10,
+      "howManyDifficultPairs": 2,
+      "allowedDifficultNumbers": [
+        11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28,
+        29, 30
+      ]
     },
     {
       "level": 3,
       "difficulty": "challenge",
       "setSize": 18,
-      "min": 2,
-      "max": 9,
-      "howManyDifficultPairs": 1,
-      "allowedDifficultNumbers": [10, 11, 12, 13, 14]
+      "min": 3,
+      "max": 10,
+      "howManyDifficultPairs": 2,
+      "allowedDifficultNumbers": [
+        10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27,
+        28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45,
+        46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63,
+        64
+      ]
     },
     {
       "level": 4,
       "difficulty": "challenge",
       "setSize": 18,
-      "min": 2,
-      "max": 9,
-      "howManyDifficultPairs": 1,
-      "allowedDifficultNumbers": [10, 11, 12, 13, 14, 15]
+      "min": 3,
+      "max": 10,
+      "howManyDifficultPairs": 2,
+      "allowedDifficultNumbers": [
+        12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29,
+        30, 31, 32, 33, 34, 35, 36, 37, 38
+      ]
     },
     {
       "level": 5,
@@ -267,44 +278,61 @@
       "setSize": 20,
       "min": 3,
       "max": 10,
-      "howManyDifficultPairs": 1,
-      "allowedDifficultNumbers": [11, 12, 13, 14, 15, 16, 17, 18, 19, 20]
+      "howManyDifficultPairs": 3,
+      "allowedDifficultNumbers": [
+        12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29,
+        30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42
+      ]
     },
     {
       "level": 6,
       "difficulty": "challenge",
       "setSize": 20,
-      "min": 3,
-      "max": 10,
-      "howManyDifficultPairs": 1,
-      "allowedDifficultNumbers": [11, 12, 13, 14, 15, 16, 17, 18, 19, 20]
+      "min": 4,
+      "max": 11,
+      "howManyDifficultPairs": 3,
+      "allowedDifficultNumbers": [
+        12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29,
+        30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42
+      ]
     },
     {
       "level": 7,
       "difficulty": "challenge",
       "setSize": 20,
-      "min": 3,
-      "max": 10,
-      "howManyDifficultPairs": 2,
-      "allowedDifficultNumbers": [11, 12, 13, 14, 15, 16, 17, 18, 19, 20]
+      "min": 4,
+      "max": 11,
+      "howManyDifficultPairs": 3,
+      "allowedDifficultNumbers": [
+        12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29,
+        30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47
+      ]
     },
     {
       "level": 8,
       "difficulty": "challenge",
       "setSize": 22,
-      "min": 3,
-      "max": 10,
-      "howManyDifficultPairs": 2,
-      "allowedDifficultNumbers": [11, 12, 13, 14, 15, 16, 17, 18, 19, 20]
+      "min": 4,
+      "max": 11,
+      "howManyDifficultPairs": 3,
+      "allowedDifficultNumbers": [
+        12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29,
+        30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47,
+        48, 49
+      ]
     },
     {
       "level": 9,
       "difficulty": "challenge",
       "setSize": 22,
-      "min": 3,
-      "max": 10,
-      "howManyDifficultPairs": 2,
-      "allowedDifficultNumbers": [11, 12, 13, 14, 15, 16, 17, 18, 19, 20]
+      "min": 4,
+      "max": 11,
+      "howManyDifficultPairs": 3,
+      "allowedDifficultNumbers": [
+        12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29,
+        30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47,
+        48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64
+      ]
     },
     {
       "level": 10,
@@ -312,10 +340,11 @@
       "setSize": 24,
       "min": 4,
       "max": 11,
-      "howManyDifficultPairs": 2,
+      "howManyDifficultPairs": 4,
       "allowedDifficultNumbers": [
         12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29,
-        30, 31, 32
+        30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47,
+        48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64
       ]
     },
     {
@@ -324,10 +353,11 @@
       "setSize": 24,
       "min": 4,
       "max": 11,
-      "howManyDifficultPairs": 2,
+      "howManyDifficultPairs": 4,
       "allowedDifficultNumbers": [
         12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29,
-        30, 31, 32
+        30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47,
+        48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64
       ]
     },
     {
@@ -336,34 +366,37 @@
       "setSize": 24,
       "min": 4,
       "max": 11,
-      "howManyDifficultPairs": 2,
+      "howManyDifficultPairs": 4,
       "allowedDifficultNumbers": [
         12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29,
-        30, 31, 32
+        30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47,
+        48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64
       ]
     },
     {
       "level": 13,
       "difficulty": "challenge",
       "setSize": 26,
-      "min": 4,
-      "max": 11,
-      "howManyDifficultPairs": 2,
+      "min": 5,
+      "max": 12,
+      "howManyDifficultPairs": 4,
       "allowedDifficultNumbers": [
-        12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29,
-        30, 31, 32
+        13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30,
+        31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48,
+        49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64
       ]
     },
     {
       "level": 14,
       "difficulty": "challenge",
       "setSize": 26,
-      "min": 4,
-      "max": 11,
-      "howManyDifficultPairs": 2,
+      "min": 5,
+      "max": 12,
+      "howManyDifficultPairs": 4,
       "allowedDifficultNumbers": [
-        12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29,
-        30, 31, 32
+        13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30,
+        31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48,
+        49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64
       ]
     },
     {
@@ -372,7 +405,7 @@
       "setSize": 28,
       "min": 5,
       "max": 12,
-      "howManyDifficultPairs": 2,
+      "howManyDifficultPairs": 5,
       "allowedDifficultNumbers": [
         13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30,
         31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48,
@@ -385,7 +418,7 @@
       "setSize": 28,
       "min": 5,
       "max": 12,
-      "howManyDifficultPairs": 2,
+      "howManyDifficultPairs": 5,
       "allowedDifficultNumbers": [
         13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30,
         31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48,
@@ -396,52 +429,52 @@
       "level": 17,
       "difficulty": "challenge",
       "setSize": 30,
-      "min": 5,
-      "max": 12,
-      "howManyDifficultPairs": 2,
+      "min": 6,
+      "max": 13,
+      "howManyDifficultPairs": 5,
       "allowedDifficultNumbers": [
-        13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30,
-        31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48,
-        49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64
+        14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31,
+        32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49,
+        50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64
       ]
     },
     {
       "level": 18,
       "difficulty": "challenge",
       "setSize": 30,
-      "min": 5,
-      "max": 12,
-      "howManyDifficultPairs": 2,
+      "min": 6,
+      "max": 13,
+      "howManyDifficultPairs": 5,
       "allowedDifficultNumbers": [
-        13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30,
-        31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48,
-        49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64
+        14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31,
+        32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49,
+        50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64
       ]
     },
     {
       "level": 19,
       "difficulty": "challenge",
       "setSize": 32,
-      "min": 5,
-      "max": 12,
-      "howManyDifficultPairs": 2,
+      "min": 6,
+      "max": 13,
+      "howManyDifficultPairs": 5,
       "allowedDifficultNumbers": [
-        13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30,
-        31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48,
-        49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64
+        14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31,
+        32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49,
+        50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64
       ]
     },
     {
       "level": 20,
       "difficulty": "challenge",
       "setSize": 32,
-      "min": 5,
-      "max": 12,
-      "howManyDifficultPairs": 2,
+      "min": 6,
+      "max": 13,
+      "howManyDifficultPairs": 6,
       "allowedDifficultNumbers": [
-        13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30,
-        31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48,
-        49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64
+        14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31,
+        32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49,
+        50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64
       ]
     }
   ]

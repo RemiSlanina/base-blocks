@@ -551,7 +551,7 @@ class BlockSet {
 
     // reminder: BaseBlock(id, number, systems, face = 0, matched = false)
 
-    const level = gameControls.levels.levels[gameControls.currentLevel - 1];
+    const level = gameControls.currentLevelData;
     const difficultNumbers = level.allowedDifficultNumbers;
     const howManyDifficult = level.howManyDifficultPairs;
 
@@ -612,16 +612,49 @@ class GameControls {
     this.levels = [];
     this.selectedBlocks = [];
     this.selectedBlocksCount = 0;
-    this.hasFiredConfettiFor42 = false; // to avoid multiple confetti firings
-
+    this.hasFiredConfettiFor42 = false;
     this.currentLevel = 1;
     this.score = 0;
     this.highScore =
       JSON.parse(localStorage.getItem('baseBlocksHighScore')) || 0;
     this.updateHighScoreDisplay();
+    this.currentLevelData = null;
   }
 
   // ****************** GameControls Methods ******************
+
+  // Fetch levels and initialize the current level
+  async fetchLevels() {
+    try {
+      const response = await fetch('./data/levels.json');
+      if (!response.ok)
+        throw new Error(`Error fetching json: ${response.status}`);
+      this.levels = await response.json();
+      await this.loadCurrentLevel();
+    } catch (e) {
+      console.error('Error fetching json: ', e);
+    }
+  }
+
+  // Load the current level's data into this.currentLevelData
+  async loadCurrentLevel() {
+    this.currentLevelData = new Level(this.currentLevel);
+    await this.currentLevelData.fetchLevel(this.levels);
+    this.applyLevelStats();
+  }
+
+  // Apply the current level's stats to the game
+  applyLevelStats() {
+    if (!this.currentLevelData) {
+      throw new Error('No level data loaded!');
+    }
+    setSize = this.currentLevelData.setSize;
+    gameRange = this.currentLevelData.min;
+    numberOfMatches = 2; // Default, or fetch from level data if needed
+    console.log(
+      `Level ${this.currentLevel}: setSize=${setSize}, gameRange=${gameRange}`
+    );
+  }
 
   updateScoreDisplay() {
     document.querySelector('.score').textContent = this.score;
@@ -651,41 +684,6 @@ class GameControls {
   }
   removeBase(systemId) {
     this.selectedBases = this.selectedBases.filter((base) => base !== systemId);
-  }
-
-  async fetchLevels() {
-    try {
-      const response = await fetch('./data/levels.json');
-      if (!response.ok) {
-        throw new Error(`Error fetching json: ${response.status}`);
-      }
-
-      this.levels = await response.json();
-      console.log('levels fetched: ', this.levels);
-      //return this.levels;
-    } catch (e) {
-      console.error('Error fetching json: ', e);
-    }
-  }
-
-  // set or update the stats for levels... maybe a class Level later.
-  setLevelStats() {
-    if (this.levels.levels.length == 0) {
-      throw new Error('Levels data is empty!');
-    }
-    if (
-      this.currentLevel < 1 ||
-      this.currentLevel > this.levels.levels.length
-    ) {
-      throw new Error(
-        `Invalid currentLevel: ${this.currentLevel} (max: ${this.levels.levels.length})`
-      );
-    }
-    setSize = this.levels.levels[this.currentLevel - 1].setSize;
-    console.log(`setSize after updating: ${setSize}`);
-    StaticRange = this.levels.levels[this.currentLevel - 1].min;
-    // add in the difficult numbers
-    // TODO : amount of difficult numbers
   }
 
   createDefaultSystems() {
@@ -740,18 +738,15 @@ class GameControls {
   start() {
     console.log('Starting the game...');
     this.initializeBlockSet();
-    // i guess i do this double now...?
-    gameControls.score = 0;
     this.updateScoreDisplay();
   }
 
   restart() {
-    console.log('Restarting the game...');
-    // Clear existing blocks from the grid
+    console.log('Restarting the current level...');
     grid.innerHTML = '';
-    // Reset score and time
-    this.hasFiredConfettiFor42 = false; // Reset confetti flag on restart
-    // reset life-universe-everything message
+    this.score = 0;
+    this.updateScoreDisplay();
+    this.hasFiredConfettiFor42 = false;
     const lifeUniverseElement = document.querySelector(
       '.life-universe-everything'
     );
@@ -759,28 +754,14 @@ class GameControls {
       lifeUniverseElement.style.display = 'none';
       lifeUniverseElement.textContent = '';
     }
-    // gameRange = 1; // 36 for testing otherwise 1
-    //levelDisplay.textContent = gameRange; // no, do this for newGame()
-    //gameControls.score = 0;
-    // document.querySelector('.score').textContent = gameControls.score;
-    //gameControls.updateScoreDisplay();
-    time = 0;
-    gameControls.setLevelStats();
-    // Create a new BlockSet
-    this.start();
+    this.initializeBlockSet(); // Reinitialize blocks for the current level
   }
 
-  continue(retries = 0) {
+  async continue(retries = 0) {
     if (retries > 3) {
-      alert('Too many errors. Restarting game.');
-      // set back to level 1 (?)
-      if (this.currentLevel < 1) this.currentLevel = 1; // I guess
-      if (this.currentLevel > this.levels.levels.length) {
-        this.currentLevel = this.levels.levels.length - 2;
-      } // i am too tired
-      this.currentLevel = 1; // fix this later: find a starting point.
-      gameControls.setLevelStats();
-      levelDisplay.textContent = level;
+      alert('Too many errors. Restarting from level 1.');
+      this.currentLevel = 1;
+      await this.loadCurrentLevel();
       this.restart();
       return;
     }
@@ -789,17 +770,11 @@ class GameControls {
         alert('You beat the game! 🎉');
         return;
       }
-      // console.log('Continuing with higher values...');
-      // Clear existing blocks from the grid
-      grid.innerHTML = '';
-      // Update starting range
       this.currentLevel++;
-      gameControls.setLevelStats();
-      levelDisplay.textContent = this.currentLevel;
-
-      // Create a new BlockSet
-      this.start();
+      await this.loadCurrentLevel();
+      this.restart();
     } catch (e) {
+      console.error('Level load failed, retrying...', e);
       this.continue(retries + 1);
     }
   }
@@ -880,24 +855,6 @@ class GameControls {
       block.element.classList.contains('disabled')
     );
     if (allDisabled) {
-      //console.log('Congratulations! You have matched all blocks!');
-      //alert('Congratulations! You have matched all blocks!');
-      // Optionally, you can restart the game or offer to restart
-      // this.continue();
-      // if (currentLevel == 8) {
-      //   alert('Great job! You have reached Level ' + currentLevel + '!');
-      // } else if (currentLevel == 16) {
-      //   alert('Fantastic! You have reached Level ' + currentLevel + '!');
-      // } else if (currentLevel == 32) {
-      //   alert('Amazing! You have reached Level ' + currentLevel + '!');
-      // } else if (currentLevel == 64) {
-      //   alert(
-      //     'Incredible! You have reached Level ' +
-      //       currentLevel +
-      //       '!\nYou completed the game! Proceed at your own risk!'
-      //   );
-      // }
-
       this.continue();
       // do some animation on levels 5, 10, 20 and so on:
       switch (this.currentLevel) {
@@ -1001,7 +958,7 @@ console.log(currentTheme); // "dark", "light", or null
 // comment out after testing:
 
 // gameRange = 3; // 2- 9 base game starting
-// gameControls.currentLevel = 5;
+// gameControls.currentLevel = 21;
 // gameControls.setLevelStats();
 // gameControls.restart();
 // highScore = 4535;
@@ -1035,26 +992,40 @@ console.log(currentTheme); // "dark", "light", or null
 // adapt the levels: there are 20 chilled levels, and there are 20 "challenge"
 // fill in sensible data for the challenge levels
 // TODO:
-class Level {
-  level = 1;
-  difficulty = 'chilled';
-  setSize = 16;
-  min = 2;
-  max = 9;
-  howManyDifficultPairs = 0;
-  allowedDifficultNumbers = [];
 
+// ****************** Level ******************
+
+class Level {
   constructor(levelNumber, difficulty = 'chilled') {
     this.level = levelNumber;
     this.difficulty = difficulty;
+    this.setSize = 16;
+    this.min = 2;
+    this.max = 9;
+    this.howManyDifficultPairs = 0;
+    this.allowedDifficultNumbers = [];
   }
 
-  async fetchLevel() {
-    const response = await fetch('./data/levels.json');
-    const json = await response.json();
-    const levelData = json.levels.find(
+  async fetchLevel(levelsData) {
+    // Accept levelsData as a parameter instead of fetching it internally
+    const levelData = levelsData.levels.find(
       (l) => l.level === this.level && l.difficulty === this.difficulty
     );
+
+    // Hardcoded fallback for levels > 20
+    if (this.level > 20 && levelsData.difficultNumbersPool) {
+      this.setSize = 32;
+      this.min = 1;
+      this.max = 8;
+      this.howManyDifficultPairs = 8;
+      this.allowedDifficultNumbers = levelsData.difficultNumbersPool;
+      console.log(
+        `Level ${this.level} has ${this.howManyDifficultPairs} difficult pairs.`
+      );
+      return;
+    }
+
+    // Populate from levelsData for levels 1-20
     if (levelData) {
       ({
         setSize: this.setSize,
@@ -1070,7 +1041,3 @@ class Level {
     }
   }
 }
-
-// Usage:
-const level = new Level(1, 'chilled');
-await level.fetchLevel();
