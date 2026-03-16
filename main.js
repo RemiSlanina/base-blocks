@@ -14,6 +14,7 @@ let trackFlips = true;
 let flipCount = 0;
 let lockBoard = false;
 let score = 0;
+let highScore = JSON.parse(localStorage.getItem('basBlocksHighScore')) || 0;
 let time = 0;
 let gameRange = 2; // 2- 9
 let levelCount = 1;
@@ -27,14 +28,6 @@ const BIN_INDEX = 0;
 const OCT_INDEX = 1;
 const DEC_INDEX = 2;
 const HEX_INDEX = 3;
-
-// ****************************** Debug Mode ******************************
-
-// comment out after testing:
-
-// gameRange = 3; // 2- 9 base game starting
-// levelCount = 1;
-// setSize = 2; // number of blocks, must be even
 
 // ****************************** Fetching Data ******************************
 // move this to gameControls later.
@@ -725,6 +718,7 @@ class GameControls {
     levelDisplay.textContent = gameRange;
     score = 0;
     time = 0;
+    gameControls.setLevelStats();
     document.querySelector('.score').textContent = score;
     // Create a new BlockSet
     this.start();
@@ -844,20 +838,41 @@ class GameControls {
       //console.log('Congratulations! You have matched all blocks!');
       //alert('Congratulations! You have matched all blocks!');
       // Optionally, you can restart the game or offer to restart
+      // this.continue();
+      // if (levelCount == 8) {
+      //   alert('Great job! You have reached Level ' + levelCount + '!');
+      // } else if (levelCount == 16) {
+      //   alert('Fantastic! You have reached Level ' + levelCount + '!');
+      // } else if (levelCount == 32) {
+      //   alert('Amazing! You have reached Level ' + levelCount + '!');
+      // } else if (levelCount == 64) {
+      //   alert(
+      //     'Incredible! You have reached Level ' +
+      //       levelCount +
+      //       '!\nYou completed the game! Proceed at your own risk!'
+      //   );
+      // }
+
       this.continue();
-      if (levelCount == 8) {
-        alert('Great job! You have reached Level ' + levelCount + '!');
-      } else if (levelCount == 16) {
-        alert('Fantastic! You have reached Level ' + levelCount + '!');
-      } else if (levelCount == 32) {
-        alert('Amazing! You have reached Level ' + levelCount + '!');
-      } else if (levelCount == 64) {
-        alert(
-          'Incredible! You have reached Level ' +
-            levelCount +
-            '!\nYou completed the game! Proceed at your own risk!'
-        );
+      // do some animation on levels 5, 10, 20 and so on:
+      switch (levelCount) {
+        case 10:
+          alert('Great job! You have reached Level ' + levelCount + '!');
+          break;
+        case 20:
+          alert(
+            'Fantastic! You have reached Level ' +
+              levelCount +
+              '!\nYou completed the game! Proceed at your own risk!'
+          );
+          break;
       }
+
+      // update high score:
+      // refactor this and make score and high score variables of gameControls later:
+      if (highScore < score) highScore = score;
+      document.querySelector('.high-score').textContent = highScore;
+      localStorage.setItem('basBlocksHighScore', JSON.stringify(highScore));
     }
   }
 
@@ -900,7 +915,6 @@ restartButton.addEventListener(
 // ************************ Run Test Game ************************
 
 // ************************ Dark Mode ************************
-// ************************ Dark Mode ************************
 // Load saved theme if there is any
 const savedTheme = localStorage.getItem('theme');
 if (savedTheme) {
@@ -933,6 +947,21 @@ console.log(currentTheme); // "dark", "light", or null
 //     }
 //   });
 // }
+
+// ****************************** Debug Mode ******************************
+
+// comment out after testing:
+
+// gameRange = 3; // 2- 9 base game starting
+// levelCount = 5;
+// gameControls.setLevelStats();
+// gameControls.restart();
+// highScore = 4535;
+// document.querySelector('.high-score').textContent = highScore;
+// localStorage.setItem('basBlocksHighScore', JSON.stringify(highScore));
+// setSize = 2; // number of blocks, must be even
+
+// ****************************** TODO List ******************************
 
 // TODO-List:
 
