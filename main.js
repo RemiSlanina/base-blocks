@@ -203,6 +203,7 @@ class BaseBlock {
     this.systems = systems; // array of SystemId objects
     this.face = face; // index of the current system => systemId
     this.matched = matched;
+    this.is3D = true;
 
     /*  Faces: (inernal note) */
     // for v1, stick to these 4 bases: (see global vars)
@@ -211,18 +212,43 @@ class BaseBlock {
     // const OCT_INDEX = 1;
     // const DEC_INDEX = 2;
     // const HEX_INDEX = 3;
+
     /* for CSS manipulation:  */
     this.baseClasses = ['base1', 'base2', 'base3', 'base4', 'base5', 'base6']; // 5 and 6 are for v2
+    // Create the parent block element
     this.element = document.createElement('div');
+    this.element.classList.add('block');
     this.element.setAttribute('role', 'button');
     this.element.setAttribute('tabindex', '0'); // Make it focusable
-    this.element.classList.add('block', this.baseClasses[this.face]);
+    // this.element.classList.add('block', this.baseClasses[this.face]);
+
+    // Create faces for 3D
+    this.faces = [];
+    const faceCount = Math.min(systems.length, 4);
+    for (let i = 0; i < faceCount; i++) {
+      const faceElement = document.createElement('div');
+      faceElement.classList.add('face', `face-${i}`, this.baseClasses[i]);
+      faceElement.textContent = this.getDisplayFor(i);
+      this.element.appendChild(faceElement);
+      this.faces.push(faceElement);
+    }
+
+    // Add top/bottom faces (aesthetic)
+    const faceElementTop = document.createElement('div');
+    faceElementTop.classList.add('face', 'face-top', 'base-top-bottom-color-1');
+    this.element.appendChild(faceElementTop);
+    const faceElementBottom = document.createElement('div');
+    faceElementBottom.classList.add(
+      'face',
+      'face-bottom',
+      'base-top-bottom-color-1'
+    );
+    this.element.appendChild(faceElementBottom);
+
     this.element.setAttribute(
       'aria-label',
       `Block showing number ${this.getCurrentDisplay()}`
     );
-    this.isFirst = false; // delete these and test later
-    this.isSecond = false; // they are not used anywhere else
 
     // Event Listeners for interaction:
     // Play using the mouse: left click to select, right click to flip
@@ -269,8 +295,11 @@ class BaseBlock {
     /* ****************** LEFT CLICK: ****************** */
     this.element.addEventListener('contextmenu', (e) => {
       e.preventDefault();
-      this.flip();
-      this.element.textContent = this.getCurrentDisplay();
+      // this.flip();
+      //this.element.textContent = this.getCurrentDisplay();
+      // this.flip();
+      // this.render();
+      this.flipAndRender();
     });
   }
 
@@ -285,31 +314,76 @@ class BaseBlock {
       this.render();
     }
   }
-  generateInterface() {
-    this.element.textContent = this.getCurrentDisplay();
-    grid.appendChild(this.element);
-    this.element.title = 'Right-click to flip the block';
-  }
   getCurrentDisplay() {
-    return this.systems[this.face].toDisplay(this.number);
+    return this.getDisplayFor(this.face);
   }
-  flipAndRender() {
-    this.flip();
-    this.render();
+  getDisplayFor(i) {
+    return this.systems[i].toDisplay(this.number);
+  }
+  update3DRotation() {
+    // TODO : TEST THIS LATER
+    // until then: if (false)
+    if (false) {
+      if (this.systems.length <= 2) {
+        // avoid cubes with only 1 or 2 sides
+        // use 90 degree
+        const deg = -90 * this.activeFaceIndex;
+        this.element.style.transform = `rotateY(${deg}deg)`;
+      } else {
+        const calcDeg = Math.floor(360 / this.systems.length()); // instead of 90°
+        const deg = -1 * calcDeg * this.activeFaceIndex;
+        this.element.style.transform = `rotateY(${deg}deg)`;
+      }
+    }
+    // before testing the above, use:
+    // hard coded 90 deg
+    // swap this for the above (after TESTING!!)
+    const deg = -90 * this.activeFaceIndex;
+    this.element.style.transform = `rotateY(${deg}deg)`;
+  }
+  generateInterface() {
+    // this.element.textContent = this.getCurrentDisplay(); // this adds text to the parent, which is wrong
+    grid.appendChild(this.element); // this.element is the parent (block) i guess. maybe i should rename it
+    this.element.title = 'Right-click to flip the block';
+    this.update3DRotation();
   }
   render() {
-    // update the textContent (the display)
+    if (this.is3D) {
+      this.render3D();
+    } else {
+      this.render2D();
+    }
+  }
+  render3D() {
+    this.faces.forEach((faceElement, i) => {
+      faceElement.textContent = this.getDisplayFor(i);
+      // update aria label:
+      // this.faceElement is undefined
+      // TODO: look at this error:
+      // this.faceElement.setAttribute(
+      //   'aria-label',
+      //   `Face with value ${this.getCurrentDisplay()}`
+      // );
+    });
+  }
+  render2D() {
+    // update the textContent (the display) for 2D logic
     this.element.textContent = this.getCurrentDisplay();
     this.element.setAttribute(
       'aria-label',
       `Block with value ${this.getCurrentDisplay()}`
     );
   }
+  flipAndRender() {
+    this.flip();
+    this.render();
+  }
   flip() {
     // Remove the old class
     this.element.classList.remove(this.baseClasses[this.face]);
     // Update the face index unsing mod:
     this.face = (this.face + 1) % this.systems.length;
+    this.update3DRotation();
     // Add the new class
     this.element.classList.add(this.baseClasses[this.face]);
     if (gameControls.trackFlips) {

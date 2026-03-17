@@ -222,6 +222,20 @@ h2 {
   text-align: center;
   margin-bottom: calc(var(--golden-major) * 1rem);
 }
+/* ********************* Link style for github: ********************* */
+.see-code {
+  color: var(--text-primary);
+}
+.see-code:link {
+  color: var(--accent-2);
+}
+.see-code:visited {
+  color: var(--text-secondary);
+}
+.see-code:hover {
+  color: var(--accent);
+}
+/* ********************* fut feat choose bases ********************* */
 .choose-bases {
   text-align: center;
   margin-bottom: var(--spacing-unit);
@@ -271,7 +285,7 @@ h2 {
   ); /* fall back to 90vw if the variable with 90dvw fails */
   place-content: center;
   place-items: center;
-  gap: 5px;
+  gap: 25px;
   margin: 0 auto;
 }
 
@@ -281,17 +295,18 @@ h2 {
   text-align: center;
   place-items: center;
   place-content: center;
-  aspect-ratio: 3/3;
-  min-width: var(--box-width-min-large-screens);
-  max-width: var(--box-width-max-large-screens);
-  background-color: var(--accent-2);
+  /* aspect-ratio: 3/3; */
+  width: var(--box-width-min-large-screens);
+  /* min-width: var(--box-width-min-large-screens);
+  max-width: var(--box-width-max-large-screens); */
+  /* background-color: var(--accent-2); */
   /*   border: 1px solid white; */
   /* color: var(--box-dark-primary); */
   color: var(--text-box);
   font-size: 1.382rem;
   font-weight: 800;
-  background-color: var(--box-light-primary);
-  border: 3px solid var(--box-dark-primary);
+  /* background-color: var(--box-light-primary);
+  border: 3px solid var(--box-dark-primary); */
 }
 .block:hover {
   background-color: var(--box-medium-primary);
@@ -354,7 +369,7 @@ h2 {
 }
 
 /* *************** DISABLE & SELECT *************** */
-
+/* 
 .disabled {
   background-color: var(--box-dark-disabled);
   color: var(--box-light-disabled);
@@ -375,22 +390,95 @@ h2 {
   transform: scale(100%);
   transition: transform 0.2s ease;
   z-index: 2;
+} */
+
+.disabled {
+  background-color: var(--box-dark-disabled);
+  color: var(--box-light-disabled);
+  pointer-events: none;
+  opacity: 0.5;
+  z-index: 1;
 }
-.see-code {
-  color: var(--text-primary);
+.disabled:hover {
+  background-color: var(--box-dark-disabled);
+  color: var(--box-light-disabled);
 }
-.see-code:link {
-  color: var(--accent-2);
+.selected {
+  transform: scale(114%);
+  box-shadow: 0 0 8px gold; /* highlight effect */
+  animation: pulse 0.5s infinite; /* optional pulse animation */
+  transition: transform 0.2s ease;
+  z-index: 10;
 }
-.see-code:visited {
-  color: var(--text-secondary);
-}
-.see-code:hover {
-  color: var(--accent);
+.deselected {
+  transform: scale(100%);
+  transition: transform 0.2s ease;
+  z-index: 2;
 }
 
-/* ****************** @media ****************** */
-/* larger screens */
+.selected-face {
+  transform: scale(1.1);
+  z-index: 10;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5); /* Or whatever */
+}
+
+/*   *********************** 3D Logic ***********************   */
+
+/* 3D Block Container */
+.block {
+  width: 120px;
+  height: 120px;
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform 0.5s;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+/* Faces of the Block */
+.face {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backface-visibility: hidden;
+  border: 1px solid #999;
+  font-size: 24px;
+  font-weight: bold;
+  color: #333;
+  box-sizing: border-box;
+}
+
+/* Face Positions (3D Transformations) */
+.face-0 {
+  transform: rotateY(0deg) translateZ(60px);
+}
+.face-1 {
+  transform: rotateY(90deg) translateZ(60px);
+}
+.face-2 {
+  transform: rotateY(180deg) translateZ(60px);
+}
+.face-3 {
+  transform: rotateY(-90deg) translateZ(60px);
+}
+.face-top {
+  transform: rotateX(90deg) translateZ(60px);
+}
+.face-bottom {
+  transform: rotateX(-90deg) translateZ(60px);
+}
+
+/* Grid Perspective */
+.grid-container {
+  perspective: 13000px;
+}
+
+/*   *********************** @media ***********************   */
+/* 
+/* larger screens 
 @media (min-width: 1320px) {
   .grid-container {
     grid-template-columns: repeat(8, 1fr);
@@ -406,7 +494,7 @@ h2 {
   }
 }
 
-/* medium screens */
+/* medium screens 
 @media (max-width: 960px) {
   .grid-container {
     grid-template-columns: repeat(4, 1fr);
@@ -423,7 +511,7 @@ h2 {
   }
 }
 
-/* small screens  */
+/* small screens  
 @media (max-width: 600px) {
   #theme-toggle {
     top: 0.5rem;
@@ -457,4 +545,6 @@ h2 {
     max-width: var(--box-width-max-very-small-screen);
     min-width: var(--box-width-min-very-small-screen);
   }
-}
+} */
+
+/* is the problem in the css? */
