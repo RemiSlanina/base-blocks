@@ -2,6 +2,7 @@
 
 A memory-style game where players match numbers across different number systems.
 
+> Currently desktop only (BACKLOG.md)
 > WIP (WORK IN PROGRESS). Test it: https://base-blocks.vercel.app/
 
 [![Screenshot 1](/assets/screenshots/Screenshot-1-WIP.png)](https://base-blocks.vercel.app/)
