@@ -41,8 +41,8 @@ function flipToBinary(blocks) {
   // console.log(`pairs: ${pairs}`);
   pairs.forEach((p) => {
     if (
-      p[0].systems[p[0].face].label == 'BIN' ||
-      p[1].systems[p[1].face].label == 'BIN'
+      p[0].systems[p[0].activeFaceIndex].label == 'BIN' ||
+      p[1].systems[p[1].activeFaceIndex].label == 'BIN'
     ) {
       // if ONE of them is already binary, skip this step
       return;
@@ -50,7 +50,7 @@ function flipToBinary(blocks) {
     // otherwise make one of them binary god grant me strength.
     // TODO
     // i guess i will find the binary number system and use a method called findNumberSystem
-    while (p[0].face != 0) {
+    while (p[0].activeFaceIndex != 0) {
       p[0].flipAndRender();
     }
   });
@@ -103,7 +103,7 @@ function findDuplicateMatches(blocks) {
   for (let i = 0; i < blocks.length - 1; i++) {
     for (let j = i + 1; j < blocks.length; j++) {
       if (blocks[i].number === blocks[j].number) {
-        if (blocks[i].face === blocks[j].face) {
+        if (blocks[i].activeFaceIndex === blocks[j].activeFaceIndex) {
           duplicateMatches.push([blocks[i], blocks[j]]);
         }
       }
@@ -197,11 +197,11 @@ const supportedBases = [
 
 //           ****************** BaseBlocks ******************
 class BaseBlock {
-  constructor(id, number, systems, face = 0, matched = false) {
+  constructor(id, number, systems, activeFaceIndex = 0, matched = false) {
     this.id = id;
     this.number = number; // the actual value (e.g., 10)
     this.systems = systems; // array of SystemId objects
-    this.face = face; // index of the current system => systemId
+    this.activeFaceIndex = activeFaceIndex; // index of the current system => systemId
     this.matched = matched;
     this.is3D = true;
 
@@ -315,31 +315,20 @@ class BaseBlock {
     }
   }
   getCurrentDisplay() {
-    return this.getDisplayFor(this.face);
+    return this.getDisplayFor(this.activeFaceIndex);
   }
   getDisplayFor(i) {
     return this.systems[i].toDisplay(this.number);
   }
   update3DRotation() {
-    // TODO : TEST THIS LATER
-    // until then: if (false)
-    if (false) {
-      if (this.systems.length <= 2) {
-        // avoid cubes with only 1 or 2 sides
-        // use 90 degree
-        const deg = -90 * this.activeFaceIndex;
-        this.element.style.transform = `rotateY(${deg}deg)`;
-      } else {
-        const calcDeg = Math.floor(360 / this.systems.length()); // instead of 90°
-        const deg = -1 * calcDeg * this.activeFaceIndex;
-        this.element.style.transform = `rotateY(${deg}deg)`;
-      }
+    if (this.systems.lenth < 2) {
+      const deg = -90 * this.activeFaceIndex;
+      this.element.style.transform = `rotateY(${deg}deg)`;
+    } else {
+      const calcDeg = Math.floor(360 / this.systems.length);
+      const deg = -1 * calcDeg * this.activeFaceIndex;
+      this.element.style.transform = `rotateY(${deg}deg)`;
     }
-    // before testing the above, use:
-    // hard coded 90 deg
-    // swap this for the above (after TESTING!!)
-    const deg = -90 * this.activeFaceIndex;
-    this.element.style.transform = `rotateY(${deg}deg)`;
   }
   generateInterface() {
     // this.element.textContent = this.getCurrentDisplay(); // this adds text to the parent, which is wrong
@@ -360,10 +349,10 @@ class BaseBlock {
       // update aria label:
       // this.faceElement is undefined
       // TODO: look at this error:
-      // this.faceElement.setAttribute(
-      //   'aria-label',
-      //   `Face with value ${this.getCurrentDisplay()}`
-      // );
+      faceElement.setAttribute(
+        'aria-label',
+        `Face with value ${this.getCurrentDisplay()}`
+      );
     });
   }
   render2D() {
@@ -379,24 +368,22 @@ class BaseBlock {
     this.render();
   }
   flip() {
-    // Remove the old class
-    this.element.classList.remove(this.baseClasses[this.face]);
     // Update the face index unsing mod:
-    this.face = (this.face + 1) % this.systems.length;
+    this.activeFaceIndex = (this.activeFaceIndex + 1) % this.systems.length;
     this.update3DRotation();
-    // Add the new class
-    this.element.classList.add(this.baseClasses[this.face]);
+    // No need to add/remove base classes from parent - they're on the faces
     if (gameControls.trackFlips) {
       gameControls.score = Math.max(0, gameControls.score - 1); // Penalty for flipping
       // document.querySelector('.score').textContent = gameControls.score;
       gameControls.updateScoreDisplay();
     }
   }
+  // TO DO fix flip left
   flipLeft() {
-    this.element.classList.remove(this.baseClasses[this.face]);
-    this.face = (this.face - 1 + this.systems.length) % this.systems.length; // avoid negative mod
+    this.activeFaceIndex =
+      (this.activeFaceIndex - 1 + this.systems.length) % this.systems.length; // avoid negative mod
     // in JavaScript, modulo can be negative (f.e. divide by -1) -> add systems.length.
-    this.element.classList.add(this.baseClasses[this.face]);
+    // No need to add/remove base classes from parent - they're on the faces
     if (gameControls.trackFlips) {
       gameControls.score = Math.max(0, gameControls.score - 1); // Penalty for flipping
       // document.querySelector('.score').textContent = gameControls.score;
@@ -428,11 +415,23 @@ class BaseBlock {
     }
 
     console.log(`selected ${this.getCurrentDisplay()}`);
+
+    // Check if this block is already in the selected blocks array
+    if (gameControls.selectedBlocks.includes(this)) {
+      console.log('Block is already selected');
+      return;
+    }
+
+    // Add highlight to the active face
+    if (this.faces && this.faces[this.activeFaceIndex]) {
+      this.faces[this.activeFaceIndex].classList.add('selected-face');
+    }
     this.element.classList.remove('deselected');
     this.element.classList.add('selected');
     gameControls.selectedBlocks.push(this);
     gameControls.selectedBlocksCount++;
 
+    // to face or to parent?
     this.element.setAttribute(
       'aria-label',
       `Selected block with value ${this.getCurrentDisplay()}`
@@ -459,6 +458,11 @@ class BaseBlock {
       return;
     }
 
+    // Remove highlight from the active face
+    if (this.faces && this.faces[this.activeFaceIndex]) {
+      this.faces[this.activeFaceIndex].classList.remove('selected-face');
+      this.faces[this.activeFaceIndex].classList.remove('deselected-face');
+    }
     this.element.classList.remove('selected');
     this.element.classList.add('deselected');
     gameControls.selectedBlocks = gameControls.selectedBlocks.filter(
@@ -475,8 +479,15 @@ class BaseBlock {
   disable() {
     this.element.removeEventListener('click', this.selectBound);
     this.deselect();
+    //  (this.element.classList.contains('disabled') || this.faces[0].contains('disabled-face'))
     if (this.element.classList.contains('disabled')) {
       return;
+    }
+    // Disable all faces
+    if (this.faces) {
+      this.faces.forEach((f) => {
+        f.classList.add('disabled-face');
+      });
     }
     this.element.classList.add('disabled');
   }
@@ -494,12 +505,15 @@ class BaseBlock {
 
 // ****************** BlockSet ******************
 class BlockSet {
-  constructor(size, matches, gameRange, systemIds) {
+  constructor(size, matches, gameRange, systemIds, skipInitialization = false) {
     this.size = size || 16; // total number of blocks
     this.matches = matches || 2; // number of matches per group
     this.gameRange = gameRange || 12; // starting range for numbers
     this.blocks = [];
-    this.createBlocks();
+    this.systemId = systemIds;
+    if (!skipInitialization) {
+      this.createBlocks(); // Only create blocks if not loading
+    }
   }
 
   ceateAndPushBlock(i) {
@@ -927,8 +941,12 @@ class GameControls {
 
           console.log('The answer to life, the universe and everything!');
         }
+
         console.log('Blocks match!');
-        this.selectedBlocks.forEach((block) => block.disable());
+        this.selectedBlocks.forEach((block) => {
+          block.disable();
+          block.matched = true;
+        });
         this.lockBoard = true; // Keep the board locked after a successful match
         gameControls.score += this.numberOfMatches * 20; // Reward for a match
 
@@ -976,6 +994,61 @@ class GameControls {
     this.lockBoard = false;
   }
 
+  /**
+   * save board state to local stoarage
+   * later, add used number sytems too
+   */
+  saveBoard() {
+    // to be called on unload or periodically
+    const boardState = {
+      currentLevel: this.currentLevel,
+      score: this.score,
+      blocks: this.blockSet.blocks.map((block) => ({
+        id: block.id,
+        number: block.number,
+        activeFaceIndex: block.activeFaceIndex,
+        matched: block.matched,
+      })),
+    };
+    localStorage.setItem('boardState', JSON.stringify(boardState));
+    console.log(JSON.parse(localStorage.getItem('boardState')));
+  }
+  loadBoard() {
+    // to be called on load
+    const boardState = JSON.parse(localStorage.getItem('boardState'));
+    if (boardState) {
+      this.currentLevel = boardState.currentLevel;
+      this.score = boardState.score;
+      this.updateScoreDisplay();
+      // Rebuild BlockSet
+      this.blockSet = new BlockSet(
+        this.setSize,
+        this.numberOfMatches,
+        this.gameRange,
+        this.getSelectedBases(),
+        true // skipInitialization
+      );
+      // Reconstruct blocks
+      this.blockSet.blocks = boardState.blocks.map((blockData) => {
+        const block = new BaseBlock(
+          blockData.id,
+          blockData.number,
+          this.getSelectedBases(),
+          blockData.activeFaceIndex,
+          blockData.matched
+        );
+        block.generateInterface();
+        if (blockData.matched) {
+          block.disable();
+          console.log(block);
+        } else {
+          block.render();
+        }
+        return block;
+      });
+    }
+  }
+
   // for testing/debugging:
   setLevel(n) {
     this.currentLevel = n;
@@ -994,7 +1067,17 @@ gameControls.createDefaultSystems();
 async function startGame() {
   try {
     await gameControls.fetchLevels();
-    gameControls.initializeBlockSet();
+    const savedState = localStorage.getItem('boardState');
+    if (savedState) {
+      const confirmLoad = confirm('Load saved game?');
+      if (confirmLoad) {
+        gameControls.loadBoard();
+      } else {
+        gameControls.initializeBlockSet();
+      }
+    } else {
+      gameControls.initializeBlockSet();
+    }
   } catch (error) {
     console.error('Error starting game:', error);
     alert('Failed to start the game. Please try again.');
@@ -1004,11 +1087,27 @@ async function startGame() {
 startGame();
 
 // ************************ EVENT LISTENERS ************************
+// Save on unload
+window.addEventListener('beforeunload', () => {
+  gameControls.saveBoard();
+});
+// Manual save (button)
+document.getElementById('save-button').addEventListener('click', () => {
+  gameControls.saveBoard();
+  alert('Game saved! You can close the tab and return later.');
+});
 
 restartButton.addEventListener(
   'click',
   gameControls.restart.bind(gameControls)
 );
+
+document.getElementById('clear-save').addEventListener('click', () => {
+  // Remember: You also auto save upon close/reload (hit the Restart
+  // button after Clear to actually get a new game)!
+  localStorage.removeItem('boardState');
+  alert('Saved game cleared!');
+});
 // ************************ Run Test Game ************************
 
 // ************************ Dark Mode ************************

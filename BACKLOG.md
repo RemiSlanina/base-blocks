@@ -1,5 +1,25 @@
 # BACKLOG (aka "Things I’ll Do When I’m Not Hyperfixating")
 
+3D issues:
+fix protruding parent element (invisible)
+--> found it. now i need to change selected to highlight ALL FACES (users might flip while selected)
+fix flipLeft for swiping
+fix mobile
+enjoy (play)
+
+PLAYTHROUGH: (notes):
+it's way more fun to play with 3D blocks. Keep them!
+ifx 1000 0000 instead of 10000000 (now blocks are smaller -> more needed)
+AND FOR GODS SAKE STOP HITTING SAVE WHILE TESTING!!!!!!!
+
+protruding parent element (invisible) in css elements created by base blocks class:
+i know it was there because it was visible before.
+i could paint it blue to find it.
+i know it is gone after flipping.
+where did i assign parent (element)?
+
+--> found it. now i need to change selected to highlight ALL FACES (users might flip while selected)
+
 - [ ] Add delete highscore
 - [ ] Add difficulty picking (2 modes)
 - [ ] Test edge cases (e.g., missing levels, wrong difficulty)
