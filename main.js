@@ -546,6 +546,10 @@ class BlockSet {
     }
   }
 
+  clearBlocks() {
+    this.blocks.length = 0;
+  }
+
   ceateAndPushBlock(i) {
     let block = new BaseBlock(
       Math.floor(Math.random() * 900) + 100,
@@ -694,22 +698,37 @@ class Level {
 
   async fetchLevel(levelsData) {
     // Accept levelsData as a parameter instead of fetching it internally
-    const levelData = levelsData.levels.find(
-      (l) => l.level === this.level && l.difficulty === this.difficulty
-    );
 
     // Hardcoded fallback for levels > 20
-    if (this.level > 20 && levelsData.numbersPool) {
+    if (this.level > 20) {
       this.setSize = 32;
-      this.min = 1;
-      this.max = 8;
+      this.min = 2;
+      this.max = 9;
       this.howManyDifficultPairs = 8;
-      this.allowedDifficultNumbers = levelsData.numbersPool;
+      let tmp = [];
+      if (this.difficulty === 'chilled') {
+        for (let i = 2; i <= 64; i++) {
+          tmp.push(i);
+        }
+      } else if (this.difficulty === 'challenge') {
+        for (let i = 2; i <= 256; i++) {
+          tmp.push(i);
+        }
+      } else console.error('Error! Invalid difficulty!');
+      // this.allowedDifficultNumbers = levelsData.numbersPool;
+      this.allowedDifficultNumbers = tmp;
+      console.log(
+        `difficult numbers in main's pool: ${this.allowedDifficultNumbers}`
+      );
       console.log(
         `Level ${this.level} has ${this.howManyDifficultPairs} difficult pairs.`
       );
       return;
     }
+
+    const levelData = levelsData.levels.find(
+      (l) => l.level === this.level && l.difficulty === this.difficulty
+    );
 
     // Populate from levelsData for levels 1-20
     if (levelData) {
@@ -990,7 +1009,7 @@ class GameControls {
       this.checkWinCondition();
       this.countAlerts = 0; // assuming the game was running fine for a minute
 
-      this.resetBoard();
+      this.clearBoard();
     }, 300);
   }
   checkWinCondition() {
@@ -1018,7 +1037,7 @@ class GameControls {
     }
   }
 
-  resetBoard() {
+  clearBoard() {
     this.selectedBlocks = [];
     this.selectedBlocksCount = 0;
     this.lockBoard = false;
@@ -1043,13 +1062,16 @@ class GameControls {
     localStorage.setItem('boardState', JSON.stringify(boardState));
     console.log(JSON.parse(localStorage.getItem('boardState')));
   }
+  /**
+   * Load a saved game from local storage.
+   */
   loadBoard() {
-    // to be called on load
     const boardState = JSON.parse(localStorage.getItem('boardState'));
     if (boardState) {
       this.currentLevel = boardState.currentLevel;
       this.score = boardState.score;
       this.updateScoreDisplay();
+      this.updateLevelDisplay();
       // Rebuild BlockSet
       this.blockSet = new BlockSet(
         this.setSize,
@@ -1186,4 +1208,4 @@ console.log(currentTheme); // "dark", "light", or null
 // document.querySelector('.high-score').textContent = highScore;
 // localStorage.setItem('basBlocksHighScore', JSON.stringify(highScore));
 // setSize = 2; // number of blocks, must be even
-// gameControls.setLevel(19);
+gameControls.setLevel(3);

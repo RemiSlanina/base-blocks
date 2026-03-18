@@ -42,6 +42,8 @@
 
 ### PLAYTHROUGH
 
+- [ ] at level 23, I get multiple blocks upon (re)load. Hitting reset sometimes helps(?)
+      might be the game logic in fetchLevel (?)
 - [ ] PLAYTHROUGH: (notes):
   - it's way more fun to play with 3D blocks. Keep them!
   - ifx 1000 0000 instead of 10000000 (now blocks are smaller -> more needed)
