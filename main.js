@@ -159,7 +159,23 @@ class SystemId {
     this.base = base; // the actual base (2, 10, 16, 8)
   }
   toDisplay(num) {
-    return num.toString(this.base).toUpperCase() + this.badge;
+    let numStr = num.toString(this.base).toUpperCase();
+    let newStr = '';
+    // display larger number separated like 1010 0110
+    if (numStr.length >= 5) {
+      while (numStr.length >= 5) {
+        //console.log(` numStr is ${numStr}, newStr for num ${num} = ${newStr}`);
+        newStr = numStr.slice(-4) + ' ' + newStr;
+        numStr = numStr.slice(0, -4);
+        //console.log(` numStr is ${numStr}, newStr for num ${num} = ${newStr}`);
+      }
+      newStr = numStr + ' ' + newStr;
+
+      //console.log(`newStr for num ${num} = ${newStr}`);
+      return newStr.trim() + this.badge;
+    } else {
+      return numStr + this.badge;
+    }
   }
 }
 // collection of systemIds used in the game:
@@ -986,11 +1002,11 @@ class GameControls {
       // TO-DO add some animation on levels 5, 10, 20 and so on
       switch (this.currentLevel) {
         case 10:
-          alert('Great job! You have reached Level ' + this.currentLevel + '!');
+          alert('You have reached Level ' + this.currentLevel + '!');
           break;
         case 21:
           alert(
-            'Fantastic! You have reached Level ' +
+            'You have reached Level ' +
               this.currentLevel +
               '!\nYou completed the game! Proceed at your own risk!'
           );
