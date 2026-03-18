@@ -422,10 +422,16 @@ class BaseBlock {
       return;
     }
 
-    // Add highlight to the active face
-    if (this.faces && this.faces[this.activeFaceIndex]) {
-      this.faces[this.activeFaceIndex].classList.add('selected-face');
+    // Add highlight from all faces
+    if (this.faces) {
+      this.faces.forEach((f) => {
+        f.classList.add('selected-face');
+      });
     }
+    // Add highlight to the active face
+    // if (this.faces && this.faces[this.activeFaceIndex]) {
+    //   this.faces[this.activeFaceIndex].classList.add('selected-face');
+    // }
     this.element.classList.remove('deselected');
     this.element.classList.add('selected');
     gameControls.selectedBlocks.push(this);
@@ -457,12 +463,20 @@ class BaseBlock {
       );
       return;
     }
+    // Remove highlight from all faces
+    if (this.faces) {
+      this.faces.forEach((f) => {
+        f.classList.remove('selected-face');
+        f.classList.add('deselected-face');
+      });
+    }
 
     // Remove highlight from the active face
-    if (this.faces && this.faces[this.activeFaceIndex]) {
-      this.faces[this.activeFaceIndex].classList.remove('selected-face');
-      this.faces[this.activeFaceIndex].classList.remove('deselected-face');
-    }
+    // if (this.faces && this.faces[this.activeFaceIndex]) {
+    //   this.faces[this.activeFaceIndex].classList.remove('selected-face');
+    //   this.faces[this.activeFaceIndex].classList.add('deselected-face');
+    // }
+
     this.element.classList.remove('selected');
     this.element.classList.add('deselected');
     gameControls.selectedBlocks = gameControls.selectedBlocks.filter(

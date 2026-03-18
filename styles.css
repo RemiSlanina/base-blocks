@@ -228,6 +228,13 @@ h2 {
   justify-content: center;
   gap: var(--spacing-unit);
 }
+
+/* footer {
+  font-size: 0.8rem;
+  font-weight: 200;
+  text-align: center;
+  margin-top: 14px;
+} */
 /* ********************* Link style for github: ********************* */
 .see-code {
   color: var(--text-primary);
