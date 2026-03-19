@@ -51,7 +51,9 @@ function flipToBinary(blocks) {
     // TODO
     // i guess i will find the binary number system and use a method called findNumberSystem
     while (p[0].activeFaceIndex != 0) {
-      p[0].flipAndRender();
+      // p[0].flipAndRender();
+      p[0].flipRight();
+      p[0].render();
     }
   });
   gameControls.trackFlips = tempFlipTrack;
@@ -144,7 +146,9 @@ function flipDuplicatePair(pair) {
   gameControls.trackFlips = false;
 
   // flip ONE block (if you flip both, they will both have the same base again)
-  block1.flipAndRender();
+  // block1.flipAndRender();
+  block1.flipRight();
+  block1.render();
 
   gameControls.trackFlips = previous;
 }
@@ -220,6 +224,12 @@ class BaseBlock {
     this.activeFaceIndex = activeFaceIndex; // index of the current system => systemId
     this.matched = matched;
     this.is3D = true;
+    this.isLeftFlip = false;
+    this.currentAngle = 0;
+    // this.prevFaceIndex =
+    //   this.activeFaceIndex - 1 >= 0
+    //     ? this.activeFaceIndex - 1
+    //     : this.systems.length - 1;
 
     /*  Faces: (inernal note) */
     // for v1, stick to these 4 bases: (see global vars)
@@ -278,7 +288,10 @@ class BaseBlock {
       } else if (e.key === ' ') {
         // Flip on Space
         e.preventDefault();
-        this.flipAndRender();
+        // this.flipAndRender();
+
+        this.flipRight();
+        this.render();
       }
     });
 
@@ -311,11 +324,13 @@ class BaseBlock {
     /* ****************** LEFT CLICK: ****************** */
     this.element.addEventListener('contextmenu', (e) => {
       e.preventDefault();
-      // this.flip();
+      // this.flipRight();
       //this.element.textContent = this.getCurrentDisplay();
-      // this.flip();
+      // this.flipRight();
       // this.render();
-      this.flipAndRender();
+      // this.flipAndRender();
+      this.flipRight();
+      this.render();
     });
   }
 
@@ -323,9 +338,15 @@ class BaseBlock {
   handleSwipe() {
     const swipeThreshold = 30; // Minimum 30 pixels for swipe
     if (this.touchEndX - this.touchStartX > swipeThreshold) {
-      this.flipAndRender(); // swipe right
+      console.log('handleSwipe is calling flipRight()');
+      // this.flipAndRender(); // swipe right
+      this.isLeftFlip = false;
+      this.flipRight();
+      this.render();
     } else if (this.touchStartX - this.touchEndX > swipeThreshold) {
       // swipe left
+      console.log('handleSwipe is calling flipLeft()');
+      this.isLeftFlip = true;
       this.flipLeft();
       this.render();
     }
@@ -337,13 +358,46 @@ class BaseBlock {
     return this.systems[i].toDisplay(this.number);
   }
   update3DRotation() {
+    console.log('update3DRotation() called, isLeftFlip:', this.isLeftFlip);
+    const leftOrRight = this.isLeftFlip ? -1 : 1;
+    console.log('leftOrRight multiplier:', leftOrRight);
     if (this.systems.lenth < 2) {
-      const deg = -90 * this.activeFaceIndex;
+      const deg = leftOrRight * 90 * this.activeFaceIndex;
       this.element.style.transform = `rotateY(${deg}deg)`;
     } else {
-      const calcDeg = Math.floor(360 / this.systems.length);
-      const deg = -1 * calcDeg * this.activeFaceIndex;
-      this.element.style.transform = `rotateY(${deg}deg)`;
+      // first with 90°
+      if (this.isLeftFlip) {
+        this.currentAngle -= 90;
+      } else {
+        this.currentAngle += 90;
+      }
+      console.log('Calculated rotation angle:', this.currentAngle);
+      this.element.style.transform = `rotateY(${this.currentAngle}deg)`;
+      console.log('Transform applied:', this.element.style.transform);
+      this.isLeftFlip = false;
+
+      // const calcDeg = Math.floor(360 / this.systems.length);
+      // console.log('Degrees per face:', calcDeg);
+      // // const deg = leftOrRight * calcDeg * this.activeFaceIndex;
+      // let deg;
+      // let prevFaceIndex =
+      //   this.activeFaceIndex - 1 >= 0
+      //     ? this.activeFaceIndex - 1
+      //     : this.systems.length - 1;
+
+      // if (
+      //   this.isLeftFlip &&
+      //   this.activeFaceIndex === this.systems.length - 1 &&
+      //   prevFaceIndex === 0
+      // ) {
+      //   deg = -calcDeg * calcDeg * this.activeFaceIndex;
+      // } else {
+      //   deg = leftOrRight * calcDeg * this.activeFaceIndex;
+      // }
+      // console.log('Calculated rotation angle:', deg);
+      // this.element.style.transform = `rotateY(${deg}deg)`;
+      // console.log('Transform applied:', this.element.style.transform);
+      // this.isLeftFlip = false;
     }
   }
   generateInterface() {
@@ -379,13 +433,24 @@ class BaseBlock {
       `Block with value ${this.getCurrentDisplay()}`
     );
   }
-  flipAndRender() {
-    this.flip();
+  flipLeftAndRender() {
+    this.flipLeft();
     this.render();
   }
-  flip() {
+  flipRightAndRender() {
+    this.flipRight();
+    this.render();
+  }
+  mod(a, b) {
+    // code breaks when i use this (why?)
+    return ((a % b) + b) % b;
+  }
+  flipRight() {
     // Update the face index unsing mod:
+    // this.prevFaceIndex = this.activeFaceIndex;
     this.activeFaceIndex = (this.activeFaceIndex + 1) % this.systems.length;
+    // this.activeFaceIndex =
+    //   this.mod(this.activeFaceIndex + 1) % this.systems.length;
     this.update3DRotation();
     // No need to add/remove base classes from parent - they're on the faces
     if (gameControls.trackFlips) {
@@ -396,10 +461,25 @@ class BaseBlock {
   }
   // TO DO fix flip left
   flipLeft() {
+    console.log('flipLeft() called');
+    console.log(
+      'Current activeFaceIndex before flipLeft:',
+      this.activeFaceIndex
+    );
+
+    // this.prevFaceIndex = this.activeFaceIndex;
+    // this.activeFaceIndex = Math.abs(
+    // (this.activeFaceIndex - 1) % this.systems.length;
+    // ); // avoid negative reminder in javascript
     this.activeFaceIndex =
       (this.activeFaceIndex - 1 + this.systems.length) % this.systems.length; // avoid negative mod
     // in JavaScript, modulo can be negative (f.e. divide by -1) -> add systems.length.
     // No need to add/remove base classes from parent - they're on the faces
+    console.log('New activeFaceIndex after flipLeft:', this.activeFaceIndex);
+    this.isLeftFlip = true;
+    console.log('isLeftFlip set to:', this.isLeftFlip);
+    this.update3DRotation();
+    // this.render();
     if (gameControls.trackFlips) {
       gameControls.score = Math.max(0, gameControls.score - 1); // Penalty for flipping
       // document.querySelector('.score').textContent = gameControls.score;
@@ -528,7 +608,9 @@ class BaseBlock {
     );
     // console.log(`randomness: ${randomness}`);
     for (let i = 0; i < randomness; i++) {
-      this.flipAndRender();
+      // this.flipAndRender();
+      this.flipRight();
+      this.render();
     }
   }
 }
