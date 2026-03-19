@@ -1,6 +1,7 @@
 // ************************* Vars *************************
 const grid = document.querySelector('.grid-container');
 const restartButton = document.getElementById('restart-button');
+const newGameButton = document.getElementById('new-game');
 const levelDisplay = document.querySelector('.level');
 // let trackFlips = true;
 // TODO : use flipCount and time
@@ -50,7 +51,7 @@ function flipToBinary(blocks) {
     // otherwise make one of them binary god grant me strength.
     // TODO
     // i guess i will find the binary number system and use a method called findNumberSystem
-    while (p[0].activeFaceIndex != 0) {
+    while (p[0].systems[p[0].activeFaceIndex].label != 'BIN') {
       // p[0].flipAndRender();
       p[0].flipRight();
       p[0].render();
@@ -358,22 +359,23 @@ class BaseBlock {
     return this.systems[i].toDisplay(this.number);
   }
   update3DRotation() {
-    console.log('update3DRotation() called, isLeftFlip:', this.isLeftFlip);
+    // console.log('update3DRotation() called, isLeftFlip:', this.isLeftFlip);
     const leftOrRight = this.isLeftFlip ? -1 : 1;
-    console.log('leftOrRight multiplier:', leftOrRight);
+    // console.log('leftOrRight multiplier:', leftOrRight);
     if (this.systems.lenth < 2) {
       const deg = leftOrRight * 90 * this.activeFaceIndex;
       this.element.style.transform = `rotateY(${deg}deg)`;
     } else {
-      // first with 90°
+      // first with 90° hardcoded
+      // make this responsive to this.systems.lenght again
       if (this.isLeftFlip) {
         this.currentAngle -= 90;
       } else {
         this.currentAngle += 90;
       }
-      console.log('Calculated rotation angle:', this.currentAngle);
+      // console.log('Calculated rotation angle:', this.currentAngle);
       this.element.style.transform = `rotateY(${this.currentAngle}deg)`;
-      console.log('Transform applied:', this.element.style.transform);
+      // console.log('Transform applied:', this.element.style.transform);
       this.isLeftFlip = false;
 
       // const calcDeg = Math.floor(360 / this.systems.length);
@@ -630,6 +632,32 @@ class BlockSet {
 
   clearBlocks() {
     this.blocks.length = 0;
+  }
+
+  // TODO test:
+  flipAllBlocksRight() {
+    if (this.blocks.lenght <= 0) {
+      console.error('flipAllBlocks this.blocks does not exit!');
+      return;
+    }
+    this.blocks.forEach((b) => {
+      b.flipRight();
+      b.render();
+    });
+    console.log('flipped all blocks right');
+  }
+
+  // TODO test:
+  flipAllBlocksLeft() {
+    if (!this.blocks) {
+      console.error('flipAllBlocks this.blocks does not exit!');
+      return;
+    }
+    this.blocks.forEach((b) => {
+      b.flipLeft();
+      b.render();
+    });
+    console.log('flipped all blocks left');
   }
 
   ceateAndPushBlock(i) {
@@ -1103,9 +1131,12 @@ class GameControls {
       // TO-DO add some animation on levels 5, 10, 20 and so on
       switch (this.currentLevel) {
         case 10:
+          // this.blockSet.blocks.flipAllBlocksRight();
           alert('You have reached Level ' + this.currentLevel + '!');
           break;
         case 21:
+          // this.blockSet.blocks.flipAllBlocksLeft();
+          // this.blockSet.blocks.flipAllBlocksRight();
           alert(
             'You have reached Level ' +
               this.currentLevel +
@@ -1123,6 +1154,14 @@ class GameControls {
     this.selectedBlocks = [];
     this.selectedBlocksCount = 0;
     this.lockBoard = false;
+  }
+  async newGame() {
+    this.currentLevel = 1;
+
+    this.clearBoard();
+    this.updateLevelDisplay();
+    await this.loadCurrentLevel();
+    this.start();
   }
 
   /**
@@ -1235,6 +1274,10 @@ restartButton.addEventListener(
   'click',
   gameControls.restart.bind(gameControls)
 );
+newGameButton.addEventListener(
+  'click',
+  gameControls.newGame.bind(gameControls)
+);
 
 document.getElementById('clear-save').addEventListener('click', () => {
   // Remember: You also auto save upon close/reload (hit the Restart
@@ -1291,3 +1334,7 @@ console.log(currentTheme); // "dark", "light", or null
 // localStorage.setItem('basBlocksHighScore', JSON.stringify(highScore));
 // setSize = 2; // number of blocks, must be even
 gameControls.setLevel(3);
+// test (not working):
+// gameControls.blockSet.blocks.flipAllBlocksLeft();
+// gameControls.blockSet.blocks.flipAllBlocksRight();
+// gameControls.blockSet.blocks.flipAllBlocksLeft();
