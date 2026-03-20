@@ -333,6 +333,15 @@ h2 {
   border: 3px solid var(--box-mid-dark-primary);
 } */
 /* ****************** COLORED BASES: ****************** */
+/* *************** BASE 0: *************** */
+.base0 {
+  background-color: var(--box-light-senary);
+  border: 3px solid var(--box-dark-senary);
+}
+.base0:hover {
+  background-color: var(--box-medium-senary);
+  border: 3px solid var(--box-mid-dark-senary);
+}
 /* *************** BASE 1: *************** */
 .base1 {
   background-color: var(--box-light-primary);
@@ -377,15 +386,6 @@ h2 {
 .base5:hover {
   background-color: var(--box-medium-quinary);
   border: 3px solid var(--box-mid-dark-quinary);
-}
-/* *************** BASE 6: *************** */
-.base6 {
-  background-color: var(--box-light-senary);
-  border: 3px solid var(--box-dark-senary);
-}
-.base6:hover {
-  background-color: var(--box-medium-senary);
-  border: 3px solid var(--box-mid-dark-senary);
 }
 
 /* *************** DISABLE & SELECT *************** */

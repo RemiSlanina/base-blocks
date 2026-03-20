@@ -1,3 +1,4 @@
+// BaseBlocks is a game for matching numbers across bases
 // ************************* Vars *************************
 const grid = document.querySelector('.grid-container');
 const restartButton = document.getElementById('restart-button');
@@ -34,28 +35,38 @@ const HEX_INDEX = 3;
  * @returns {void}
  */
 function flipToBinary(blocks) {
+  console.log('flipToBinary was called');
   // console.log(`param blocks: ${blocks}`);
   //do something
   const tempFlipTrack = gameControls.trackFlips;
   gameControls.trackFlips = false;
   const pairs = findMatches(blocks);
-  // console.log(`pairs: ${pairs}`);
-  pairs.forEach((p) => {
+  console.log(`pairs: ${pairs}`);
+  pairs.forEach((pair) => {
     if (
-      p[0].systems[p[0].activeFaceIndex].label == 'BIN' ||
-      p[1].systems[p[1].activeFaceIndex].label == 'BIN'
+      pair[0].systems[pair[0].currentFaceIndex].label == 'BIN' ||
+      pair[1].systems[pair[1].currentFaceIndex].label == 'BIN'
     ) {
       // if ONE of them is already binary, skip this step
+      console.log('one is already binary');
+      console.log('pair element 1 ', pair[0].getCurrentDisplay());
+      console.log('pair element 2 ', pair[1].getCurrentDisplay());
+      console.log('........');
       return;
     }
     // otherwise make one of them binary god grant me strength.
     // TODO
     // i guess i will find the binary number system and use a method called findNumberSystem
-    while (p[0].systems[p[0].activeFaceIndex].label != 'BIN') {
+    while (pair[0].systems[pair[0].currentFaceIndex].label != 'BIN') {
       // p[0].flipAndRender();
-      p[0].flipRight();
-      p[0].render();
+      pair[0].flipRight();
+      pair[0].render();
+
+      // for debugging, disable later:
+      // pair[1].flipRight(); // debugging
+      // pair[1].render(); // debugging
     }
+    console.log('after flipping b to bin: ', pair[0].getCurrentDisplay());
   });
   gameControls.trackFlips = tempFlipTrack;
 }
@@ -82,7 +93,7 @@ function findMatches(blocks) {
       }
     }
   }
-
+  // console.log('matches found: ', matches);
   return matches;
 }
 
@@ -106,7 +117,7 @@ function findDuplicateMatches(blocks) {
   for (let i = 0; i < blocks.length - 1; i++) {
     for (let j = i + 1; j < blocks.length; j++) {
       if (blocks[i].number === blocks[j].number) {
-        if (blocks[i].activeFaceIndex === blocks[j].activeFaceIndex) {
+        if (blocks[i].currentFaceIndex === blocks[j].currentFaceIndex) {
           duplicateMatches.push([blocks[i], blocks[j]]);
         }
       }
@@ -216,20 +227,40 @@ const supportedBases = [
   new SystemId('30', '₃₀', 30),
 ];
 
+//           ****************** Face ******************
+// currentFaceIndex and the display of the current face are
+// out of tune. they are mismatched. create a face class
+// to manage current face index and current angle
+// and ensure they stay in tune.
+// face that represents a base, to be used in a block
+class Face {
+  constructor(systemId) {
+    this.currentAngle = 0;
+    this.currentFaceIndex = 0;
+    this.systemId = systemId;
+  }
+  // turn faces, modify values here
+  // positive or negative values
+  manageCurrentFace(addAngle, addIndex) {
+    this.currentAngle += addAngle; // actually not -> mod
+    this.currentFaceIndex += addIndex; // actually not -> mod
+  }
+}
+
 //           ****************** BaseBlocks ******************
 class BaseBlock {
-  constructor(id, number, systems, activeFaceIndex = 0, matched = false) {
+  constructor(id, number, systems, currentFaceIndex = 0, matched = false) {
     this.id = id;
     this.number = number; // the actual value (e.g., 10)
     this.systems = systems; // array of SystemId objects
-    this.activeFaceIndex = activeFaceIndex; // index of the current system => systemId
+    this.currentFaceIndex = currentFaceIndex; // index of the current system => systemId
     this.matched = matched;
     this.is3D = true;
     this.isLeftFlip = false;
     this.currentAngle = 0;
     // this.prevFaceIndex =
-    //   this.activeFaceIndex - 1 >= 0
-    //     ? this.activeFaceIndex - 1
+    //   this.currentFaceIndex - 1 >= 0
+    //     ? this.currentFaceIndex - 1
     //     : this.systems.length - 1;
 
     /*  Faces: (inernal note) */
@@ -241,38 +272,46 @@ class BaseBlock {
     // const HEX_INDEX = 3;
 
     /* for CSS manipulation:  */
-    this.baseClasses = ['base1', 'base2', 'base3', 'base4', 'base5', 'base6']; // 5 and 6 are for v2
-    // Create the parent block element
-    this.element = document.createElement('div');
-    this.element.classList.add('block');
-    this.element.setAttribute('role', 'button');
-    this.element.setAttribute('tabindex', '0'); // Make it focusable
-    // this.element.classList.add('block', this.baseClasses[this.face]);
+    this.baseClasses = ['base0', 'base1', 'base2', 'base3', 'base4', 'base5']; // 5 and 6 are for v2
+    // Create the parent block element "cubeElement"
+    this.cubeElement = document.createElement('div');
+    this.cubeElement.classList.add('block');
+    this.cubeElement.setAttribute('role', 'button');
+    this.cubeElement.setAttribute('tabindex', '0'); // Make it focusable
+    // this.cubeElement.classList.add('block', this.baseClasses[this.face]);
 
     // Create faces for 3D
     this.faces = [];
     const faceCount = Math.min(systems.length, 4);
     for (let i = 0; i < faceCount; i++) {
       const faceElement = document.createElement('div');
+      // this.currentFaceIndex = i;
       faceElement.classList.add('face', `face-${i}`, this.baseClasses[i]);
       faceElement.textContent = this.getDisplayFor(i);
-      this.element.appendChild(faceElement);
+      this.cubeElement.appendChild(faceElement);
       this.faces.push(faceElement);
+      console.log(
+        `********************************************
+        Face (this.faces[${i}]) created with: currentFaceIndex ${this.currentFaceIndex}, 
+        face-${i}, baseClasses ${this.baseClasses[i]}; with systems ${this.systems[i]} and 
+        a display of  ${this.getDisplayFor(i)} 
+        ********************************************`
+      );
     }
 
     // Add top/bottom faces (aesthetic)
     const faceElementTop = document.createElement('div');
     faceElementTop.classList.add('face', 'face-top', 'base-top-bottom-color-1');
-    this.element.appendChild(faceElementTop);
+    this.cubeElement.appendChild(faceElementTop);
     const faceElementBottom = document.createElement('div');
     faceElementBottom.classList.add(
       'face',
       'face-bottom',
       'base-top-bottom-color-1'
     );
-    this.element.appendChild(faceElementBottom);
+    this.cubeElement.appendChild(faceElementBottom);
 
-    this.element.setAttribute(
+    this.cubeElement.setAttribute(
       'aria-label',
       `Block showing number ${this.getCurrentDisplay()}`
     );
@@ -282,7 +321,7 @@ class BaseBlock {
     // Play using the keyboard: Enter to select, Space to flip
 
     /* ****************** Keyboard: ****************** */
-    this.element.addEventListener('keydown', (e) => {
+    this.cubeElement.addEventListener('keydown', (e) => {
       if (e.key === 'Enter') {
         e.preventDefault();
         this.select(); // Select on Enter
@@ -300,7 +339,7 @@ class BaseBlock {
     this.touchStartX = 0; // for swiping -
     this.touchEndX = 0; // range
 
-    this.element.addEventListener(
+    this.cubeElement.addEventListener(
       'touchstart',
       (e) => {
         this.touchStartX = e.changedTouches[0].screenX;
@@ -308,7 +347,7 @@ class BaseBlock {
       { passive: true }
     );
 
-    this.element.addEventListener(
+    this.cubeElement.addEventListener(
       'touchend',
       (e) => {
         this.touchEndX = e.changedTouches[0].screenX;
@@ -321,12 +360,12 @@ class BaseBlock {
 
     /* ****************** RIGHT CLICK: ****************** */
     this.selectBound = this.select.bind(this);
-    this.element.addEventListener('click', this.selectBound);
+    this.cubeElement.addEventListener('click', this.selectBound);
     /* ****************** LEFT CLICK: ****************** */
-    this.element.addEventListener('contextmenu', (e) => {
+    this.cubeElement.addEventListener('contextmenu', (e) => {
       e.preventDefault();
       // this.flipRight();
-      //this.element.textContent = this.getCurrentDisplay();
+      //this.cubeElement.textContent = this.getCurrentDisplay();
       // this.flipRight();
       // this.render();
       // this.flipAndRender();
@@ -353,70 +392,91 @@ class BaseBlock {
     }
   }
   getCurrentDisplay() {
-    return this.getDisplayFor(this.activeFaceIndex);
+    return this.getDisplayFor(this.currentFaceIndex);
   }
   getDisplayFor(i) {
     return this.systems[i].toDisplay(this.number);
   }
   update3DRotation() {
+    // debugging:
+    console.log(`Face: ${this.currentFaceIndex}, Angle: ${this.currentAngle}`);
     // console.log('update3DRotation() called, isLeftFlip:', this.isLeftFlip);
     const leftOrRight = this.isLeftFlip ? -1 : 1;
+    const degPerFace = 360 / this.systems.length;
+    console.log('addAnge: ', degPerFace);
     // console.log('leftOrRight multiplier:', leftOrRight);
     if (this.systems.lenth < 2) {
-      const deg = leftOrRight * 90 * this.activeFaceIndex;
-      this.element.style.transform = `rotateY(${deg}deg)`;
-    } else {
-      // first with 90° hardcoded
-      // make this responsive to this.systems.lenght again
+      // const deg = leftOrRight * 90 * this.currentFaceIndex;
+      // this.cubeElement.style.transform = `rotateY(${deg}deg)`;
       if (this.isLeftFlip) {
         this.currentAngle -= 90;
       } else {
         this.currentAngle += 90;
       }
+    } else {
+      // first with 90° hardcoded
+      // make this responsive to this.systems.lenght again
+      if (this.isLeftFlip) {
+        this.currentAngle -= degPerFace;
+        // this.currentAngle = this.currentFaceIndex * degPerFace;
+      } else {
+        this.currentAngle += degPerFace;
+        // this.currentAngle = this.currentFaceIndex * degPerFace;
+      }
       // console.log('Calculated rotation angle:', this.currentAngle);
-      this.element.style.transform = `rotateY(${this.currentAngle}deg)`;
-      // console.log('Transform applied:', this.element.style.transform);
+      this.cubeElement.style.transform = `rotateY(${this.currentAngle}deg)`;
+      // console.log('Transform applied:', this.cubeElement.style.transform);
       this.isLeftFlip = false;
 
       // const calcDeg = Math.floor(360 / this.systems.length);
       // console.log('Degrees per face:', calcDeg);
-      // // const deg = leftOrRight * calcDeg * this.activeFaceIndex;
+      // // const deg = leftOrRight * calcDeg * this.currentFaceIndex;
       // let deg;
       // let prevFaceIndex =
-      //   this.activeFaceIndex - 1 >= 0
-      //     ? this.activeFaceIndex - 1
+      //   this.currentFaceIndex - 1 >= 0
+      //     ? this.currentFaceIndex - 1
       //     : this.systems.length - 1;
 
       // if (
       //   this.isLeftFlip &&
-      //   this.activeFaceIndex === this.systems.length - 1 &&
+      //   this.currentFaceIndex === this.systems.length - 1 &&
       //   prevFaceIndex === 0
       // ) {
-      //   deg = -calcDeg * calcDeg * this.activeFaceIndex;
+      //   deg = -calcDeg * calcDeg * this.currentFaceIndex;
       // } else {
-      //   deg = leftOrRight * calcDeg * this.activeFaceIndex;
+      //   deg = leftOrRight * calcDeg * this.currentFaceIndex;
       // }
       // console.log('Calculated rotation angle:', deg);
-      // this.element.style.transform = `rotateY(${deg}deg)`;
-      // console.log('Transform applied:', this.element.style.transform);
+      // this.cubeElement.style.transform = `rotateY(${deg}deg)`;
+      // console.log('Transform applied:', this.cubeElement.style.transform);
       // this.isLeftFlip = false;
     }
   }
   generateInterface() {
-    // this.element.textContent = this.getCurrentDisplay(); // this adds text to the parent, which is wrong
-    grid.appendChild(this.element); // this.element is the parent (block) i guess. maybe i should rename it
-    this.element.title = 'Right-click to flip the block';
+    // this.cubeElement.textContent = this.getCurrentDisplay(); // this adds text to the parent, which is wrong
+    grid.appendChild(this.cubeElement); // this.cubeElement is the parent (block) i guess. maybe i should rename it
+    this.cubeElement.title = 'Right-click to flip the block';
     this.update3DRotation();
   }
   render() {
     if (this.is3D) {
-      this.render3D();
+      // this.render3D();
     } else {
       this.render2D();
     }
   }
   render3D() {
+    // debugging
+    console.log(
+      'Face order:',
+      this.systems.map((s, i) => `${i}: ${s.label}`)
+    );
+    // normal code contiued:
     this.faces.forEach((faceElement, i) => {
+      // actually, I already assigned this inside the constructor,
+      // so this is utterly redundant. the whole method!
+      this.currentFaceIndex = i;
+      console.log(`render3D: Face ${i}: ${this.getDisplayFor(i)}`);
       faceElement.textContent = this.getDisplayFor(i);
       // update aria label:
       // this.faceElement is undefined
@@ -429,8 +489,8 @@ class BaseBlock {
   }
   render2D() {
     // update the textContent (the display) for 2D logic
-    this.element.textContent = this.getCurrentDisplay();
-    this.element.setAttribute(
+    this.cubeElement.textContent = this.getCurrentDisplay();
+    this.cubeElement.setAttribute(
       'aria-label',
       `Block with value ${this.getCurrentDisplay()}`
     );
@@ -448,13 +508,23 @@ class BaseBlock {
     return ((a % b) + b) % b;
   }
   flipRight() {
+    console.log(
+      'Current currentFaceIndex and display before flipright:',
+      this.currentFaceIndex,
+      this.getCurrentDisplay()
+    );
     // Update the face index unsing mod:
-    // this.prevFaceIndex = this.activeFaceIndex;
-    this.activeFaceIndex = (this.activeFaceIndex + 1) % this.systems.length;
-    // this.activeFaceIndex =
-    //   this.mod(this.activeFaceIndex + 1) % this.systems.length;
+    // this.prevFaceIndex = this.currentFaceIndex;
+    this.currentFaceIndex = (this.currentFaceIndex + 1) % this.systems.length;
     this.update3DRotation();
+    // this.currentFaceIndex =
+    //   this.mod(this.currentFaceIndex + 1) % this.systems.length;
     // No need to add/remove base classes from parent - they're on the faces
+    console.log(
+      'Current currentFaceIndex and display after flipright:',
+      this.currentFaceIndex,
+      this.getCurrentDisplay()
+    );
     if (gameControls.trackFlips) {
       gameControls.score = Math.max(0, gameControls.score - 1); // Penalty for flipping
       // document.querySelector('.score').textContent = gameControls.score;
@@ -465,23 +535,27 @@ class BaseBlock {
   flipLeft() {
     console.log('flipLeft() called');
     console.log(
-      'Current activeFaceIndex before flipLeft:',
-      this.activeFaceIndex
+      'Current currentFaceIndex and display before flipLeft:',
+      this.currentFaceIndex,
+      this.getCurrentDisplay()
     );
 
-    // this.prevFaceIndex = this.activeFaceIndex;
-    // this.activeFaceIndex = Math.abs(
-    // (this.activeFaceIndex - 1) % this.systems.length;
+    // this.prevFaceIndex = this.currentFaceIndex;
+    // this.currentFaceIndex = Math.abs(
+    // (this.currentFaceIndex - 1) % this.systems.length;
     // ); // avoid negative reminder in javascript
-    this.activeFaceIndex =
-      (this.activeFaceIndex - 1 + this.systems.length) % this.systems.length; // avoid negative mod
-    // in JavaScript, modulo can be negative (f.e. divide by -1) -> add systems.length.
-    // No need to add/remove base classes from parent - they're on the faces
-    console.log('New activeFaceIndex after flipLeft:', this.activeFaceIndex);
+    this.currentFaceIndex =
+      (this.currentFaceIndex - 1 + this.systems.length) % this.systems.length;
+    this.update3DRotation();
+    console.log('New currentFaceIndex after flipLeft:', this.currentFaceIndex);
     this.isLeftFlip = true;
     console.log('isLeftFlip set to:', this.isLeftFlip);
-    this.update3DRotation();
     // this.render();
+    console.log(
+      'Current currentFaceIndex and display after flipLeft:',
+      this.currentFaceIndex,
+      this.getCurrentDisplay()
+    );
     if (gameControls.trackFlips) {
       gameControls.score = Math.max(0, gameControls.score - 1); // Penalty for flipping
       // document.querySelector('.score').textContent = gameControls.score;
@@ -490,7 +564,7 @@ class BaseBlock {
   }
   select = () => {
     //console.trace();
-    if (this.element.classList.contains('disabled')) {
+    if (this.cubeElement.classList.contains('disabled')) {
       console.log('Block is disabled, cannot select');
       return;
     }
@@ -498,7 +572,7 @@ class BaseBlock {
       console.log('Board is locked, cannot select');
       return;
     }
-    if (this.element.classList.contains('selected')) {
+    if (this.cubeElement.classList.contains('selected')) {
       this.deselect();
       return;
     }
@@ -512,7 +586,9 @@ class BaseBlock {
       return;
     }
 
-    console.log(`selected ${this.getCurrentDisplay()}`);
+    console.log(
+      `selected ${this.getCurrentDisplay()} with f-index ${this.currentFaceIndex}`
+    );
 
     // Check if this block is already in the selected blocks array
     if (gameControls.selectedBlocks.includes(this)) {
@@ -527,16 +603,16 @@ class BaseBlock {
       });
     }
     // Add highlight to the active face
-    // if (this.faces && this.faces[this.activeFaceIndex]) {
-    //   this.faces[this.activeFaceIndex].classList.add('selected-face');
+    // if (this.faces && this.faces[this.currentFaceIndex]) {
+    //   this.faces[this.currentFaceIndex].classList.add('selected-face');
     // }
-    this.element.classList.remove('deselected');
-    this.element.classList.add('selected');
+    this.cubeElement.classList.remove('deselected');
+    this.cubeElement.classList.add('selected');
     gameControls.selectedBlocks.push(this);
     gameControls.selectedBlocksCount++;
 
     // to face or to parent?
-    this.element.setAttribute(
+    this.cubeElement.setAttribute(
       'aria-label',
       `Selected block with value ${this.getCurrentDisplay()}`
     );
@@ -547,7 +623,7 @@ class BaseBlock {
     }
   };
   deselect() {
-    if (!this.element.classList.contains('selected')) {
+    if (!this.cubeElement.classList.contains('selected')) {
       console.log('Block is not selected, cannot deselect');
       return;
     }
@@ -570,29 +646,31 @@ class BaseBlock {
     }
 
     // Remove highlight from the active face
-    // if (this.faces && this.faces[this.activeFaceIndex]) {
-    //   this.faces[this.activeFaceIndex].classList.remove('selected-face');
-    //   this.faces[this.activeFaceIndex].classList.add('deselected-face');
+    // if (this.faces && this.faces[this.currentFaceIndex]) {
+    //   this.faces[this.currentFaceIndex].classList.remove('selected-face');
+    //   this.faces[this.currentFaceIndex].classList.add('deselected-face');
     // }
 
-    this.element.classList.remove('selected');
-    this.element.classList.add('deselected');
+    this.cubeElement.classList.remove('selected');
+    this.cubeElement.classList.add('deselected');
     gameControls.selectedBlocks = gameControls.selectedBlocks.filter(
       (block) => block !== this
     );
     gameControls.selectedBlocksCount--;
-    console.log(`deselected ${this.getCurrentDisplay()}`);
+    console.log(
+      `deselected ${this.getCurrentDisplay()} with f-index ${this.currentFaceIndex}`
+    );
 
-    this.element.setAttribute(
+    this.cubeElement.setAttribute(
       'aria-label',
       `Dselected block with value ${this.getCurrentDisplay()}`
     );
   }
   disable() {
-    this.element.removeEventListener('click', this.selectBound);
+    this.cubeElement.removeEventListener('click', this.selectBound);
     this.deselect();
     //  (this.element.classList.contains('disabled') || this.faces[0].contains('disabled-face'))
-    if (this.element.classList.contains('disabled')) {
+    if (this.cubeElement.classList.contains('disabled')) {
       return;
     }
     // Disable all faces
@@ -601,7 +679,7 @@ class BaseBlock {
         f.classList.add('disabled-face');
       });
     }
-    this.element.classList.add('disabled');
+    this.cubeElement.classList.add('disabled');
   }
 
   shuffleFaces() {
@@ -996,10 +1074,13 @@ class GameControls {
       this.restart();
     }
 
-    if (this.gameRange <= 7) {
-      // change this to collect all pairs <8 instead of gameRange
+    if (this.currentLevel <= 20) {
       flipToBinary(this.blockSet.blocks);
-    }
+    } // later flip to hex above level 20
+    // if (this.gameRange <= 7) {
+    //   // change this to collect all pairs <8 instead of gameRange
+    //   flipToBinary(this.blockSet.blocks);
+    // }
   }
 
   start() {
@@ -1124,7 +1205,7 @@ class GameControls {
   }
   checkWinCondition() {
     const allDisabled = this.blockSet.blocks.every((block) =>
-      block.element.classList.contains('disabled')
+      block.cubeElement.classList.contains('disabled')
     );
     if (allDisabled) {
       this.continue();
@@ -1176,7 +1257,7 @@ class GameControls {
       blocks: this.blockSet.blocks.map((block) => ({
         id: block.id,
         number: block.number,
-        activeFaceIndex: block.activeFaceIndex,
+        currentFaceIndex: block.currentFaceIndex,
         matched: block.matched,
       })),
     };
@@ -1207,7 +1288,7 @@ class GameControls {
           blockData.id,
           blockData.number,
           this.getSelectedBases(),
-          blockData.activeFaceIndex,
+          blockData.currentFaceIndex,
           blockData.matched
         );
         block.generateInterface();
