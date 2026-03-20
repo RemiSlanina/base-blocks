@@ -234,16 +234,37 @@ const supportedBases = [
 // and ensure they stay in tune.
 // face that represents a base, to be used in a block
 class Face {
-  constructor(systemId) {
-    this.currentAngle = 0;
-    this.currentFaceIndex = 0;
+  constructor(systemId, i) {
+    /**
+     * So, but if I want to stop the CSS animation from disrupting
+     * the game flow, why not always add/sbtrct 90 degrees (for 4 sides or x)
+     * and then calculate currentFaceIndex from there?
+     *
+     * Update3D would then just add or subtract 90 degrees
+     * and using mod operation, circling through angle modulo 360 and then / 90 = faceIndex.
+     * This is still a mess, but I'll try tomorrow.
+     * Currently, 2 of the faces show correctly, but oct and hex are bugged.
+     *
+     */
+    this.faceIndex = i;
     this.systemId = systemId;
+    this.faceElement = document.createElement('div');
+    this.rotationAngle = this.findCorrectYRotationForFace(i);
+    // this.faceElement.classList.add('face', `face-${i}`, this.baseClasses[i]);
+    this.faceElement.classList.add('face', this.baseClasses[i]);
+    faceElement.style.transform = `rotateY(${rotationAngle}deg) translateZ(60px)`;
+    faceElement.textContent = this.getDisplay();
+
+    console.log(
+      `o.o.o.o.o.o.o.o.o.o.o.o.o.o.o.o.o.o.o.o.o.o
+        Face (this.faces[${i}]) created with: currentFaceIndex ${this.currentFaceIndex}, 
+        face-${i}, baseClasses ${this.baseClasses[i]}; with systems ${this.systemId} and 
+        a display of  ${this.getDisplay()} 
+        o.o.o.o.o.o.o.o.o.o.o.o.o.o.o.o.o.o.o.o.o.o`
+    );
   }
-  // turn faces, modify values here
-  // positive or negative values
-  manageCurrentFace(addAngle, addIndex) {
-    this.currentAngle += addAngle; // actually not -> mod
-    this.currentFaceIndex += addIndex; // actually not -> mod
+  getDisplay() {
+    return this.systemId.toDisplay(this.number);
   }
 }
 
@@ -283,10 +304,24 @@ class BaseBlock {
     // Create faces for 3D
     this.faces = [];
     const faceCount = Math.min(systems.length, 4);
+    // just to be sure, or for debuggin:
+    const faceSystems = [...this.systems].sort((a, b) => {
+      // Sort by your preferred order (e.g., BIN, OCT, DEC, HEX)
+      const order = ['BIN', 'OCT', 'DEC', 'HEX'];
+      return order.indexOf(a.label) - order.indexOf(b.label);
+    });
+    // output:
+    console.log('systems ', this.systems); // bin oct dec hex
+    console.log('faceSystems ', faceSystems); // bin oct dec hex
+    // so this should work
+    // now assing the faces:
     for (let i = 0; i < faceCount; i++) {
       const faceElement = document.createElement('div');
       // this.currentFaceIndex = i;
-      faceElement.classList.add('face', `face-${i}`, this.baseClasses[i]);
+      // faceElement.classList.add('face', `face-${i}`, this.baseClasses[i]);
+      let rotationAngle = this.findCorrectYRotationForFace(i);
+      faceElement.classList.add('face', this.baseClasses[i]);
+      faceElement.style.transform = `rotateY(${rotationAngle}deg) translateZ(60px)`;
       faceElement.textContent = this.getDisplayFor(i);
       this.cubeElement.appendChild(faceElement);
       this.faces.push(faceElement);
@@ -397,60 +432,160 @@ class BaseBlock {
   getDisplayFor(i) {
     return this.systems[i].toDisplay(this.number);
   }
+  findCorrectYRotationForFace(i) {
+    // returns a rotation angle for rotateY (NOT top and bottom,
+    // they would need rotate X)
+    // could implement it here as well
+    let rotationAngle = 0;
+    if (this.systems.length > 6 || this.systems.length < 3) {
+      console.error('Invalid systems.length: ', this.systems.length);
+      return;
+    }
+    // for 3 sides: 120°, for 5 sided: 72°, for 6 sides: 60°
+    // + accordingly named css classes (face-1-three-sides...)
+    if (this.systems.length === 3) {
+      switch (i) {
+        case 0: // BIN
+          rotationAngle = 0;
+          break;
+        case 1: // OCT
+          rotationAngle = 120; // 360/3 for 3 faces
+          break;
+        case 2: // DEC
+          rotationAngle = -120; // 240°
+          break;
+        default: // error
+          console.error('Invalid Face Index for 3 bases ', i);
+      }
+    }
+    if (this.systems.length === 4) {
+      switch (i) {
+        case 0: // BIN
+          rotationAngle = 0;
+          break;
+        case 1: // OCT
+          rotationAngle = 90;
+          break;
+        case 2: // DEC
+          rotationAngle = 180;
+          break;
+        case 3: // HEX
+          rotationAngle = -90;
+          break;
+        default: // error
+          console.error('Invalid Face Index for 4 bases ', i);
+      }
+    }
+
+    // for 5 systems:
+    if (this.systems.length === 5) {
+      switch (i) {
+        case 0: // BIN
+          rotationAngle = 0;
+          break;
+        case 1: // OCT
+          rotationAngle = 72; // 360/5 for 5 faces
+          break;
+        case 2: // DEC
+          rotationAngle = 144;
+          break;
+        case 3: // HEX
+          rotationAngle = 216;
+          break;
+        case 4: // 5th face
+          rotationAngle = 288;
+          break;
+        default:
+          console.error('Invalid Face Index for 5 bases ', i);
+      }
+    }
+
+    // for 5 systems:
+    if (this.systems.length === 6) {
+      switch (i) {
+        case 0: // BIN
+          rotationAngle = 0;
+          break;
+        case 1: // OCT
+          rotationAngle = 60; // 360/6 for 6 faces
+          break;
+        case 2: // DEC
+          rotationAngle = 120;
+          break;
+        case 3: // HEX
+          rotationAngle = 180;
+          break;
+        case 4: // 5th face
+          rotationAngle = 240;
+          break;
+        case 5: // 6th face
+          rotationAngle = 300;
+          break;
+        default:
+          console.error('Invalid Face Index for 5 bases ', i);
+      }
+    }
+    return rotationAngle;
+  }
+
   update3DRotation() {
     // debugging:
-    console.log(`Face: ${this.currentFaceIndex}, Angle: ${this.currentAngle}`);
-    // console.log('update3DRotation() called, isLeftFlip:', this.isLeftFlip);
-    const leftOrRight = this.isLeftFlip ? -1 : 1;
-    const degPerFace = 360 / this.systems.length;
-    console.log('addAnge: ', degPerFace);
-    // console.log('leftOrRight multiplier:', leftOrRight);
-    if (this.systems.lenth < 2) {
-      // const deg = leftOrRight * 90 * this.currentFaceIndex;
-      // this.cubeElement.style.transform = `rotateY(${deg}deg)`;
-      if (this.isLeftFlip) {
-        this.currentAngle -= 90;
-      } else {
-        this.currentAngle += 90;
-      }
-    } else {
-      // first with 90° hardcoded
-      // make this responsive to this.systems.lenght again
-      if (this.isLeftFlip) {
-        this.currentAngle -= degPerFace;
-        // this.currentAngle = this.currentFaceIndex * degPerFace;
-      } else {
-        this.currentAngle += degPerFace;
-        // this.currentAngle = this.currentFaceIndex * degPerFace;
-      }
-      // console.log('Calculated rotation angle:', this.currentAngle);
-      this.cubeElement.style.transform = `rotateY(${this.currentAngle}deg)`;
-      // console.log('Transform applied:', this.cubeElement.style.transform);
-      this.isLeftFlip = false;
+    // console.log(`Face: ${this.currentFaceIndex}, Angle: ${this.currentAngle}`);
+    // // console.log('update3DRotation() called, isLeftFlip:', this.isLeftFlip);
+    // const leftOrRight = this.isLeftFlip ? -1 : 1;
+    // const degPerFace = 360 / this.systems.length;
+    // console.log('addAnge: ', degPerFace);
+    // // console.log('leftOrRight multiplier:', leftOrRight);
+    // if (this.systems.lenth < 2) {
+    //   // const deg = leftOrRight * 90 * this.currentFaceIndex;
+    //   // this.cubeElement.style.transform = `rotateY(${deg}deg)`;
+    //   if (this.isLeftFlip) {
+    //     this.currentAngle -= 90;
+    //   } else {
+    //     this.currentAngle += 90;
+    //   }
+    // } else {
+    //   // first with 90° hardcoded
+    //   // make this responsive to this.systems.lenght again
+    //   if (this.isLeftFlip) {
+    //     this.currentAngle -= degPerFace;
+    //     // this.currentAngle = this.currentFaceIndex * degPerFace;
+    //   } else {
+    //     this.currentAngle += degPerFace;
+    //     // this.currentAngle = this.currentFaceIndex * degPerFace;
+    //   }
+    //   // console.log('Calculated rotation angle:', this.currentAngle);
+    //   this.cubeElement.style.transform = `rotateY(${this.currentAngle}deg)`;
+    //   // console.log('Transform applied:', this.cubeElement.style.transform);
+    //   this.isLeftFlip = false;
 
-      // const calcDeg = Math.floor(360 / this.systems.length);
-      // console.log('Degrees per face:', calcDeg);
-      // // const deg = leftOrRight * calcDeg * this.currentFaceIndex;
-      // let deg;
-      // let prevFaceIndex =
-      //   this.currentFaceIndex - 1 >= 0
-      //     ? this.currentFaceIndex - 1
-      //     : this.systems.length - 1;
+    // const calcDeg = Math.floor(360 / this.systems.length);
+    // console.log('Degrees per face:', calcDeg);
+    // // const deg = leftOrRight * calcDeg * this.currentFaceIndex;
+    // let deg;
+    // let prevFaceIndex =
+    //   this.currentFaceIndex - 1 >= 0
+    //     ? this.currentFaceIndex - 1
+    //     : this.systems.length - 1;
 
-      // if (
-      //   this.isLeftFlip &&
-      //   this.currentFaceIndex === this.systems.length - 1 &&
-      //   prevFaceIndex === 0
-      // ) {
-      //   deg = -calcDeg * calcDeg * this.currentFaceIndex;
-      // } else {
-      //   deg = leftOrRight * calcDeg * this.currentFaceIndex;
-      // }
-      // console.log('Calculated rotation angle:', deg);
-      // this.cubeElement.style.transform = `rotateY(${deg}deg)`;
-      // console.log('Transform applied:', this.cubeElement.style.transform);
-      // this.isLeftFlip = false;
-    }
+    // if (
+    //   this.isLeftFlip &&
+    //   this.currentFaceIndex === this.systems.length - 1 &&
+    //   prevFaceIndex === 0
+    // ) {
+    //   deg = -calcDeg * calcDeg * this.currentFaceIndex;
+    // } else {
+    //   deg = leftOrRight * calcDeg * this.currentFaceIndex;
+    // }
+    // console.log('Calculated rotation angle:', deg);
+    // this.cubeElement.style.transform = `rotateY(${deg}deg)`;
+    // console.log('Transform applied:', this.cubeElement.style.transform);
+    // this.isLeftFlip = false;
+    // }
+
+    this.currentAngle = this.findCorrectYRotationForFace(this.currentFaceIndex);
+    this.cubeElement.style.transform = `rotateY(${this.currentAngle}deg)`;
+    this.isLeftFlip = false;
   }
   generateInterface() {
     // this.cubeElement.textContent = this.getCurrentDisplay(); // this adds text to the parent, which is wrong
