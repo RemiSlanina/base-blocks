@@ -249,11 +249,13 @@ class Face {
     this.faceIndex = i;
     this.systemId = systemId;
     this.faceElement = document.createElement('div');
-    this.rotationAngle = this.findCorrectYRotationForFace(i);
+    this.rotationAngle = this.findFaceRotationAngle(i);
     // this.faceElement.classList.add('face', `face-${i}`, this.baseClasses[i]);
     this.faceElement.classList.add('face', this.baseClasses[i]);
-    faceElement.style.transform = `rotateY(${rotationAngle}deg) translateZ(60px)`;
-    faceElement.textContent = this.getDisplay();
+    this.faceElement.style.transform = `rotateY(${rotationAngle}deg) translateZ(60px)`;
+    // this.faceElement.classList.add(`face-${i}`);
+    this.faceElement.textContent = this.getDisplay();
+    // this.faceElement.textContent +=
 
     console.log(
       `o.o.o.o.o.o.o.o.o.o.o.o.o.o.o.o.o.o.o.o.o.o
@@ -270,11 +272,12 @@ class Face {
 
 //           ****************** BaseBlocks ******************
 class BaseBlock {
-  constructor(id, number, systems, currentFaceIndex = 0, matched = false) {
+  constructor(id, number, systems, startFaceIndex = 0, matched = false) {
     this.id = id;
     this.number = number; // the actual value (e.g., 10)
     this.systems = systems; // array of SystemId objects
-    this.currentFaceIndex = currentFaceIndex; // index of the current system => systemId
+    this.currentFaceIndex = 0; // index of the current system => systemId
+    this.startFaceIndex = startFaceIndex;
     this.matched = matched;
     this.is3D = true;
     this.isLeftFlip = false;
@@ -303,6 +306,7 @@ class BaseBlock {
 
     // Create faces for 3D
     this.faces = [];
+    this.faceElement;
     const faceCount = Math.min(systems.length, 4);
     // just to be sure, or for debuggin:
     const faceSystems = [...this.systems].sort((a, b) => {
@@ -315,16 +319,21 @@ class BaseBlock {
     console.log('faceSystems ', faceSystems); // bin oct dec hex
     // so this should work
     // now assing the faces:
+    // ********************************************************
+    this.trackFlips = false;
     for (let i = 0; i < faceCount; i++) {
-      const faceElement = document.createElement('div');
+      this.faceElement = document.createElement('div');
       // this.currentFaceIndex = i;
       // faceElement.classList.add('face', `face-${i}`, this.baseClasses[i]);
-      let rotationAngle = this.findCorrectYRotationForFace(i);
-      faceElement.classList.add('face', this.baseClasses[i]);
-      faceElement.style.transform = `rotateY(${rotationAngle}deg) translateZ(60px)`;
-      faceElement.textContent = this.getDisplayFor(i);
-      this.cubeElement.appendChild(faceElement);
-      this.faces.push(faceElement);
+      let rotationAngle = this.findFaceRotationAngle(i);
+      this.faceElement.classList.add('face', this.baseClasses[i]);
+      this.faceElement.style.transform = `rotateY(${rotationAngle}deg) translateZ(60px)`;
+      // faceElement.classList.add(`face-${i}`);
+      this.faceElement.textContent = this.getDisplayFor(i);
+      this.faceElement.textContent += `, a: ${rotationAngle}, index: ${this.currentFaceIndex}`;
+      // this.faceElement.textContent += `, findex: ${this.currentFaceIndex}`;
+      this.cubeElement.appendChild(this.faceElement);
+      this.faces.push(this.faceElement);
       console.log(
         `********************************************
         Face (this.faces[${i}]) created with: currentFaceIndex ${this.currentFaceIndex}, 
@@ -332,7 +341,10 @@ class BaseBlock {
         a display of  ${this.getDisplayFor(i)} 
         ********************************************`
       );
+      this.flipRightAndRender();
     }
+    this.trackFlips = true;
+    // ********************************************************
 
     // Add top/bottom faces (aesthetic)
     const faceElementTop = document.createElement('div');
@@ -432,7 +444,7 @@ class BaseBlock {
   getDisplayFor(i) {
     return this.systems[i].toDisplay(this.number);
   }
-  findCorrectYRotationForFace(i) {
+  findFaceRotationAngle(i) {
     // returns a rotation angle for rotateY (NOT top and bottom,
     // they would need rotate X)
     // could implement it here as well
@@ -443,16 +455,17 @@ class BaseBlock {
     }
     // for 3 sides: 120°, for 5 sided: 72°, for 6 sides: 60°
     // + accordingly named css classes (face-1-three-sides...)
+    // TODO: test, and assign correct (+/-) values
     if (this.systems.length === 3) {
       switch (i) {
         case 0: // BIN
           rotationAngle = 0;
           break;
         case 1: // OCT
-          rotationAngle = 120; // 360/3 for 3 faces
+          rotationAngle = -120; // 360/3 for 3 faces
           break;
         case 2: // DEC
-          rotationAngle = -120; // 240°
+          rotationAngle = 120; // 240°
           break;
         default: // error
           console.error('Invalid Face Index for 3 bases ', i);
@@ -464,13 +477,13 @@ class BaseBlock {
           rotationAngle = 0;
           break;
         case 1: // OCT
-          rotationAngle = 90;
+          rotationAngle = -90;
           break;
         case 2: // DEC
           rotationAngle = 180;
           break;
         case 3: // HEX
-          rotationAngle = -90;
+          rotationAngle = +90;
           break;
         default: // error
           console.error('Invalid Face Index for 4 bases ', i);
@@ -478,22 +491,23 @@ class BaseBlock {
     }
 
     // for 5 systems:
+    // TODO: test, and assign correct (+/-) values
     if (this.systems.length === 5) {
       switch (i) {
         case 0: // BIN
           rotationAngle = 0;
           break;
         case 1: // OCT
-          rotationAngle = 72; // 360/5 for 5 faces
+          rotationAngle = -72; // 360/5 for 5 faces
           break;
         case 2: // DEC
-          rotationAngle = 144;
+          rotationAngle = -144;
           break;
         case 3: // HEX
-          rotationAngle = 216;
+          rotationAngle = 144; // 216
           break;
         case 4: // 5th face
-          rotationAngle = 288;
+          rotationAngle = 72; // 288
           break;
         default:
           console.error('Invalid Face Index for 5 bases ', i);
@@ -501,25 +515,26 @@ class BaseBlock {
     }
 
     // for 5 systems:
+    // TODO: test, and assign correct (+/-) values
     if (this.systems.length === 6) {
       switch (i) {
         case 0: // BIN
           rotationAngle = 0;
           break;
         case 1: // OCT
-          rotationAngle = 60; // 360/6 for 6 faces
+          rotationAngle = -60; // 360/6 for 6 faces
           break;
         case 2: // DEC
-          rotationAngle = 120;
+          rotationAngle = -120;
           break;
         case 3: // HEX
           rotationAngle = 180;
           break;
         case 4: // 5th face
-          rotationAngle = 240;
+          rotationAngle = 120; // 240
           break;
         case 5: // 6th face
-          rotationAngle = 300;
+          rotationAngle = 60; // 300
           break;
         default:
           console.error('Invalid Face Index for 5 bases ', i);
@@ -599,7 +614,7 @@ class BaseBlock {
   //   // this.isLeftFlip = false;
   //   // }
 
-  //   this.currentAngle = this.findCorrectYRotationForFace(this.currentFaceIndex);
+  //   this.currentAngle = this.findFaceRotationAngle(this.currentFaceIndex);
   //   this.cubeElement.style.transform = `rotateY(${this.currentAngle}deg)`;
   //   this.isLeftFlip = false;
   // }
