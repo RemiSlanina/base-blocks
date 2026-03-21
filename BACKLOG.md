@@ -3,16 +3,17 @@
 ## 3D issues:
 
 - [ ] commented out mobile (fix mobile)
-- [ ] fix flipLeft for swiping
 - [ ] test
+- [ ] delete redundant commented out code
 
 ## Other:
 
 - [ ] Add delete highscore
+- [ ] refactor: grid should become a property of game controls
 - [ ] Add difficulty picking (2 modes)
 - [ ] Test edge cases (e.g., missing levels, wrong difficulty)
 - [ ] implement fliptohex()
-- [ ] add penalty for wrong guesses
+- [ ] update penalty for wrong guesses and flips
 - [ ] ADD interactive demo (How to play)
       (e.g., for clicking and flipping blocks,...).
 - [ ] ADD Timer Button + logic
@@ -70,3 +71,13 @@
 ## TO-DO list styles.css :
 
 - [ ] ...
+
+## === DONE (2026-03-22) ===
+
+- Fix face alignment of hex and oct in 3D (angle sign)
+- Flipping isn't actually swapped, just feels counterintuitive because of swiping
+- Refactor redundant code in flipping (flip(isLeft) instead of flipLeft() and flipRight() function)
+- Add a function flipToIndex
+- Fixed extra flip in loadBoard() (was calling update3DRotation in generateInterface)
+- Fix blockSet artifacts upon NewGame (grid issue)
+- Debugged flipToIndex() logic (off-by-one error in angle calculation)

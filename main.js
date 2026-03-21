@@ -10,6 +10,7 @@ let flipCount = 0;
 let time = 0;
 
 // face indices in gameControls.selectedBases in V1 (!!!)
+// flips counter clockwise for increasing numbers (because of swipes)
 const BIN_INDEX = 0;
 const OCT_INDEX = 1;
 const DEC_INDEX = 2;
@@ -59,11 +60,11 @@ function flipToBinary(blocks) {
     // i guess i will find the binary number system and use a method called findNumberSystem
     while (pair[0].systems[pair[0].currentFaceIndex].label != 'BIN') {
       // p[0].flipAndRender();
-      pair[0].flipRight();
+      pair[0].flip(false);
       pair[0].render();
 
       // for debugging, disable later:
-      // pair[1].flipRight(); // debugging
+      // pair[1].flip(false); // debugging
       // pair[1].render(); // debugging
     }
     console.log('after flipping b to bin: ', pair[0].getCurrentDisplay());
@@ -159,7 +160,7 @@ function flipDuplicatePair(pair) {
 
   // flip ONE block (if you flip both, they will both have the same base again)
   // block1.flipAndRender();
-  block1.flipRight();
+  block1.flip(false);
   block1.render();
 
   gameControls.trackFlips = previous;
@@ -235,17 +236,6 @@ const supportedBases = [
 // face that represents a base, to be used in a block
 class Face {
   constructor(systemId, i) {
-    /**
-     * So, but if I want to stop the CSS animation from disrupting
-     * the game flow, why not always add/sbtrct 90 degrees (for 4 sides or x)
-     * and then calculate currentFaceIndex from there?
-     *
-     * Update3D would then just add or subtract 90 degrees
-     * and using mod operation, circling through angle modulo 360 and then / 90 = faceIndex.
-     * This is still a mess, but I'll try tomorrow.
-     * Currently, 2 of the faces show correctly, but oct and hex are bugged.
-     *
-     */
     this.faceIndex = i;
     this.systemId = systemId;
     this.faceElement = document.createElement('div');
@@ -330,7 +320,11 @@ class BaseBlock {
       this.faceElement.style.transform = `rotateY(${rotationAngle}deg) translateZ(60px)`;
       // faceElement.classList.add(`face-${i}`);
       this.faceElement.textContent = this.getDisplayFor(i);
-      this.faceElement.textContent += `, a: ${rotationAngle}, index: ${this.currentFaceIndex}`;
+      // const pElement = document.createElement('P');
+      // pElement.style = 'font-size: 0.8rem';
+      // pElement.textContent += `,
+      //  a: ${rotationAngle}, index: ${this.currentFaceIndex}`;
+      // this.faceElement.appendChild(pElement);
       // this.faceElement.textContent += `, findex: ${this.currentFaceIndex}`;
       this.cubeElement.appendChild(this.faceElement);
       this.faces.push(this.faceElement);
@@ -377,7 +371,7 @@ class BaseBlock {
         e.preventDefault();
         // this.flipAndRender();
 
-        this.flipRight();
+        this.flip(false);
         this.render();
       }
     });
@@ -411,30 +405,77 @@ class BaseBlock {
     /* ****************** LEFT CLICK: ****************** */
     this.cubeElement.addEventListener('contextmenu', (e) => {
       e.preventDefault();
-      // this.flipRight();
+      // this.flip(false);
       //this.cubeElement.textContent = this.getCurrentDisplay();
-      // this.flipRight();
+      // this.flip(false);
       // this.render();
       // this.flipAndRender();
-      this.flipRight();
+      this.flip(false);
       this.render();
     });
+    /* ********** Flip to Correct Face Upon Load ********** */
+    if (this.startFaceIndex) {
+      this.flipToIndex(this.startFaceIndex);
+    }
+    // TO DO: debug:
+    // it flips one time too many, but not here. the loop ends correctly
+    // the issue seems to be someone else calling flip after constructor call (in loadBoard() func , likely)
   }
 
+  /* ****************** End Constructor ****************** */
+
   /* ****************** Methods: ****************** */
+  flipToIndex(targetIndex) {
+    /*  Flip to Correct Face Upon Load  */
+    if (
+      targetIndex > this.systems.length ||
+      targetIndex > this.systems.length
+    ) {
+      console.error('flipToIndex: invalid index, ', targetIndex);
+      return;
+    }
+    console.log(
+      `target-fi: ${targetIndex}, current-fi: ${this.currentFaceIndex}`
+    );
+
+    // if (this.currentFaceIndex === targetIndex) return;
+    // while (this.currentFaceIndex != targetIndex) {
+    //   this.flip(false);
+    //   this.render();
+    // }
+    console.log(
+      `START: target=${targetIndex}, current=${this.currentFaceIndex}`
+    );
+    if (this.currentFaceIndex === targetIndex) {
+      console.log('Indices match! Exiting early.');
+      return;
+    }
+    console.log('Starting flip loop...');
+    while (this.currentFaceIndex != targetIndex) {
+      console.log(
+        `Flipping right. Current: ${this.currentFaceIndex}, Target: ${targetIndex}`
+      );
+      this.flip(false);
+      console.log(`After flip: current=${this.currentFaceIndex}`);
+      this.render();
+    }
+    console.log('Loop ended.');
+  }
   handleSwipe() {
+    // expect a left swipe to swap right visually
+    // expect a right swipt to flip left (visually)
     const swipeThreshold = 30; // Minimum 30 pixels for swipe
     if (this.touchEndX - this.touchStartX > swipeThreshold) {
-      console.log('handleSwipe is calling flipRight()');
+      console.log('handleSwipe is calling flip(false)');
       // this.flipAndRender(); // swipe right
       this.isLeftFlip = false;
-      this.flipRight();
+      this.flip(false);
       this.render();
     } else if (this.touchStartX - this.touchEndX > swipeThreshold) {
       // swipe left
-      console.log('handleSwipe is calling flipLeft()');
+      console.log('handleSwipe is calling flip(true)');
       this.isLeftFlip = true;
-      this.flipLeft();
+      this.flip(true);
       this.render();
     }
   }
@@ -445,9 +486,8 @@ class BaseBlock {
     return this.systems[i].toDisplay(this.number);
   }
   findFaceRotationAngle(i) {
-    // returns a rotation angle for rotateY (NOT top and bottom,
-    // they would need rotate X)
-    // could implement it here as well
+    // returns a rotation angle for rotateY
+    // (except top and bottom currently - requires rotateX)
     let rotationAngle = 0;
     if (this.systems.length > 6 || this.systems.length < 3) {
       console.error('Invalid systems.length: ', this.systems.length);
@@ -543,9 +583,9 @@ class BaseBlock {
     return rotationAngle;
   }
 
-  update3DRotation(isLeftFlip) {
+  update3DRotation(isLeft) {
     const degPerFace = 360 / this.systems.length; // 90°
-    if (isLeftFlip) {
+    if (isLeft) {
       this.currentAngle -= degPerFace;
     } else {
       this.currentAngle += degPerFace;
@@ -554,9 +594,15 @@ class BaseBlock {
     // this.currentAngle = (((this.currentAngle % 360 ) + 360) % 360);
     // calculate the face from the angle
     // using mod operation, circling through angle modulo 360 and then / 90 = faceIndex.
+    console.log('_____________________');
+    console.log('f-index before updating: ', this.currentFaceIndex);
+    // unnecessary to round for system.length values from 3-6, actually
+    // but to be sure:
     this.currentFaceIndex =
       Math.floor((((this.currentAngle % 360) + 360) % 360) / degPerFace) %
       this.systems.length;
+    console.log('f-index after updating: ', this.currentFaceIndex);
+    console.log('_____________________');
     this.cubeElement.style.transform = `rotateY(${this.currentAngle}deg)`;
   }
   // update3DRotation() {
@@ -577,7 +623,7 @@ class BaseBlock {
   //   //   }
   //   // } else {
   //   //   // first with 90° hardcoded
-  //   //   // make this responsive to this.systems.lenght again
+  //   //   // make this responsive to this.systems.length again
   //   //   if (this.isLeftFlip) {
   //   //     this.currentAngle -= degPerFace;
   //   //     // this.currentAngle = this.currentFaceIndex * degPerFace;
@@ -622,7 +668,7 @@ class BaseBlock {
     // this.cubeElement.textContent = this.getCurrentDisplay(); // this adds text to the parent, which is wrong
     grid.appendChild(this.cubeElement); // this.cubeElement is the parent (block) i guess. maybe i should rename it
     this.cubeElement.title = 'Right-click to flip the block';
-    this.update3DRotation();
+    // this.update3DRotation();
   }
   render() {
     if (this.is3D) {
@@ -633,7 +679,9 @@ class BaseBlock {
   }
   render3D() {
     if (true) {
-      console.log('render3D: Render currently out of service.');
+      console.log(
+        'render3D: Render currently out of service. (currently only necessary for 2D)'
+      );
       return;
     }
     // debugging
@@ -666,25 +714,35 @@ class BaseBlock {
     );
   }
   flipLeftAndRender() {
-    this.flipLeft();
+    this.flip(true);
     this.render();
   }
   flipRightAndRender() {
-    this.flipRight();
+    this.flip(false);
     this.render();
   }
   mod(a, b) {
     // code breaks when i use this (why?)
+    // because i wrote systems.lenght? (typo)
     return ((a % b) + b) % b;
   }
-  flipRight() {
-    this.update3DRotation(false);
+  // expect a left swipe to swap right visually
+  // and a right swipt to flip left (visually)
+  flip(isLeft) {
+    this.update3DRotation(isLeft);
     this.flippingPenalty(gameControls.trackFlips);
   }
-  flipLeft() {
-    this.update3DRotation(true);
-    this.flippingPenalty(gameControls.trackFlips);
-  }
+  // redundant:
+  // expect a left swipe to swap right visually
+  // flipRight() {
+  //   this.update3DRotation(false);
+  //   this.flippingPenalty(gameControls.trackFlips);
+  // }
+  // // expect a right swipt to flip left (visually)
+  // flipLeft() {
+  //   this.update3DRotation(true);
+  //   this.flippingPenalty(gameControls.trackFlips);
+  // }
 
   flippingPenalty(isTracking) {
     if (isTracking) {
@@ -877,7 +935,7 @@ class BaseBlock {
     // console.log(`randomness: ${randomness}`);
     for (let i = 0; i < randomness; i++) {
       // this.flipAndRender();
-      this.flipRight();
+      this.flip(false);
       this.render();
     }
   }
@@ -902,12 +960,12 @@ class BlockSet {
 
   // TODO test:
   flipAllBlocksRight() {
-    if (this.blocks.lenght <= 0) {
+    if (this.blocks.length <= 0) {
       console.error('flipAllBlocks this.blocks does not exit!');
       return;
     }
     this.blocks.forEach((b) => {
-      b.flipRight();
+      b.flip(false);
       b.render();
     });
     console.log('flipped all blocks right');
@@ -920,7 +978,7 @@ class BlockSet {
       return;
     }
     this.blocks.forEach((b) => {
-      b.flipLeft();
+      b.flip(true);
       b.render();
     });
     console.log('flipped all blocks left');
@@ -1440,8 +1498,10 @@ class GameControls {
     this.lockBoard = false;
   }
   async newGame() {
+    // clear the grid, otherwise, there are artifacts from the old blockset
+    // actually, grid should probably be a property of game controls?
+    grid.innerHTML = '';
     this.currentLevel = 1;
-
     this.clearBoard();
     this.updateLevelDisplay();
     await this.loadCurrentLevel();
@@ -1498,9 +1558,11 @@ class GameControls {
         if (blockData.matched) {
           block.disable();
           console.log(block);
-        } else {
-          block.render();
         }
+        // why the else, actually?
+        // else {
+        //   block.render();
+        // }
         return block;
       });
     }
@@ -1617,7 +1679,7 @@ console.log(currentTheme); // "dark", "light", or null
 // document.querySelector('.high-score').textContent = highScore;
 // localStorage.setItem('basBlocksHighScore', JSON.stringify(highScore));
 // setSize = 2; // number of blocks, must be even
-gameControls.setLevel(3);
+// gameControls.setLevel(21);
 // test (not working):
 // gameControls.blockSet.blocks.flipAllBlocksLeft();
 // gameControls.blockSet.blocks.flipAllBlocksRight();
