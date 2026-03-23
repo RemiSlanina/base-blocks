@@ -2,7 +2,6 @@
 
 ## 3D issues:
 
-- [ ] commented out mobile (fix mobile)
 - [ ] test
 - [ ] delete redundant commented out code
 
@@ -71,6 +70,14 @@
 ## TO-DO list styles.css :
 
 - [ ] ...
+
+## === DONE (2026-03-23) ===
+
+- fix mobile
+- add smaller blocks for mobile (reuse face-i classes in main.js to scale mobile)
+- add layouts with 8, 6 or 4 columns
+- fix font size etc. ...
+- fix score display and buttons on mobile
 
 ## === DONE (2026-03-22) ===
 

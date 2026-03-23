@@ -160,8 +160,18 @@ function flipDuplicatePair(pair) {
 
   // flip ONE block (if you flip both, they will both have the same base again)
   // block1.flipAndRender();
-  block1.flip(false);
-  block1.render();
+  // block1.flip(false);
+  // block1.render();
+  const otherIndex = block2.currentFaceIndex;
+  let attempts = 0;
+  while (
+    block1.currentFaceIndex === otherIndex &&
+    attempts < block1.systems.length
+  ) {
+    block1.flip(false);
+    block1.render();
+    attempts++;
+  }
 
   gameControls.trackFlips = previous;
 }
@@ -242,8 +252,8 @@ class Face {
     this.rotationAngle = this.findFaceRotationAngle(i);
     // this.faceElement.classList.add('face', `face-${i}`, this.baseClasses[i]);
     this.faceElement.classList.add('face', this.baseClasses[i]);
-    this.faceElement.style.transform = `rotateY(${rotationAngle}deg) translateZ(60px)`;
-    // this.faceElement.classList.add(`face-${i}`);
+    // this.faceElement.style.transform = `rotateY(${rotationAngle}deg) translateZ(60px)`;
+    this.faceElement.classList.add(`face-${i}`);
     this.faceElement.textContent = this.getDisplay();
     // this.faceElement.textContent +=
 
@@ -317,8 +327,8 @@ class BaseBlock {
       // faceElement.classList.add('face', `face-${i}`, this.baseClasses[i]);
       let rotationAngle = this.findFaceRotationAngle(i);
       this.faceElement.classList.add('face', this.baseClasses[i]);
-      this.faceElement.style.transform = `rotateY(${rotationAngle}deg) translateZ(60px)`;
-      // faceElement.classList.add(`face-${i}`);
+      // this.faceElement.style.transform = `rotateY(${rotationAngle}deg) translateZ(60px)`;
+      this.faceElement.classList.add(`face-${i}`);
       this.faceElement.textContent = this.getDisplayFor(i);
       // const pElement = document.createElement('P');
       // pElement.style = 'font-size: 0.8rem';
@@ -1147,7 +1157,8 @@ class Level {
           tmp.push(i);
         }
       } else if (this.difficulty === 'challenge') {
-        for (let i = 2; i <= 256; i++) {
+        // number up to 1111 1111 (255) fit on mobile
+        for (let i = 2; i < 256; i++) {
           tmp.push(i);
         }
       } else console.error('Error! Invalid difficulty!');
@@ -1303,10 +1314,16 @@ class GameControls {
     // resolve duplicates every time a new set is initializied:
     try {
       let duplicates;
+      let safeguard = 0;
+      const MAX = 50;
       do {
         duplicates = findDuplicateMatches(gameControls.blockSet.blocks);
         // duplicates = 'pizza'; // testing...
         if (duplicates.length === 0) break; // to be sure;
+        if (safety++ > MAX) {
+          console.error('Duplicate resolution loop error (>50 cycles)');
+          break;
+        }
         if (this.countAlerts > this.maxAlerts) {
           console.error(
             `Something's not right: countAlerts exceeded limits! GameControls: initializeBlockSet()`

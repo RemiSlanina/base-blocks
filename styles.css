@@ -164,6 +164,15 @@ body {
   max-width: var(--max-width-screen);
   min-width: 20dvw;
 }
+
+.display-and-buttons {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: space-evenly;
+  flex: 0 0 auto;
+}
+
 .display {
   display: flex;
   align-items: center;
@@ -171,6 +180,15 @@ body {
   text-align: center;
   gap: 4rem;
   padding: 0.8rem;
+  max-width: 100%;
+}
+
+.actions {
+  max-width: 95vw;
+  display: flex;
+  justify-content: center;
+  gap: var(--spacing-unit);
+  max-width: 100%;
 }
 
 .below-game {
@@ -197,7 +215,7 @@ button {
   background: var(--bg-secondary);
   padding: var(--spacing-unit);
   color: var(--accent);
-  aspect-ratio: var(--aspect-ratio);
+  /* aspect-ratio: var(--aspect-ratio); */
   border-radius: var(--golden-minor-rem);
   border: 1.4px solid var(--text-secondary);
 }
@@ -221,12 +239,6 @@ h2 {
   font-size: 1.618rem;
   text-align: center;
   margin-bottom: calc(var(--golden-major) * 1rem);
-}
-
-.actions {
-  display: flex;
-  justify-content: center;
-  gap: var(--spacing-unit);
 }
 
 /* footer {
@@ -298,9 +310,20 @@ h2 {
   ); /* fall back to 90vw if the variable with 90dvw fails */
   place-content: center;
   place-items: center;
-  gap: 25px;
+  gap: 30px;
   margin: 0 auto;
+  max-width: 95vw;
+  perspective: 13000px;
+  transform-style: preserve-3d;
 }
+
+/* .grid-container::after {
+  content: '↓ Scroll for more';
+  position: sticky;
+  bottom: 0;
+  text-align: center;
+  padding: 8px;
+} */
 
 /* ****************** BLOCKS: ****************** */
 
@@ -476,10 +499,12 @@ h2 {
   justify-content: center;
   backface-visibility: hidden;
   border: 1px solid #999;
-  font-size: 24px;
-  font-weight: bold;
-  color: #333;
+  font-size: 1.8rem;
+  font-weight: 600;
+  padding: 0.3rem;
+  /* color: #333; */
   box-sizing: border-box;
+  /* max-width: 95vw; */
 }
 
 /* Face Positions (3D Transformations) */
@@ -508,42 +533,88 @@ h2 {
 }
 
 /*   *********************** @media ***********************   */
-/* 
-/* larger screens 
+
+/* larger screens */
 @media (min-width: 1320px) {
   .grid-container {
     grid-template-columns: repeat(8, 1fr);
-    gap: 5px;
+    gap: 30px;
   }
   h1 {
     margin-bottom: 2rem;
     margin-top: 2rem;
   }
   .block {
-    max-width: var(--box-width-max-large-screens);
-    min-width: var(--box-width-min-large-screens);
+    width: 120px;
+    height: 120px;
+  }
+  .face {
+    font-size: 1.8rem;
+    font-weight: 600;
+    padding: 0.3rem;
+  }
+  /* Face Positions (3D Transformations) */
+  .face-0 {
+    transform: rotateY(0deg) translateZ(60px);
+  }
+  .face-1 {
+    transform: rotateY(90deg) translateZ(60px);
+  }
+  .face-2 {
+    transform: rotateY(180deg) translateZ(60px);
+  }
+  .face-3 {
+    transform: rotateY(-90deg) translateZ(60px);
+  }
+  .face-top {
+    transform: rotateX(90deg) translateZ(60px);
+  }
+  .face-bottom {
+    transform: rotateX(-90deg) translateZ(60px);
   }
 }
 
-/* medium screens 
-@media (max-width: 960px) {
-  .grid-container {
-    grid-template-columns: repeat(4, 1fr);
-  }
-  .block {
-    max-width: var(--box-width-max);
-    min-width: var(--box-width-min);
-  }
+/* medium screens */
+@media (max-width: 1230px) {
   h1 {
     margin-bottom: 1.6rem;
   }
   .grid-container {
-    gap: 3px;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 28px;
+  }
+  .block {
+    width: 120px;
+    height: 120px;
+  }
+  .face {
+    font-size: 1.7rem;
+    font-weight: 600;
+    padding: 0.25rem;
+  }
+  /* Face Positions (3D Transformations) */
+  .face-0 {
+    transform: rotateY(0deg) translateZ(60px);
+  }
+  .face-1 {
+    transform: rotateY(90deg) translateZ(60px);
+  }
+  .face-2 {
+    transform: rotateY(180deg) translateZ(60px);
+  }
+  .face-3 {
+    transform: rotateY(-90deg) translateZ(60px);
+  }
+  .face-top {
+    transform: rotateX(90deg) translateZ(60px);
+  }
+  .face-bottom {
+    transform: rotateX(-90deg) translateZ(60px);
   }
 }
 
-/* small screens  
-@media (max-width: 600px) {
+/* small screens */
+@media (max-width: 915px) {
   #theme-toggle {
     top: 0.5rem;
     padding: calc(var(--golden-minor) * 0.8rem);
@@ -557,25 +628,89 @@ h2 {
     margin-bottom: 1rem;
   }
   .grid-container {
-    grid-template-columns: repeat(4, 1fr);
-    gap: 3px;
+    max-width: 99vw;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 15px;
   }
   .block {
-    max-width: var(--box-width-max);
-    min-width: var(--box-width-min);
+    width: 80px;
+    height: 80px;
+  }
+  .face {
+    font-size: 1.5rem;
+    font-weight: 600;
+    padding: 0.2rem;
+  }
+  /* Face Positions (3D Transformations) */
+  .face-0 {
+    transform: rotateY(0deg) translateZ(40px);
+  }
+  .face-1 {
+    transform: rotateY(90deg) translateZ(40px);
+  }
+  .face-2 {
+    transform: rotateY(180deg) translateZ(40px);
+  }
+  .face-3 {
+    transform: rotateY(-90deg) translateZ(40px);
+  }
+  .face-top {
+    transform: rotateX(90deg) translateZ(40px);
+  }
+  .face-bottom {
+    transform: rotateX(-90deg) translateZ(40px);
   }
 }
 
-@media (max-width: 340px) {
+@media (max-width: 600px) {
   .grid-container {
-    grid-template-columns: repeat(3, 1fr);
-    gap: 1px;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 13px;
   }
   .block {
     font-size: 1rem;
-    max-width: var(--box-width-max-very-small-screen);
-    min-width: var(--box-width-min-very-small-screen);
+    width: 70px;
+    height: 70px;
   }
-} */
+  .face {
+    font-size: 1.2rem;
+    font-weight: 600;
+    padding: 0.15rem;
+  }
+  /* Face Positions (3D Transformations) */
+  .face-0 {
+    transform: rotateY(0deg) translateZ(35px);
+  }
+  .face-1 {
+    transform: rotateY(90deg) translateZ(35px);
+  }
+  .face-2 {
+    transform: rotateY(180deg) translateZ(35px);
+  }
+  .face-3 {
+    transform: rotateY(-90deg) translateZ(35px);
+  }
+  .face-top {
+    transform: rotateX(90deg) translateZ(35px);
+  }
+  .face-bottom {
+    transform: rotateX(-90deg) translateZ(35px);
+  }
+}
 
-/* is the problem in the css? */
+@media (max-width: 500px) {
+  .grid-container {
+    grid-template-columns: repeat(5, 1fr);
+  }
+  .block {
+    font-size: 1rem;
+  }
+}
+@media (max-width: 404px) {
+  .grid-container {
+    grid-template-columns: repeat(4, 1fr);
+  }
+  .block {
+    font-size: 1rem;
+  }
+}
