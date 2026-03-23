@@ -1314,13 +1314,13 @@ class GameControls {
     // resolve duplicates every time a new set is initializied:
     try {
       let duplicates;
-      let safeguard = 0;
+      let saftety = 0;
       const MAX = 50;
       do {
         duplicates = findDuplicateMatches(gameControls.blockSet.blocks);
         // duplicates = 'pizza'; // testing...
         if (duplicates.length === 0) break; // to be sure;
-        if (safety++ > MAX) {
+        if (saftety++ > MAX) {
           console.error('Duplicate resolution loop error (>50 cycles)');
           break;
         }
@@ -1696,7 +1696,7 @@ console.log(currentTheme); // "dark", "light", or null
 // document.querySelector('.high-score').textContent = highScore;
 // localStorage.setItem('basBlocksHighScore', JSON.stringify(highScore));
 // setSize = 2; // number of blocks, must be even
-// gameControls.setLevel(21);
+// gameControls.setLevel(2);
 // test (not working):
 // gameControls.blockSet.blocks.flipAllBlocksLeft();
 // gameControls.blockSet.blocks.flipAllBlocksRight();

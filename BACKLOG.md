@@ -1,12 +1,9 @@
 # BACKLOG (aka "Things I’ll Do When I’m Not Hyperfixating")
 
-## 3D issues:
-
-- [ ] test
-- [ ] delete redundant commented out code
-
 ## Other:
 
+- [ ] test startup and safety
+- [ ] delete redundant commented out code
 - [ ] Add delete highscore
 - [ ] refactor: grid should become a property of game controls
 - [ ] Add difficulty picking (2 modes)
@@ -44,20 +41,6 @@
 
 - [ ] at level 23, I get multiple blocks upon (re)load. Hitting reset sometimes helps(?)
       might be the game logic in fetchLevel (?)
-- [ ] PLAYTHROUGH: (notes):
-  - it's way more fun to play with 3D blocks. Keep them!
-  - ifx 1000 0000 instead of 10000000 (now blocks are smaller -> more needed)
-  - AND FOR GODS SAKE STOP HITTING SAVE WHILE TESTING!!!!!!!
-- [ ] maybe even up to 256 (hex values, binary up to (64?))
-
-```
-  "numbersPool": [
-    1, 2, 3, 4, 5, 6, 7, 8, 9,
-    10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28,
-    29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47,
-    48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64
-  ],
-```
 
 ## TODO-List main.js:
 
@@ -78,6 +61,7 @@
 - add layouts with 8, 6 or 4 columns
 - fix font size etc. ...
 - fix score display and buttons on mobile
+- fix typo in initializeBlockSet that caused crash upon restart / newGame (needs more testing)
 
 ## === DONE (2026-03-22) ===
 
