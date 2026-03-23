@@ -534,6 +534,8 @@ h2 {
 
 /*   *********************** @media ***********************   */
 
+/*       ***************** mobile *****************       */
+
 /* larger screens */
 @media (min-width: 1320px) {
   .grid-container {
@@ -712,5 +714,21 @@ h2 {
   }
   .block {
     font-size: 1rem;
+  }
+}
+
+/*       ***************** reduced-motion  *****************       */
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+  .block {
+    transition: none !important;
+    animation: none !important;
+  }
+  .selected-face {
+    animation: none !important;
   }
 }

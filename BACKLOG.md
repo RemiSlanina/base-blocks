@@ -62,6 +62,7 @@
 - fix font size etc. ...
 - fix score display and buttons on mobile
 - fix typo in initializeBlockSet that caused crash upon restart / newGame (needs more testing)
+- prefers-reduced-motion added in css (so maybe i can delete the 2D remanants later on.)
 
 ## === DONE (2026-03-22) ===
 
