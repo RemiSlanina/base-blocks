@@ -171,6 +171,7 @@ body {
   flex-wrap: wrap;
   justify-content: space-evenly;
   flex: 0 0 auto;
+  margin-top: 1.4rem;
 }
 
 .display {
@@ -476,15 +477,26 @@ h2 {
   z-index: 1;
 }
 .selected-face {
-  transform: scale(1.1);
-  animation: pulse 0.5s infinite;
+  /* transform: scale(1.05); */
   z-index: 10;
-  box-shadow: 0 0 8px gold; /* highlight effect on the face */
+  box-shadow: 0 0 10px var(--text-secondary);
+  /* outline: 10px solid var(--text-secondary); */
+  box-shadow:
+    0 0 0 5px var(--bg-primary),
+    /* Gap color (background color) */ 0 0 0 10px var(--text-secondary); /* Outer "outline" color */
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
 }
+/* .deselected-face is actually useless from css speaking. did i use it in main.js for seomething? test it. 
+actually, i even seem to apply both to some boxes, causing errors to occur */
 .deselected-face {
-  transform: scale(100%);
-  transition: transform 0.2s ease;
-  z-index: 2;
+  /* transform: scale(1);
+  box-shadow: none;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+  z-index: 2; */
 }
 
 /*   *********************** 3D Logic ***********************   */

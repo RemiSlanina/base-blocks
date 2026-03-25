@@ -2,6 +2,7 @@
 
 ## Other:
 
+- [ ] debug .deselected-face (redundant .deselected-face CSS)
 - [ ] test startup and safety
 - [ ] delete redundant commented out code
 - [ ] Add delete highscore
@@ -53,6 +54,10 @@
 ## TO-DO list styles.css :
 
 - [ ] ...
+
+## === DONE (2026-03-2) ===
+
+- make selected block outline visible
 
 ## === DONE (2026-03-23) ===
 
