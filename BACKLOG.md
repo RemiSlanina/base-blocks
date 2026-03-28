@@ -4,7 +4,6 @@
 
 - [ ] debug .deselected-face (redundant .deselected-face CSS)
 - [ ] test startup and safety
-- [ ] delete redundant commented out code
 - [ ] Add delete highscore
 - [ ] refactor: grid should become a property of game controls
 - [ ] Add difficulty picking (2 modes)
@@ -55,7 +54,11 @@
 
 - [ ] ...
 
-## === DONE (2026-03-2) ===
+## === DONE (2026-03-28) ===
+
+- delete some comments
+
+## === DONE (2026-03-25) ===
 
 - make selected block outline visible
 

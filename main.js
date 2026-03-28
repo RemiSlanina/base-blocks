@@ -62,10 +62,6 @@ function flipToBinary(blocks) {
       // p[0].flipAndRender();
       pair[0].flip(false);
       pair[0].render();
-
-      // for debugging, disable later:
-      // pair[1].flip(false); // debugging
-      // pair[1].render(); // debugging
     }
     console.log('after flipping b to bin: ', pair[0].getCurrentDisplay());
   });
@@ -159,9 +155,6 @@ function flipDuplicatePair(pair) {
   gameControls.trackFlips = false;
 
   // flip ONE block (if you flip both, they will both have the same base again)
-  // block1.flipAndRender();
-  // block1.flip(false);
-  // block1.render();
   const otherIndex = block2.currentFaceIndex;
   let attempts = 0;
   while (
@@ -239,6 +232,7 @@ const supportedBases = [
 ];
 
 //           ****************** Face ******************
+//       TO-DO: implement (currently not yet in use)
 // currentFaceIndex and the display of the current face are
 // out of tune. they are mismatched. create a face class
 // to manage current face index and current angle
@@ -323,19 +317,10 @@ class BaseBlock {
     this.trackFlips = false;
     for (let i = 0; i < faceCount; i++) {
       this.faceElement = document.createElement('div');
-      // this.currentFaceIndex = i;
-      // faceElement.classList.add('face', `face-${i}`, this.baseClasses[i]);
       let rotationAngle = this.findFaceRotationAngle(i);
       this.faceElement.classList.add('face', this.baseClasses[i]);
-      // this.faceElement.style.transform = `rotateY(${rotationAngle}deg) translateZ(60px)`;
       this.faceElement.classList.add(`face-${i}`);
       this.faceElement.textContent = this.getDisplayFor(i);
-      // const pElement = document.createElement('P');
-      // pElement.style = 'font-size: 0.8rem';
-      // pElement.textContent += `,
-      //  a: ${rotationAngle}, index: ${this.currentFaceIndex}`;
-      // this.faceElement.appendChild(pElement);
-      // this.faceElement.textContent += `, findex: ${this.currentFaceIndex}`;
       this.cubeElement.appendChild(this.faceElement);
       this.faces.push(this.faceElement);
       console.log(
@@ -379,8 +364,6 @@ class BaseBlock {
       } else if (e.key === ' ') {
         // Flip on Space
         e.preventDefault();
-        // this.flipAndRender();
-
         this.flip(false);
         this.render();
       }
@@ -415,11 +398,6 @@ class BaseBlock {
     /* ****************** LEFT CLICK: ****************** */
     this.cubeElement.addEventListener('contextmenu', (e) => {
       e.preventDefault();
-      // this.flip(false);
-      //this.cubeElement.textContent = this.getCurrentDisplay();
-      // this.flip(false);
-      // this.render();
-      // this.flipAndRender();
       this.flip(false);
       this.render();
     });
@@ -427,9 +405,6 @@ class BaseBlock {
     if (this.startFaceIndex) {
       this.flipToIndex(this.startFaceIndex);
     }
-    // TO DO: debug:
-    // it flips one time too many, but not here. the loop ends correctly
-    // the issue seems to be someone else calling flip after constructor call (in loadBoard() func , likely)
   }
 
   /* ****************** End Constructor ****************** */
@@ -448,11 +423,6 @@ class BaseBlock {
       `target-fi: ${targetIndex}, current-fi: ${this.currentFaceIndex}`
     );
 
-    // if (this.currentFaceIndex === targetIndex) return;
-    // while (this.currentFaceIndex != targetIndex) {
-    //   this.flip(false);
-    //   this.render();
-    // }
     console.log(
       `START: target=${targetIndex}, current=${this.currentFaceIndex}`
     );
@@ -477,7 +447,7 @@ class BaseBlock {
     const swipeThreshold = 30; // Minimum 30 pixels for swipe
     if (this.touchEndX - this.touchStartX > swipeThreshold) {
       console.log('handleSwipe is calling flip(false)');
-      // this.flipAndRender(); // swipe right
+      // swipe right
       this.isLeftFlip = false;
       this.flip(false);
       this.render();
@@ -615,65 +585,7 @@ class BaseBlock {
     console.log('_____________________');
     this.cubeElement.style.transform = `rotateY(${this.currentAngle}deg)`;
   }
-  // update3DRotation() {
-  //   // debugging:
-  //   // console.log(`Face: ${this.currentFaceIndex}, Angle: ${this.currentAngle}`);
-  //   // // console.log('update3DRotation() called, isLeftFlip:', this.isLeftFlip);
-  //   // const leftOrRight = this.isLeftFlip ? -1 : 1;
-  //   // const degPerFace = 360 / this.systems.length;
-  //   // console.log('addAnge: ', degPerFace);
-  //   // // console.log('leftOrRight multiplier:', leftOrRight);
-  //   // if (this.systems.lenth < 2) {
-  //   //   // const deg = leftOrRight * 90 * this.currentFaceIndex;
-  //   //   // this.cubeElement.style.transform = `rotateY(${deg}deg)`;
-  //   //   if (this.isLeftFlip) {
-  //   //     this.currentAngle -= 90;
-  //   //   } else {
-  //   //     this.currentAngle += 90;
-  //   //   }
-  //   // } else {
-  //   //   // first with 90° hardcoded
-  //   //   // make this responsive to this.systems.length again
-  //   //   if (this.isLeftFlip) {
-  //   //     this.currentAngle -= degPerFace;
-  //   //     // this.currentAngle = this.currentFaceIndex * degPerFace;
-  //   //   } else {
-  //   //     this.currentAngle += degPerFace;
-  //   //     // this.currentAngle = this.currentFaceIndex * degPerFace;
-  //   //   }
-  //   //   // console.log('Calculated rotation angle:', this.currentAngle);
-  //   //   this.cubeElement.style.transform = `rotateY(${this.currentAngle}deg)`;
-  //   //   // console.log('Transform applied:', this.cubeElement.style.transform);
-  //   //   this.isLeftFlip = false;
 
-  //   // const calcDeg = Math.floor(360 / this.systems.length);
-  //   // console.log('Degrees per face:', calcDeg);
-  //   // // const deg = leftOrRight * calcDeg * this.currentFaceIndex;
-  //   // let deg;
-  //   // let prevFaceIndex =
-  //   //   this.currentFaceIndex - 1 >= 0
-  //   //     ? this.currentFaceIndex - 1
-  //   //     : this.systems.length - 1;
-
-  //   // if (
-  //   //   this.isLeftFlip &&
-  //   //   this.currentFaceIndex === this.systems.length - 1 &&
-  //   //   prevFaceIndex === 0
-  //   // ) {
-  //   //   deg = -calcDeg * calcDeg * this.currentFaceIndex;
-  //   // } else {
-  //   //   deg = leftOrRight * calcDeg * this.currentFaceIndex;
-  //   // }
-  //   // console.log('Calculated rotation angle:', deg);
-  //   // this.cubeElement.style.transform = `rotateY(${deg}deg)`;
-  //   // console.log('Transform applied:', this.cubeElement.style.transform);
-  //   // this.isLeftFlip = false;
-  //   // }
-
-  //   this.currentAngle = this.findFaceRotationAngle(this.currentFaceIndex);
-  //   this.cubeElement.style.transform = `rotateY(${this.currentAngle}deg)`;
-  //   this.isLeftFlip = false;
-  // }
   generateInterface() {
     // this.cubeElement.textContent = this.getCurrentDisplay(); // this adds text to the parent, which is wrong
     grid.appendChild(this.cubeElement); // this.cubeElement is the parent (block) i guess. maybe i should rename it
@@ -742,17 +654,6 @@ class BaseBlock {
     this.update3DRotation(isLeft);
     this.flippingPenalty(gameControls.trackFlips);
   }
-  // redundant:
-  // expect a left swipe to swap right visually
-  // flipRight() {
-  //   this.update3DRotation(false);
-  //   this.flippingPenalty(gameControls.trackFlips);
-  // }
-  // // expect a right swipt to flip left (visually)
-  // flipLeft() {
-  //   this.update3DRotation(true);
-  //   this.flippingPenalty(gameControls.trackFlips);
-  // }
 
   flippingPenalty(isTracking) {
     if (isTracking) {
@@ -763,61 +664,7 @@ class BaseBlock {
       gameControls.updateScoreDisplay();
     }
   }
-  // flipRight() {
-  //   console.log(
-  //     'Current currentFaceIndex and display before flipright:',
-  //     this.currentFaceIndex,
-  //     this.getCurrentDisplay()
-  //   );
-  //   // Update the face index unsing mod:
-  //   // this.prevFaceIndex = this.currentFaceIndex;
-  //   this.currentFaceIndex = (this.currentFaceIndex + 1) % this.systems.length;
-  //   this.update3DRotation();
-  //   // this.currentFaceIndex =
-  //   //   this.mod(this.currentFaceIndex + 1) % this.systems.length;
-  //   // No need to add/remove base classes from parent - they're on the faces
-  //   console.log(
-  //     'Current currentFaceIndex and display after flipright:',
-  //     this.currentFaceIndex,
-  //     this.getCurrentDisplay()
-  //   );
-  //   if (gameControls.trackFlips) {
-  //     gameControls.score = Math.max(0, gameControls.score - 1); // Penalty for flipping
-  //     // document.querySelector('.score').textContent = gameControls.score;
-  //     gameControls.updateScoreDisplay();
-  //   }
-  // }
-  // // TO DO fix flip left
-  // flipLeft() {
-  //   console.log('flipLeft() called');
-  //   console.log(
-  //     'Current currentFaceIndex and display before flipLeft:',
-  //     this.currentFaceIndex,
-  //     this.getCurrentDisplay()
-  //   );
 
-  //   // this.prevFaceIndex = this.currentFaceIndex;
-  //   // this.currentFaceIndex = Math.abs(
-  //   // (this.currentFaceIndex - 1) % this.systems.length;
-  //   // ); // avoid negative reminder in javascript
-  //   this.currentFaceIndex =
-  //     (this.currentFaceIndex - 1 + this.systems.length) % this.systems.length;
-  //   this.update3DRotation();
-  //   console.log('New currentFaceIndex after flipLeft:', this.currentFaceIndex);
-  //   this.isLeftFlip = true;
-  //   console.log('isLeftFlip set to:', this.isLeftFlip);
-  //   // this.render();
-  //   console.log(
-  //     'Current currentFaceIndex and display after flipLeft:',
-  //     this.currentFaceIndex,
-  //     this.getCurrentDisplay()
-  //   );
-  //   if (gameControls.trackFlips) {
-  //     gameControls.score = Math.max(0, gameControls.score - 1); // Penalty for flipping
-  //     // document.querySelector('.score').textContent = gameControls.score;
-  //     gameControls.updateScoreDisplay();
-  //   }
-  // }
   select = () => {
     //console.trace();
     if (this.cubeElement.classList.contains('disabled')) {
@@ -859,9 +706,7 @@ class BaseBlock {
       });
     }
     // Add highlight to the active face
-    // if (this.faces && this.faces[this.currentFaceIndex]) {
-    //   this.faces[this.currentFaceIndex].classList.add('selected-face');
-    // }
+
     this.cubeElement.classList.remove('deselected');
     this.cubeElement.classList.add('selected');
     gameControls.selectedBlocks.push(this);
@@ -902,10 +747,6 @@ class BaseBlock {
     }
 
     // Remove highlight from the active face
-    // if (this.faces && this.faces[this.currentFaceIndex]) {
-    //   this.faces[this.currentFaceIndex].classList.remove('selected-face');
-    //   this.faces[this.currentFaceIndex].classList.add('deselected-face');
-    // }
 
     this.cubeElement.classList.remove('selected');
     this.cubeElement.classList.add('deselected');
@@ -944,7 +785,6 @@ class BaseBlock {
     );
     // console.log(`randomness: ${randomness}`);
     for (let i = 0; i < randomness; i++) {
-      // this.flipAndRender();
       this.flip(false);
       this.render();
     }
@@ -1054,7 +894,6 @@ class BlockSet {
         );
 
         this.blocks.push(block);
-        // debucgger++;
       }
     }
 
@@ -1162,7 +1001,6 @@ class Level {
           tmp.push(i);
         }
       } else console.error('Error! Invalid difficulty!');
-      // this.allowedDifficultNumbers = levelsData.numbersPool;
       this.allowedDifficultNumbers = tmp;
       console.log(
         `difficult numbers in main's pool: ${this.allowedDifficultNumbers}`
@@ -1340,13 +1178,11 @@ class GameControls {
       this.restart();
     }
 
-    if (this.currentLevel <= 20) {
-      flipToBinary(this.blockSet.blocks);
-    } // later flip to hex above level 20
-    // if (this.gameRange <= 7) {
-    //   // change this to collect all pairs <8 instead of gameRange
-    //   flipToBinary(this.blockSet.blocks);
-    // }
+    // later flip to hex for bigger nums
+    flipToBinary(this.blockSet.blocks);
+    //   if (this.currentLevel <= 20) {
+    //     flipToBinary(this.blockSet.blocks);
+    //   } // later flip to hex above level 20
   }
 
   start() {
@@ -1489,10 +1325,10 @@ class GameControls {
       this.continue();
       // TO-DO add some animation on levels 5, 10, 20 and so on
       switch (this.currentLevel) {
-        case 10:
-          // this.blockSet.blocks.flipAllBlocksRight();
-          alert('You have reached Level ' + this.currentLevel + '!');
-          break;
+        // case 10:
+        //   // this.blockSet.blocks.flipAllBlocksRight();
+        //   alert('You have reached Level ' + this.currentLevel + '!');
+        //   break;
         case 21:
           // this.blockSet.blocks.flipAllBlocksLeft();
           // this.blockSet.blocks.flipAllBlocksRight();
@@ -1665,24 +1501,6 @@ document.getElementById('theme-toggle').addEventListener('click', () => {
 });
 const currentTheme = document.documentElement.getAttribute('data-theme');
 console.log(currentTheme); // "dark", "light", or null
-
-// // ************************ ACCORDION ************************
-// const accordions = document.getElementsByClassName('accordion');
-// //console.log(accordions);
-// for (let i = 0; i < accordions.length; i++) {
-//   accordions[i].addEventListener('click', (e) => {
-//     // button: stay active
-//     e.target.classList.toggle('active');
-//     // toggle accordion panels
-//     //let panel = this.nextElementSibling;
-//     let panel = e.target.nextElementSibling;
-//     if (panel.style.display === 'block') {
-//       panel.style.display = 'none';
-//     } else {
-//       panel.style.display = 'block';
-//     }
-//   });
-// }
 
 // ****************************** Debug Mode ******************************
 
