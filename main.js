@@ -1471,6 +1471,14 @@ document.addEventListener('keydown', (e) => {
   const columns = getComputedStyle(grid).gridTemplateColumns.split(' ').length;
   console.log('columns: ', columns); // 8 - 4 cols (responsive)
 
+  // if no block is active, set the first as active upon keydown:
+  if (!blocks.includes(active)) {
+    if (blocks.length > 0) {
+      blocks[0].focus();
+      return;
+    }
+  }
+
   const index = blocks.indexOf(active);
   if (index === -1) return;
 
