@@ -36,22 +36,22 @@ const HEX_INDEX = 3;
  * @returns {void}
  */
 function flipToBinary(blocks) {
-  console.log('flipToBinary was called');
+  // console.log('flipToBinary was called');
   // console.log(`param blocks: ${blocks}`);
   //do something
   const tempFlipTrack = gameControls.trackFlips;
   gameControls.trackFlips = false;
   const pairs = findMatches(blocks);
-  console.log(`pairs: ${pairs}`);
+  // console.log(`pairs: ${pairs}`);
   pairs.forEach((pair) => {
     if (
       pair[0].systems[pair[0].currentFaceIndex].label == 'BIN' ||
       pair[1].systems[pair[1].currentFaceIndex].label == 'BIN'
     ) {
       // if ONE of them is already binary, skip this step
-      console.log('one is already binary');
-      console.log('pair element 1 ', pair[0].getCurrentDisplay());
-      console.log('pair element 2 ', pair[1].getCurrentDisplay());
+      // console.log('one is already binary');
+      // console.log('pair element 1 ', pair[0].getCurrentDisplay());
+      // console.log('pair element 2 ', pair[1].getCurrentDisplay());
       console.log('........');
       return;
     }
@@ -63,7 +63,7 @@ function flipToBinary(blocks) {
       pair[0].flip(false);
       pair[0].render();
     }
-    console.log('after flipping b to bin: ', pair[0].getCurrentDisplay());
+    // console.log('after flipping b to bin: ', pair[0].getCurrentDisplay());
   });
   gameControls.trackFlips = tempFlipTrack;
 }
@@ -251,13 +251,13 @@ class Face {
     this.faceElement.textContent = this.getDisplay();
     // this.faceElement.textContent +=
 
-    console.log(
-      `o.o.o.o.o.o.o.o.o.o.o.o.o.o.o.o.o.o.o.o.o.o
-        Face (this.faces[${i}]) created with: currentFaceIndex ${this.currentFaceIndex}, 
-        face-${i}, baseClasses ${this.baseClasses[i]}; with systems ${this.systemId} and 
-        a display of  ${this.getDisplay()} 
-        o.o.o.o.o.o.o.o.o.o.o.o.o.o.o.o.o.o.o.o.o.o`
-    );
+    // console.log(
+    //   `o.o.o.o.o.o.o.o.o.o.o.o.o.o.o.o.o.o.o.o.o.o
+    //     Face (this.faces[${i}]) created with: currentFaceIndex ${this.currentFaceIndex},
+    //     face-${i}, baseClasses ${this.baseClasses[i]}; with systems ${this.systemId} and
+    //     a display of  ${this.getDisplay()}
+    //     o.o.o.o.o.o.o.o.o.o.o.o.o.o.o.o.o.o.o.o.o.o`
+    // );
   }
   getDisplay() {
     return this.systemId.toDisplay(this.number);
@@ -309,8 +309,8 @@ class BaseBlock {
       return order.indexOf(a.label) - order.indexOf(b.label);
     });
     // output:
-    console.log('systems ', this.systems); // bin oct dec hex
-    console.log('faceSystems ', faceSystems); // bin oct dec hex
+    // console.log('systems ', this.systems); // bin oct dec hex
+    // console.log('faceSystems ', faceSystems); // bin oct dec hex
     // so this should work
     // now assing the faces:
     // ********************************************************
@@ -323,13 +323,13 @@ class BaseBlock {
       this.faceElement.textContent = this.getDisplayFor(i);
       this.cubeElement.appendChild(this.faceElement);
       this.faces.push(this.faceElement);
-      console.log(
-        `********************************************
-        Face (this.faces[${i}]) created with: currentFaceIndex ${this.currentFaceIndex}, 
-        face-${i}, baseClasses ${this.baseClasses[i]}; with systems ${this.systems[i]} and 
-        a display of  ${this.getDisplayFor(i)} 
-        ********************************************`
-      );
+      // console.log(
+      //   `********************************************
+      //   Face (this.faces[${i}]) created with: currentFaceIndex ${this.currentFaceIndex},
+      //   face-${i}, baseClasses ${this.baseClasses[i]}; with systems ${this.systems[i]} and
+      //   a display of  ${this.getDisplayFor(i)}
+      //   ********************************************`
+      // );
       this.flipRightAndRender();
     }
     this.trackFlips = true;
@@ -419,41 +419,41 @@ class BaseBlock {
       console.error('flipToIndex: invalid index, ', targetIndex);
       return;
     }
-    console.log(
-      `target-fi: ${targetIndex}, current-fi: ${this.currentFaceIndex}`
-    );
+    // console.log(
+    //   `target-fi: ${targetIndex}, current-fi: ${this.currentFaceIndex}`
+    // );
 
-    console.log(
-      `START: target=${targetIndex}, current=${this.currentFaceIndex}`
-    );
+    // console.log(
+    //   `START: target=${targetIndex}, current=${this.currentFaceIndex}`
+    // );
     if (this.currentFaceIndex === targetIndex) {
       console.log('Indices match! Exiting early.');
       return;
     }
-    console.log('Starting flip loop...');
+    // console.log('Starting flip loop...');
     while (this.currentFaceIndex != targetIndex) {
-      console.log(
-        `Flipping right. Current: ${this.currentFaceIndex}, Target: ${targetIndex}`
-      );
+      // console.log(
+      //   `Flipping right. Current: ${this.currentFaceIndex}, Target: ${targetIndex}`
+      // );
       this.flip(false);
-      console.log(`After flip: current=${this.currentFaceIndex}`);
+      // console.log(`After flip: current=${this.currentFaceIndex}`);
       this.render();
     }
-    console.log('Loop ended.');
+    // console.log('Loop ended.');
   }
   handleSwipe() {
     // expect a left swipe to swap right visually
     // expect a right swipt to flip left (visually)
     const swipeThreshold = 30; // Minimum 30 pixels for swipe
     if (this.touchEndX - this.touchStartX > swipeThreshold) {
-      console.log('handleSwipe is calling flip(false)');
+      // console.log('handleSwipe is calling flip(false)');
       // swipe right
       this.isLeftFlip = false;
       this.flip(false);
       this.render();
     } else if (this.touchStartX - this.touchEndX > swipeThreshold) {
       // swipe left
-      console.log('handleSwipe is calling flip(true)');
+      // console.log('handleSwipe is calling flip(true)');
       this.isLeftFlip = true;
       this.flip(true);
       this.render();
@@ -574,15 +574,15 @@ class BaseBlock {
     // this.currentAngle = (((this.currentAngle % 360 ) + 360) % 360);
     // calculate the face from the angle
     // using mod operation, circling through angle modulo 360 and then / 90 = faceIndex.
-    console.log('_____________________');
-    console.log('f-index before updating: ', this.currentFaceIndex);
+    // console.log('_____________________');
+    // console.log('f-index before updating: ', this.currentFaceIndex);
     // unnecessary to round for system.length values from 3-6, actually
     // but to be sure:
     this.currentFaceIndex =
       Math.floor((((this.currentAngle % 360) + 360) % 360) / degPerFace) %
       this.systems.length;
-    console.log('f-index after updating: ', this.currentFaceIndex);
-    console.log('_____________________');
+    // console.log('f-index after updating: ', this.currentFaceIndex);
+    // console.log('_____________________');
     this.cubeElement.style.transform = `rotateY(${this.currentAngle}deg)`;
   }
 
@@ -601,22 +601,22 @@ class BaseBlock {
   }
   render3D() {
     if (true) {
-      console.log(
-        'render3D: Render currently out of service. (currently only necessary for 2D)'
-      );
+      // console.log(
+      //   'render3D: Render currently out of service. (currently only necessary for 2D)'
+      // );
       return;
     }
     // debugging
-    console.log(
-      'Face order:',
-      this.systems.map((s, i) => `${i}: ${s.label}`)
-    );
+    // console.log(
+    //   'Face order:',
+    //   this.systems.map((s, i) => `${i}: ${s.label}`)
+    // );
     // normal code contiued:
     this.faces.forEach((faceElement, i) => {
       // actually, I already assigned this inside the constructor,
       // so this is utterly redundant. the whole method!
       this.currentFaceIndex = i;
-      console.log(`render3D: Face ${i}: ${this.getDisplayFor(i)}`);
+      // console.log(`render3D: Face ${i}: ${this.getDisplayFor(i)}`);
       faceElement.textContent = this.getDisplayFor(i);
       // update aria label:
       // this.faceElement is undefined
@@ -689,9 +689,9 @@ class BaseBlock {
       return;
     }
 
-    console.log(
-      `selected ${this.getCurrentDisplay()} with f-index ${this.currentFaceIndex}`
-    );
+    // console.log(
+    //   `selected ${this.getCurrentDisplay()} with f-index ${this.currentFaceIndex}`
+    // );
 
     // Check if this block is already in the selected blocks array
     if (gameControls.selectedBlocks.includes(this)) {
@@ -754,9 +754,9 @@ class BaseBlock {
       (block) => block !== this
     );
     gameControls.selectedBlocksCount--;
-    console.log(
-      `deselected ${this.getCurrentDisplay()} with f-index ${this.currentFaceIndex}`
-    );
+    // console.log(
+    //   `deselected ${this.getCurrentDisplay()} with f-index ${this.currentFaceIndex}`
+    // );
 
     this.cubeElement.setAttribute(
       'aria-label',
@@ -1002,12 +1002,12 @@ class Level {
         }
       } else console.error('Error! Invalid difficulty!');
       this.allowedDifficultNumbers = tmp;
-      console.log(
-        `difficult numbers in main's pool: ${this.allowedDifficultNumbers}`
-      );
-      console.log(
-        `Level ${this.level} has ${this.howManyDifficultPairs} difficult pairs.`
-      );
+      // console.log(
+      //   `difficult numbers in main's pool: ${this.allowedDifficultNumbers}`
+      // );
+      // console.log(
+      //   `Level ${this.level} has ${this.howManyDifficultPairs} difficult pairs.`
+      // );
       return;
     }
 
@@ -1459,6 +1459,48 @@ async function startGame() {
 startGame();
 
 // ************************ EVENT LISTENERS ************************
+// arrow key navigation : left and right
+document.addEventListener('keydown', (e) => {
+  const blocks = [...document.querySelectorAll('.block')];
+  const active = document.activeElement; // focused element
+  // CSS: grid-template-columns: repeat(6, 1fr)
+  // getComputedStyle resolves this to something like:
+  // "200px 200px 200px 200px 200px 200px"
+  // → one value per column, separated by spaces
+  // → splitting by " " gives the column count
+  const columns = getComputedStyle(grid).gridTemplateColumns.split(' ').length;
+  console.log('columns: ', columns); // 8 - 4 cols (responsive)
+
+  const index = blocks.indexOf(active);
+  if (index === -1) return;
+
+  let nextIndex = index;
+  if (e.key === 'ArrowRight') nextIndex++;
+  if (e.key === 'ArrowLeft') nextIndex--;
+
+  // up and down movement:
+  if (e.key === 'ArrowUp') {
+    nextIndex -= columns;
+    // is it out of bounds?
+    if (nextIndex >= blocks.length) nextIndex = blocks.length - 1;
+  }
+  if (e.key === 'ArrowDown') {
+    nextIndex += columns;
+    // out of bounds?
+    if (nextIndex < 0) nextIndex = 0;
+  }
+
+  // circling through
+  const length = blocks.length;
+  if (nextIndex >= length) nextIndex = 0;
+  if (nextIndex < 0) nextIndex = length - 1;
+
+  // checking bounds
+  if (nextIndex >= 0 && nextIndex < blocks.length) {
+    blocks[nextIndex].focus(); // focus this element
+  }
+});
+
 // Save on unload
 window.addEventListener('beforeunload', () => {
   gameControls.saveBoard();

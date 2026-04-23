@@ -1,4 +1,4 @@
-# BACKLOG (aka "Things I’ll Do When I’m Not Hyperfixating")
+# BACKLOG
 
 ## Other:
 
@@ -53,6 +53,16 @@
 ## TO-DO list styles.css :
 
 - [ ] ...
+
+## === DONE (2026-04-23) ===
+
+- add keyboard navigation (ArrowLeft / ArrowRight)
+- implement wrap-around for horizontal navigation
+- basic grid-aware navigation (ArrowUp / ArrowDown via column count)
+- integrate DOM focus handling (`tabindex`, `document.activeElement`)
+- use computed CSS grid data via `getComputedStyle`
+- document grid → column calculation in code comments
+- reduce console.log noise (commented out for now)
 
 ## === DONE (2026-03-28) ===
 
