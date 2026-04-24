@@ -1469,6 +1469,10 @@ document.addEventListener('keydown', (e) => {
   // → one value per column, separated by spaces
   // → splitting by " " gives the column count
   const columns = getComputedStyle(grid).gridTemplateColumns.split(' ').length;
+  // const rows = getComputedStyle(grid).gridTemplateRows.split(' ').length; // unreliable for rows
+  const rows = Math.ceil(blocks.length / columns);
+  console.log('rows: ', rows);
+  // console.log('rows2: ', rows2);
   console.log('columns: ', columns); // 8 - 4 cols (responsive)
 
   // if no block is active, set the first as active upon keydown:
@@ -1498,10 +1502,52 @@ document.addEventListener('keydown', (e) => {
     if (nextIndex < 0) nextIndex = 0;
   }
 
-  // circling through
-  const length = blocks.length;
-  if (nextIndex >= length) nextIndex = 0;
-  if (nextIndex < 0) nextIndex = length - 1;
+  // wrap rows:
+  const currentCol = index % columns;
+  const nextCol = nextIndex % columns;
+  const isLastRow = columns * (rows - 1) <= nextIndex - 1 ? true : false;
+
+  // -------------------------------------------------------
+  // edge case: empty slots in last row:
+  if (rows * columns != blocks.length && isLastRow) {
+    // to do
+    console.log('last row reached');
+    if (e.key === 'ArrowRight' && nextIndex >= blocks.length) {
+      nextIndex = index;
+    }
+    if (e.key === 'ArrowLeft' && currentCol === 0) {
+      nextIndex = index;
+    }
+
+    if (nextIndex >= 0 && nextIndex < blocks.length) {
+      blocks[nextIndex].focus(); // focus this element
+    }
+    return;
+  }
+  // -------------------------------------------------------
+
+  if (e.key === 'ArrowRight' && nextCol === 0) {
+    // nextCol = nextIndex % columns === 0, which means
+    // we would jump to next row
+    // so jump to row beginning:
+    nextIndex = index - currentCol;
+    // nextIndex -= columns;
+    //   nextIndex = index; // stay in place
+  }
+
+  if (e.key === 'ArrowLeft' && currentCol === 0) {
+    // nextCol = nextIndex % columns === 0
+    // we would jump to prev row
+    // so jump to row end:
+    nextIndex = index + (columns - 1);
+    // nextIndex += columns;
+    //   nextIndex = index; // stay in place
+  }
+
+  // circling through the whole array, from last to first
+  // const length = blocks.length;
+  // if (nextIndex >= length) nextIndex = 0;
+  // if (nextIndex < 0) nextIndex = length - 1;
 
   // checking bounds
   if (nextIndex >= 0 && nextIndex < blocks.length) {

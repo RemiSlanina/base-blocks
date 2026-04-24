@@ -54,6 +54,16 @@
 
 - [ ] ...
 
+## === DONE (2026-04-24) ===
+
+- refine keyboard navigation to respect grid rows (no snake movement)
+- prevent horizontal wrap into next/previous row
+- add handling for incomplete last row (no focus into empty cells)
+- improve grid-based index logic (row/column reasoning)
+
+Note: LAST ROW is incomplete (still needs wrapping)
+Note: Navigation logic may need refinement for incomplete rows
+
 ## === DONE (2026-04-23) ===
 
 - add keyboard navigation (ArrowLeft / ArrowRight)
