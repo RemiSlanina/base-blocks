@@ -357,6 +357,10 @@ h2 {
   border: 3px solid var(--box-mid-dark-primary);
 } */
 /* just for testing, should be face later: */
+.block:focus {
+  box-shadow: 0 0 0 4px var(--accent);
+  color: var(--text-secondary);
+}
 /* ****************** COLORED BASES: ****************** */
 /* *************** BASE 0: *************** */
 .base0 {
@@ -538,6 +542,11 @@ actually, i even seem to apply both to some boxes, causing errors to occur */
 }
 .face-bottom {
   transform: rotateX(-90deg) translateZ(60px);
+}
+
+/* TO DO when finished focus */
+.focused-face {
+  box-shadow: 0 0 0 24px var(--accent);
 }
 
 /* Grid Perspective */

@@ -1479,6 +1479,7 @@ document.addEventListener('keydown', (e) => {
   if (!blocks.includes(active)) {
     if (blocks.length > 0) {
       blocks[0].focus();
+      updateFocusedFaces();
       return;
     }
   }
@@ -1521,6 +1522,7 @@ document.addEventListener('keydown', (e) => {
 
     if (nextIndex >= 0 && nextIndex < blocks.length) {
       blocks[nextIndex].focus(); // focus this element
+      updateFocusedFaces();
     }
     return;
   }
@@ -1552,8 +1554,43 @@ document.addEventListener('keydown', (e) => {
   // checking bounds
   if (nextIndex >= 0 && nextIndex < blocks.length) {
     blocks[nextIndex].focus(); // focus this element
+    updateFocusedFaces();
+
+    // Add highlight from all faces
+    // if (blocks[nextIndex].faces) {
+    //   blocks[nextIndex].faces.forEach((f) => {
+    //     f.classList.add('focused-face');
+    //   });
+    // }
+
+    // // remove old focus highlight:
+    // document.querySelectorAll('.focused-face').forEach((f) => {
+    //   f.classList.remove('focused-face');
+    // });
+
+    // // add focus
+    // const faces = blocks[nextIndex].querySelectorAll('.face');
+    // faces.forEach((f) => {
+    //   f.classList.add('focused-face');
+    // });
   }
 });
+
+// TODO: move helper function to class (and finally use face class):
+function updateFocusedFaces() {
+  document.querySelectorAll('.focused-face').forEach((f) => {
+    f.classList.remove('focused-face');
+  });
+
+  const active = document.activeElement;
+  if (!active || !active.classList.contains('block')) return;
+
+  const faces = active.querySelectorAll('.face');
+  faces.forEach((f) => f.classList.add('focused-face'));
+}
+//  ------------------------------------------------------
+//  ------------------------------------------------------
+//  ------------------------------------------------------
 
 // Save on unload
 window.addEventListener('beforeunload', () => {
