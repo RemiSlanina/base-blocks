@@ -231,39 +231,6 @@ const supportedBases = [
   new SystemId('30', '₃₀', 30),
 ];
 
-//           ****************** Face ******************
-//       TO-DO: implement (currently not yet in use)
-// currentFaceIndex and the display of the current face are
-// out of tune. they are mismatched. create a face class
-// to manage current face index and current angle
-// and ensure they stay in tune.
-// face that represents a base, to be used in a block
-class Face {
-  constructor(systemId, i) {
-    this.faceIndex = i;
-    this.systemId = systemId;
-    this.faceElement = document.createElement('div');
-    this.rotationAngle = this.findFaceRotationAngle(i);
-    // this.faceElement.classList.add('face', `face-${i}`, this.baseClasses[i]);
-    this.faceElement.classList.add('face', this.baseClasses[i]);
-    // this.faceElement.style.transform = `rotateY(${rotationAngle}deg) translateZ(60px)`;
-    this.faceElement.classList.add(`face-${i}`);
-    this.faceElement.textContent = this.getDisplay();
-    // this.faceElement.textContent +=
-
-    // console.log(
-    //   `o.o.o.o.o.o.o.o.o.o.o.o.o.o.o.o.o.o.o.o.o.o
-    //     Face (this.faces[${i}]) created with: currentFaceIndex ${this.currentFaceIndex},
-    //     face-${i}, baseClasses ${this.baseClasses[i]}; with systems ${this.systemId} and
-    //     a display of  ${this.getDisplay()}
-    //     o.o.o.o.o.o.o.o.o.o.o.o.o.o.o.o.o.o.o.o.o.o`
-    // );
-  }
-  getDisplay() {
-    return this.systemId.toDisplay(this.number);
-  }
-}
-
 //           ****************** BaseBlocks ******************
 class BaseBlock {
   constructor(id, number, systems, startFaceIndex = 0, matched = false) {
@@ -600,32 +567,7 @@ class BaseBlock {
     }
   }
   render3D() {
-    if (true) {
-      // console.log(
-      //   'render3D: Render currently out of service. (currently only necessary for 2D)'
-      // );
-      return;
-    }
-    // debugging
-    // console.log(
-    //   'Face order:',
-    //   this.systems.map((s, i) => `${i}: ${s.label}`)
-    // );
-    // normal code contiued:
-    this.faces.forEach((faceElement, i) => {
-      // actually, I already assigned this inside the constructor,
-      // so this is utterly redundant. the whole method!
-      this.currentFaceIndex = i;
-      // console.log(`render3D: Face ${i}: ${this.getDisplayFor(i)}`);
-      faceElement.textContent = this.getDisplayFor(i);
-      // update aria label:
-      // this.faceElement is undefined
-      // TODO: look at this error:
-      faceElement.setAttribute(
-        'aria-label',
-        `Face with value ${this.getCurrentDisplay()}`
-      );
-    });
+    // not needed anymore: merge with update3D or delete!!
   }
   render2D() {
     // update the textContent (the display) for 2D logic
@@ -1002,12 +944,6 @@ class Level {
         }
       } else console.error('Error! Invalid difficulty!');
       this.allowedDifficultNumbers = tmp;
-      // console.log(
-      //   `difficult numbers in main's pool: ${this.allowedDifficultNumbers}`
-      // );
-      // console.log(
-      //   `Level ${this.level} has ${this.howManyDifficultPairs} difficult pairs.`
-      // );
       return;
     }
 
@@ -1486,8 +1422,17 @@ document.addEventListener('keydown', (e) => {
 
   const index = blocks.indexOf(active);
   if (index === -1) return;
-
   let nextIndex = index;
+
+  let currentCol;
+  updateCurrentCol();
+  const nextCol = nextIndex % columns;
+  const isLastRow = nextIndex >= columns * (rows - 1);
+
+  function updateCurrentCol() {
+    currentCol = index % columns;
+  }
+
   if (e.key === 'ArrowRight') nextIndex++;
   if (e.key === 'ArrowLeft') nextIndex--;
 
@@ -1503,24 +1448,34 @@ document.addEventListener('keydown', (e) => {
     if (nextIndex < 0) nextIndex = 0;
   }
 
-  // wrap rows:
-  const currentCol = index % columns;
-  const nextCol = nextIndex % columns;
-  const isLastRow = columns * (rows - 1) <= nextIndex - 1 ? true : false;
+  // works if currentCols was here => inspect
+
+  // console.log(`blocks.length: ${blocks.length}`);
+  // console.log(` columns * (rows): ${columns * rows}`);
+  // console.log(` columns * (rows - 1): ${columns * (rows - 1)}`);
 
   // -------------------------------------------------------
   // edge case: empty slots in last row:
   if (rows * columns != blocks.length && isLastRow) {
     // to do
-    console.log('last row reached');
-    if (e.key === 'ArrowRight' && nextIndex >= blocks.length) {
-      nextIndex = index;
+    // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    console.log('last row reached'); // this code is reached
+    console.log(`nextIndex: ${nextIndex}`);
+    console.log(`currentCol: ${currentCol}`);
+    // last element:
+    if (e.key === 'ArrowRight' && nextIndex >= blocks.length - 1) {
+      //nextIndex = index;
+      // just stop and wrap later
+      console.log('last block is reached'); // i do not reach this code
     }
+    // first element of last row:
     if (e.key === 'ArrowLeft' && currentCol === 0) {
-      nextIndex = index;
+      nextIndex = blocks.length - 1;
+      console.log(`first last block is reached, nextIndex: ${nextIndex}`); // this is not reached
     }
 
     if (nextIndex >= 0 && nextIndex < blocks.length) {
+      // console.log('hello world'); // this code is reached
       blocks[nextIndex].focus(); // focus this element
       updateFocusedFaces();
     }
@@ -1533,8 +1488,6 @@ document.addEventListener('keydown', (e) => {
     // we would jump to next row
     // so jump to row beginning:
     nextIndex = index - currentCol;
-    // nextIndex -= columns;
-    //   nextIndex = index; // stay in place
   }
 
   if (e.key === 'ArrowLeft' && currentCol === 0) {
@@ -1542,41 +1495,16 @@ document.addEventListener('keydown', (e) => {
     // we would jump to prev row
     // so jump to row end:
     nextIndex = index + (columns - 1);
-    // nextIndex += columns;
-    //   nextIndex = index; // stay in place
   }
-
-  // circling through the whole array, from last to first
-  // const length = blocks.length;
-  // if (nextIndex >= length) nextIndex = 0;
-  // if (nextIndex < 0) nextIndex = length - 1;
 
   // checking bounds
   if (nextIndex >= 0 && nextIndex < blocks.length) {
     blocks[nextIndex].focus(); // focus this element
     updateFocusedFaces();
-
-    // Add highlight from all faces
-    // if (blocks[nextIndex].faces) {
-    //   blocks[nextIndex].faces.forEach((f) => {
-    //     f.classList.add('focused-face');
-    //   });
-    // }
-
-    // // remove old focus highlight:
-    // document.querySelectorAll('.focused-face').forEach((f) => {
-    //   f.classList.remove('focused-face');
-    // });
-
-    // // add focus
-    // const faces = blocks[nextIndex].querySelectorAll('.face');
-    // faces.forEach((f) => {
-    //   f.classList.add('focused-face');
-    // });
   }
 });
 
-// TODO: move helper function to class (and finally use face class):
+// TODO: move helper function to class or helper method section
 function updateFocusedFaces() {
   document.querySelectorAll('.focused-face').forEach((f) => {
     f.classList.remove('focused-face');

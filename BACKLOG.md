@@ -2,6 +2,27 @@
 
 ## Daily logs
 
+### === (2026-04-28) ===
+
+**Log (done)**
+
+- tried to refactor face class and discarded it
+- started wrapping arrow keys
+- ran into currentCols error (before vs. after other code)
+
+**Next (todo)**
+
+- inspect and fix currentCols error
+- wrap up and down
+- see to focus vs. mouse use edge cases (navigate with focus, then switch to mouse)
+
+**Later (todo): Structure (not urgent)**
+
+- look into that refactor again
+
+Note: LAST ROW is incomplete (still needs wrapping)
+Note: Navigation logic may need refinement for incomplete rows
+
 ### === (2026-04-27) ===
 
 **Log (done)**
