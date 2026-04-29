@@ -1,9 +1,9 @@
 # Base Blocks Game
 
-A memory-style game where players match numbers across different number systems.
-
-> Currently desktop only (BACKLOG.md)
+> Stable version on main. Experimental work in branches
 > WIP (WORK IN PROGRESS). Test it: https://base-blocks.vercel.app/
+
+A memory-style game where players match numbers across different number systems.
 
 [![Screenshot 1](/assets/screenshots/Screenshot-1-WIP.png)](https://base-blocks.vercel.app/)
 
@@ -39,23 +39,15 @@ or:
 ## Future Plans
 
 - Fix style.
-- Add a timer.
 - Let users select game difficulty (number of blocks, bases).
 - Add a "Custom" mode for advanced users.
-- Add Pause.
-- Eat some cookies.
+- Add a timer and pause.
 
 ## License
 
 MIT for the code:
 
-- The **code** in this repository is licensed under the [MIT License](./LICENSE).
-
-This means:
-
-- **Developers** → free to use the code in your own projects.
-- **Artists/educators** → free to show or remix the visuals if you credit me.
-- **Companies** → please contact me before using any artwork commercially.
+The code in this repository is licensed under the [MIT License](./LICENSE).
 
 ---
 
