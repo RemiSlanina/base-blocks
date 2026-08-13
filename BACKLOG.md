@@ -1,7 +1,55 @@
-# BACKLOG (aka "Things I’ll Do When I’m Not Hyperfixating")
+# BACKLOG
+
+## Refactoring back to 4x4 grid.
+
+### Why these changes?
+
+I used to have a fixed 4x4 grid for this project. I changed it to be a flexible grid to impllement growing sets for levels. I want to revert this now. I want to revert these changes back to 4x4 in steps.
+
+The 4x4 grid had many advantages:
+
+- Less visual clutter/overwhelm
+- More elegant design
+- Cleaner navigation (wrap around)
+- Better game feel
+- Better user experience in my opinion
+
+Difficulty will be achieved through bigger numbers, puzzles, riddles and settings for choosing options and difficulty rather than bigger sets (?)
+
+### Necessary tasks
+
+- reverting the grid
+- updating the css and javascript
+- checking whether arrow key movement and swiping still works (might work as is, the code might just be a bit complicated now)
+- writing a new levels.json/disabling growing grid
+
+First manual testing succesfull.
+
+### Post refactor issues:
+
+1. constructor for BlockSet
+   class BlockSet still takes size as constructor args => keep it for eventual later size variations (i.e. smaller or larger screens?) or remove it? for example, for a 3x3 or 5x5 grid, there could be a joker block to make use of the spare odd block (get an even array).
+
+Maybe change it to
+class BlockSet {
+constructor(size = 16, matches, gameRange, systemIds, skipInitialization = false) {...}
+
+2.  grid-template-columns: repeat(4, 1fr);
+    in styles.css, this line appears in a redundant way now. after testing and refactoring, clean up by reducing the number of occurances to the minimum amount (repeats in the @media sections)
+
+Further tasks:
+
+- test swiping on mobile
+- testing levels
+- planning and structuring levels
+- updating levels and json
+- fixing the (redundant) levels implementation
+- maybe finally writing unit test, or migrating
+- finish the last tasks for arrow key/wrap around navigation
 
 ## Other:
 
+- [ ] persistence, settings
 - [ ] debug .deselected-face (redundant .deselected-face CSS)
 - [ ] test startup and safety
 - [ ] delete redundant commented out code
@@ -78,3 +126,7 @@
 - Fixed extra flip in loadBoard() (was calling update3DRotation in generateInterface)
 - Fix blockSet artifacts upon NewGame (grid issue)
 - Debugged flipToIndex() logic (off-by-one error in angle calculation)
+
+## === DONE (2026-08-13) ===
+
+- refactor back to 4x4 grid (see first item in BACKLOG: Refactoring back to 4x4 grid.)

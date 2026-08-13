@@ -302,8 +302,7 @@ h2 {
 /* ********************* GRID: ********************* */
 .grid-container {
   display: grid;
-  /* grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); */
-  grid-template-columns: repeat(8, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   width: fit-content;
   max-width: var(
     --max-width-screen,
@@ -551,7 +550,7 @@ actually, i even seem to apply both to some boxes, causing errors to occur */
 /* larger screens */
 @media (min-width: 1320px) {
   .grid-container {
-    grid-template-columns: repeat(8, 1fr);
+    grid-template-columns: repeat(4, 1fr);
     gap: 30px;
   }
   h1 {
@@ -594,7 +593,7 @@ actually, i even seem to apply both to some boxes, causing errors to occur */
     margin-bottom: 1.6rem;
   }
   .grid-container {
-    grid-template-columns: repeat(6, 1fr);
+    grid-template-columns: repeat(4, 1fr);
     gap: 28px;
   }
   .block {
@@ -643,7 +642,7 @@ actually, i even seem to apply both to some boxes, causing errors to occur */
   }
   .grid-container {
     max-width: 99vw;
-    grid-template-columns: repeat(6, 1fr);
+    grid-template-columns: repeat(4, 1fr);
     gap: 15px;
   }
   .block {
@@ -678,7 +677,7 @@ actually, i even seem to apply both to some boxes, causing errors to occur */
 
 @media (max-width: 600px) {
   .grid-container {
-    grid-template-columns: repeat(6, 1fr);
+    grid-template-columns: repeat(4, 1fr);
     gap: 13px;
   }
   .block {
@@ -714,7 +713,7 @@ actually, i even seem to apply both to some boxes, causing errors to occur */
 
 @media (max-width: 500px) {
   .grid-container {
-    grid-template-columns: repeat(5, 1fr);
+    grid-template-columns: repeat(4, 1fr);
   }
   .block {
     font-size: 1rem;

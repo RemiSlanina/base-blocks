@@ -954,7 +954,7 @@ class BaseBlock {
 // ****************** BlockSet ******************
 class BlockSet {
   constructor(size, matches, gameRange, systemIds, skipInitialization = false) {
-    this.size = size || 16; // total number of blocks
+    this.size = 16; // total number of blocks (4x4 fixed grid)
     this.matches = matches || 2; // number of matches per group
     this.gameRange = gameRange || 12; // starting range for numbers
     this.blocks = [];
@@ -1133,7 +1133,7 @@ class Level {
   constructor(levelNumber, difficulty = 'chilled') {
     this.level = levelNumber;
     this.difficulty = difficulty;
-    this.setSize = 16;
+    this.setSize = 16; // Fixed 4x4 grid
     this.min = 2;
     this.max = 9;
     this.howManyDifficultPairs = 0;
@@ -1147,10 +1147,10 @@ class Level {
 
     // Hardcoded fallback for levels > 20
     if (this.level > 20) {
-      this.setSize = 32;
+      this.setSize = 16; // Fixed 4x4 grid
       this.min = 2;
       this.max = 9;
-      this.howManyDifficultPairs = 8;
+      this.howManyDifficultPairs = 2; // Reduced for 4x4 grid (8 pairs max)
       let tmp = [];
       if (this.difficulty === 'chilled') {
         for (let i = 2; i <= 64; i++) {
@@ -1179,8 +1179,9 @@ class Level {
 
     // Populate from levelsData for levels 1-20
     if (levelData) {
+      // Only use min, max, and difficulty settings from level data
+      // Keep setSize fixed at 16 for 4x4 grid
       ({
-        setSize: this.setSize,
         min: this.min,
         max: this.max,
         howManyDifficultPairs: this.howManyDifficultPairs,
@@ -1210,7 +1211,7 @@ class GameControls {
     this.updateHighScoreDisplay();
     this.currentLevelData = null;
     this.gameRange = 2; // 2- 9
-    this.setSize = 16; // number of blocks, must be even
+    this.setSize = 16; // number of blocks, must be even (4x4 fixed grid)
     this.numberOfMatches = 2;
     this.trackFlips = true;
     this.lockBoard = false;
@@ -1246,11 +1247,12 @@ class GameControls {
     if (!this.currentLevelData) {
       throw new Error('No level data loaded!');
     }
-    this.setSize = this.currentLevelData.setSize;
+    // Use fixed 4x4 grid (16 blocks) regardless of level data
+    this.setSize = 16;
     this.gameRange = this.currentLevelData.min;
     this.numberOfMatches = 2; // Default, or fetch from level data if needed
     console.log(
-      `Level ${this.currentLevel}: setSize=${this.setSize}, gameRange=${this.gameRange}`
+      `Level ${this.currentLevel}: setSize=${this.setSize} (fixed 4x4), gameRange=${this.gameRange}`
     );
   }
 
