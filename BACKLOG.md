@@ -55,6 +55,13 @@
 
 - [ ] ...
 
+## === DONE (2026-04-29) ===
+
+BlockSet.blocks (array) was the source of truth.
+index 0–15 + fixed 4×4
+row = floor(index / 4)
+col = index % 4
+
 ## === DONE (2026-03-2) ===
 
 - make selected block outline visible
